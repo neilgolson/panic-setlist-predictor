@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panic Setlist Predictor</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-dark: #0a0a0a;
+      --bg-card: #1a1a1a;
+      --accent-red: #ff3366;
+      --accent-orange: #ff8c42;
+      --accent-yellow: #ffd93d;
+      --text-primary: #f5f5f5;
+      --text-secondary: #999;
+      --text-muted: #666;
+      --border: #333;
+      --available: #4ade80;
+      --resting: #fbbf24;
+      --played: #f87171;
+    }
+
+    body {
+      font-family: 'Crimson Pro', serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 51, 102, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 140, 66, 0.05) 0%, transparent 50%);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem 0;
+      border-bottom: 2px solid var(--accent-red);
+      position: relative;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, var(--accent-red), var(--accent-orange), var(--accent-yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 968px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+      color: var(--accent-orange);
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-family: 'Crimson Pro', serif;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent-orange);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 51, 102, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+    }
+
+    .mode-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 0.75rem;
+      background: var(--bg-dark);
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 6px;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+      border-color: var(--accent-red);
+      color: white;
+    }
+
+    .song-list {
+      display: grid;
+      gap: 0.5rem;
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .song-list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .song-list::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+      border-radius: 4px;
+    }
+
+    .song-list::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .song-list::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-orange);
+    }
+
+    .song-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-left: 4px solid;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .song-item:hover {
+      background: rgba(255, 140, 66, 0.05);
+      border-left-color: var(--accent-orange);
+    }
+
+    .song-item.available {
+      border-left-color: var(--available);
+    }
+
+    .song-item.resting {
+      border-left-color: var(--resting);
+    }
+
+    .song-item.played {
+      border-left-color: var(--played);
+      opacity: 0.6;
+    }
+
+    .song-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .song-status {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .status-badge.available {
+      background: rgba(74, 222, 128, 0.2);
+      color: var(--available);
+    }
+
+    .status-badge.resting {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--resting);
+    }
+
+    .status-badge.played {
+      background: rgba(248, 113, 113, 0.2);
+      color: var(--played);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-dark);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .search-box {
+      margin-bottom: 1rem;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .help-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .setlist-display {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: var(--bg-dark);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .setlist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .setlist-date {
+      font-weight: 600;
+      color: var(--accent-orange);
+    }
+
+    .setlist-songs {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid var(--available);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--available);
+      animation: pulse-live 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-live {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--available);
+      border-radius: 50%;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .quick-add {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .quick-add input {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // Heavy rotation / favorite songs (from Apple Music top songs)
+    const FAVORITES = [
+      "Up All Night",
+      "Climb To Safety",
+      "Ain't Life Grand",
+      "Space Wrangler",
+      "Airplane",
+      "Driving Song",
+      "Pleas",
+      "Bear's Gone Fishin'",
+      "Chilly Water",
+      "Tall Boy",
+      "Blue Indian",
+      "Disco",
+      "Party At Your Mama's House",
+      "Little Lilly",
+      "Nobody's Loss",
+      "Porch Song",
+      "Little by Little",
+      "The Last Straw",
+      "Love Tractor",
+      "Hatfield",
+      "Papa's Home",
+      "Wondering",
+      "Blackout Blues",
+      "Aunt Avis",
+      "Hope In A Hopeless World",
+      "C. Brown",
+      "Pilgrims",
+      "And It Stoned Me",
+      "Holden Oversoul",
+      "Stop-Go",
+      "All Time Low",
+      "Travelin' Light",
+      "Can't Get High",
+      "One Arm Steve",
+      "Surprise Valley",
+      "Walkin' (For Your Love)",
+      "Diner",
+      "Jack",
+      "Dyin' Man",
+      "The Waker",
+      "Pickin' Up The Pieces"
+    ];
+
+    // Songs with city/location references in lyrics
+    const CITY_SONGS = {
+      "savannah": ["Red Hot Mama"],
+      "athens": ["Coconut", "Space Wrangler"],
+      "atlanta": ["Tall Boy", "C. Brown"],
+      "memphis": ["Red Hot Mama"],
+      "nashville": [],
+      "new orleans": ["Papa Johnny Road", "Red Hot Mama"],
+      "orleans": ["Papa Johnny Road", "Red Hot Mama"],
+      "chicago": [],
+      "austin": ["Stop-Go"],
+      "san francisco": [],
+      "denver": [],
+      "boulder": ["Barstools And Dreamers"],
+      "colorado": ["Holden Oversoul"],
+      "tennessee": ["North", "Up All Night"],
+      "georgia": ["Blue Indian", "Coconut"],
+      "jackson": ["Action Man"],
+      "tallahassee": ["Tall Boy"],
+      "miami": [],
+      "key west": [],
+      "charleston": [],
+      "asheville": [],
+      "raleigh": [],
+      "new york": ["Imitation Leather Shoes", "Sundance"],
+      "california": ["Imitation Leather Shoes"],
+      "boston": [],
+      "texas": [],
+      "florida": [],
+      "carolina": [],
+      "north carolina": [],
+      "south carolina": []
+    };
+
+    // Complete song database from the lyrics file
+    const ALL_SONGS = [
+      "Chilly Water", "Travelin' Light", "Space Wrangler", "Coconut", "Porch Song",
+      "Stop-Go", "Driving Song", "Holden Oversoul", "Contentment Blues", "Me And The Devil Blues",
+      "Heaven", "Send Your Mind", "Walkin' (For Your Love)", "Pigeons", "Mercy", "Rock",
+      "Makes Sense To Me", "C. Brown", "Love Tractor", "Weight Of The World", "I'm Not Alone",
+      "Barstools And Dreamers", "Proving Ground", "The Last Straw", "Pleas", "Hatfield",
+      "Wondering", "Papa's Home", "Diner", "Better Off", "Pickin' Up The Pieces",
+      "Henry Parsons Died", "Pilgrims", "Postcard", "Dream Song", "Little Kin", "Ain't Life Grand",
+      "Airplane", "Can't Get High", "Heroes", "Raise The Roof", "Junior", "Blackout Blues",
+      "Jack", "Fishwater", "Radio Child", "Aunt Avis", "Tall Boy", "Gradle", "Glory",
+      "Rebirtha", "You Got Yours", "Hope In A Hopeless World", "Greta", "Surprise Valley",
+      "Bear's Gone Fishin'", "Climb To Safety", "Blue Indian", "The Waker", "Dyin' Man",
+      "You'll Be Fine", "One Arm Steve", "Christmas Katie", "All Time Low", "Nobody's Loss",
+      "Fishing", "Thin Air (Smells Like Mississippi)", "Tortured Artist", "Papa Johnny Road",
+      "Sparks Fly", "Counting Train Cars", "Don't Wanna Lose You", "Longer Look",
+      "Meeting of the Waters", "Nebulous", "Monstrosity", "Time Waits", "Travelin' Man",
+      "Second Skin", "Goodpeople", "From The Cradle", "Solid Rock", "Time Zones",
+      "When The Clowns Come Home", "Ribs And Whiskey", "Crazy", "You Should Be Glad",
+      "May Your Glass Be Filled", "Boom Boom Boom", "Walk On The Flood", "Angels On High",
+      "Three Candles", "Tickle The Truth", "Free Somehow", "Flicker", "Dark Day Program",
+      "Her Dance Needs No Body", "Already Fried", "Up All Night", "Saint Ex", "North",
+      "Dirty Side Down", "This Cruel Thing", "Visiting Day", "Clinic Cynic", "Shut Up And Drive",
+      "True To My Nature", "When You Coming Home", "Jaded Tourist", "Cotton Was King"
+    ].sort();
+
+    // Common covers and variations (not in official lyrics but played frequently)
+    const COMMON_COVERS = [
+      "Low Spark Of High Heeled Boys",
+      "Bowlegged Woman",
+      "Let's Get Down To Business",
+      "Sleeping Man",
+      "Conrad",
+      "Machine",
+      "Dark Bar",
+      "Party At Your Mama's House",
+      "Stop Breakin' Down Blues",
+      "Mr. Soul",
+      "Little By Little",
+      "Walk On",
+      "Pleas",
+      "There Is A Time",
+      "Let's Get The Show On The Road",
+      "Sewing Machine",
+      "Protein Drink",
+      "Bust It Big",
+      "We Walk Each Other Home",
+      "Don't Be Denied",
+      "Down in a Hole",
+      "Who Do You Belong To?",
+      "Big Wooly Mammoth",
+      "King Baby",
+      "Sitting In Limbo",
+      "I Can See Clearly Now",
+      "Paranoid",
+      "War Pigs",
+      "Disco",
+      "Tie Your Shoes",
+      "Ride Me High",
+      "Little Lilly",
+      "Trashy",
+      "Lawyers, Guns, And Money",
+      "Down",
+      "Drums",
+      "Arleen",
+      "Smokestack Lightning",
+      "Blight",
+      "Pusherman",
+      "For What It's Worth",
+      "Action Man",
+      "Good Morning Little Schoolgirl",
+      "Chainsaw City",
+      "I Walk On Guilded Splinters",
+      "I'm So Glad",
+      "And It Stoned Me",
+      "Red Hot Mama",
+      "Spoonful",
+      "Maggot Brain",
+      "Jack Straw",
+      "Blue Carousel",
+      "The Take Out"
+    ];
+
+    // Fuzzy match song names to handle variations
+    const normalizeSongName = (name) => {
+      return name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Remove special chars
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
+
+    const findSongMatch = (inputSong) => {
+      const normalized = normalizeSongName(inputSong);
+      
+      // Exact match first
+      const exactMatch = ALL_SONGS_WITH_COVERS.find(s => 
+        normalizeSongName(s) === normalized
+      );
+      if (exactMatch) return exactMatch;
+
+      // Partial match (contains)
+      const partialMatch = ALL_SONGS_WITH_COVERS.find(s =>
+        normalizeSongName(s).includes(normalized) || 
+        normalized.includes(normalizeSongName(s))
+      );
+      if (partialMatch) return partialMatch;
+
+      // Return original if no match (will be marked as unknown)
+      return inputSong;
+    };
+
+    function PanicSetlistPredictor() {
+      const [mode, setMode] = useState('setup'); // setup, live, view
+      const [setlists, setSetlists] = useState([]);
+      const [currentRun, setCurrentRun] = useState(null);
+      const [liveSetlist, setLiveSetlist] = useState([]);
+      const [searchTerm, setSearchTerm] = useState('');
+      const [sortBy, setSortBy] = useState('showsSince'); // 'alpha', 'showsSince', 'status'
+      const [newDate, setNewDate] = useState('');
+      const [newSongs, setNewSongs] = useState('');
+      const [quickAdd, setQuickAdd] = useState('');
+      const [isRun, setIsRun] = useState(false);
+      const [runDays, setRunDays] = useState(4);
+      const [nextRunCity, setNextRunCity] = useState('austin');
+      const [editingSetlist, setEditingSetlist] = useState(null); // ID of setlist being edited
+      const [unmatchedSongs, setUnmatchedSongs] = useState([]); // Songs that couldn't be matched
+      const [customSongs, setCustomSongs] = useState([]); // User-added songs
+
+      // Combine all available songs (base + covers + custom)
+      const ALL_SONGS_WITH_COVERS = useMemo(() => {
+        return [...new Set([...ALL_SONGS, ...COMMON_COVERS, ...customSongs])].sort();
+      }, [customSongs]);
+
+      // Find song match using fuzzy matching
+      const findSongMatch = (inputSong) => {
+        const normalized = normalizeSongName(inputSong);
+        
+        // Exact match first
+        const exactMatch = ALL_SONGS_WITH_COVERS.find(s => 
+          normalizeSongName(s) === normalized
+        );
+        if (exactMatch) return exactMatch;
+
+        // Partial match (contains)
+        const partialMatch = ALL_SONGS_WITH_COVERS.find(s =>
+          normalizeSongName(s).includes(normalized) || 
+          normalized.includes(normalizeSongName(s))
+        );
+        if (partialMatch) return partialMatch;
+
+        // Return null if no match found
+        return null;
+      };
+
+      // Load from storage on mount
+      useEffect(() => {
+        const saved = localStorage.getItem('panicSetlists');
+        if (saved) {
+          const data = JSON.parse(saved);
+          setSetlists(data.setlists || []);
+          setCurrentRun(data.currentRun || null);
+          setCustomSongs(data.customSongs || []);
+        }
+      }, []);
+
+      // Save to storage whenever data changes
+      useEffect(() => {
+        localStorage.setItem('panicSetlists', JSON.stringify({
+          setlists,
+          currentRun,
+          customSongs
+        }));
+      }, [setlists, currentRun, customSongs]);
+
+      const addSetlist = () => {
+        if (!newDate || !newSongs) return;
+
+        const rawSongs = newSongs
+          .split(/[,\n>]/)  // Also split on > for segues
+          .map(s => s.trim())
+          .filter(s => s.length > 0)
+          .filter(s => !['1:', '2:', '3:', 'E:', 'Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
+          .map(s => s.replace(/\*+$/, '').trim());  // Remove asterisks at end
+
+        // Try to match each song
+        const matchedSongs = [];
+        const unmatched = [];
+        
+        rawSongs.forEach(rawSong => {
+          const matched = findSongMatch(rawSong);
+          if (matched) {
+            matchedSongs.push(matched);
+          } else {
+            unmatched.push(rawSong);
+          }
+        });
+
+        // If there are unmatched songs, show them to the user
+        if (unmatched.length > 0) {
+          setUnmatchedSongs(unmatched);
+          // Don't add the setlist yet - wait for user to review unmatched songs
+          return;
+        }
+
+        // Create and add the setlist
+        const newSetlist = {
+          date: newDate,
+          songs: matchedSongs,
+          city: currentRun?.city || '',  // Store city with setlist
+          id: Date.now()
+        };
+
+        // Add and sort by date (newest first)
+        setSetlists(prev => {
+          const updated = [newSetlist, ...prev];
+          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+          
+          // Auto-detect runs: check if consecutive shows have the same city
+          if (sorted.length >= 2 && newSetlist.city) {
+            let consecutiveSameCity = 1;
+            for (let i = 1; i < sorted.length; i++) {
+              if (sorted[i].city && sorted[i].city.toLowerCase() === newSetlist.city.toLowerCase()) {
+                consecutiveSameCity++;
+              } else {
+                break;
+              }
+            }
+            
+            // If 2+ consecutive shows in same city, enable run mode
+            if (consecutiveSameCity >= 2) {
+              setCurrentRun({ days: consecutiveSameCity, city: newSetlist.city });
+              setIsRun(true);
+              setRunDays(consecutiveSameCity);
+            }
+          }
+          
+          return sorted;
+        });
+        setNewDate('');
+        setNewSongs('');
+      };
+
+      const addUnmatchedSongsAndContinue = () => {
+        // Add unmatched songs to custom songs list
+        setCustomSongs(prev => [...prev, ...unmatchedSongs]);
+        
+        // Now process the setlist with all songs (including newly added ones)
+        const allSongs = newSongs
+          .split(/[,\n>]/)
+          .map(s => s.trim())
+          .filter(s => s.length > 0)
+          .filter(s => !['1:', '2:', '3:', 'E:', 'Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
+          .map(s => s.replace(/\*+$/, '').trim())
+          .map(rawSong => {
+            // Try to match in updated list
+            const allAvailable = [...ALL_SONGS, ...COMMON_COVERS, ...customSongs, ...unmatchedSongs];
+            return allAvailable.find(song => 
+              normalizeSongName(song) === normalizeSongName(rawSong) ||
+              normalizeSongName(song).includes(normalizeSongName(rawSong)) ||
+              normalizeSongName(rawSong).includes(normalizeSongName(song))
+            ) || rawSong; // Use raw name if still no match
+          });
+
+        const newSetlist = {
+          date: newDate,
+          songs: allSongs,
+          city: currentRun?.city || '',
+          id: Date.now()
+        };
+
+        setSetlists(prev => {
+          const updated = [newSetlist, ...prev];
+          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+          
+          if (sorted.length >= 2 && newSetlist.city) {
+            let consecutiveSameCity = 1;
+            for (let i = 1; i < sorted.length; i++) {
+              if (sorted[i].city && sorted[i].city.toLowerCase() === newSetlist.city.toLowerCase()) {
+                consecutiveSameCity++;
+              } else {
+                break;
+              }
+            }
+            
+            if (consecutiveSameCity >= 2) {
+              setCurrentRun({ days: consecutiveSameCity, city: newSetlist.city });
+              setIsRun(true);
+              setRunDays(consecutiveSameCity);
+            }
+          }
+          
+          return sorted;
+        });
+
+        setUnmatchedSongs([]);
+        setNewDate('');
+        setNewSongs('');
+      };
+
+      const skipUnmatchedAndContinue = () => {
+        // Process setlist without unmatched songs
+        const matchedSongs = newSongs
+          .split(/[,\n>]/)
+          .map(s => s.trim())
+          .filter(s => s.length > 0)
+          .filter(s => !['1:', '2:', '3:', 'E:', 'Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
+          .map(s => s.replace(/\*+$/, '').trim())
+          .map(findSongMatch)
+          .filter(s => s); // Remove nulls
+
+        const newSetlist = {
+          date: newDate,
+          songs: matchedSongs,
+          city: currentRun?.city || '',
+          id: Date.now()
+        };
+
+        setSetlists(prev => {
+          const updated = [newSetlist, ...prev];
+          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+          
+          if (sorted.length >= 2 && newSetlist.city) {
+            let consecutiveSameCity = 1;
+            for (let i = 1; i < sorted.length; i++) {
+              if (sorted[i].city && sorted[i].city.toLowerCase() === newSetlist.city.toLowerCase()) {
+                consecutiveSameCity++;
+              } else {
+                break;
+              }
+            }
+            
+            if (consecutiveSameCity >= 2) {
+              setCurrentRun({ days: consecutiveSameCity, city: newSetlist.city });
+              setIsRun(true);
+              setRunDays(consecutiveSameCity);
+            }
+          }
+          
+          return sorted;
+        });
+
+        setUnmatchedSongs([]);
+        setNewDate('');
+        setNewSongs('');
+      };
+
+      const deleteSetlist = (id) => {
+        setSetlists(prev => prev.filter(s => s.id !== id));
+      };
+
+      const startEditingSetlist = (setlist) => {
+        setEditingSetlist(setlist.id);
+        setNewDate(setlist.date);
+        setNewSongs(setlist.songs.join(', '));
+        if (setlist.city) {
+          setCurrentRun({ days: runDays, city: setlist.city });
+          setIsRun(true);
+        }
+      };
+
+      const saveEditedSetlist = () => {
+        if (!editingSetlist || !newDate || !newSongs) return;
+
+        const songs = newSongs
+          .split(/[,\n>]/)
+          .map(s => s.trim())
+          .filter(s => s.length > 0)
+          .filter(s => !['1:', '2:', '3:', 'E:', 'Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
+          .map(s => s.replace(/\*+$/, '').trim())
+          .map(findSongMatch);
+
+        setSetlists(prev => {
+          const updated = prev.map(s => {
+            if (s.id === editingSetlist) {
+              return {
+                ...s,
+                date: newDate,
+                songs: songs,
+                city: currentRun?.city || ''
+              };
+            }
+            return s;
+          });
+          return updated.sort((a, b) => new Date(b.date) - new Date(a.date));
+        });
+
+        // Clear edit mode
+        setEditingSetlist(null);
+        setNewDate('');
+        setNewSongs('');
+        setIsRun(false);
+        setCurrentRun(null);
+      };
+
+      const cancelEdit = () => {
+        setEditingSetlist(null);
+        setNewDate('');
+        setNewSongs('');
+        setIsRun(false);
+        setCurrentRun(null);
+      };
+
+      const startLiveMode = () => {
+        setMode('live');
+        setLiveSetlist([]);
+      };
+
+      const addSongToLive = (song) => {
+        if (!liveSetlist.includes(song)) {
+          setLiveSetlist(prev => [...prev, song]);
+        }
+        setQuickAdd('');
+      };
+
+      const removeSongFromLive = (song) => {
+        setLiveSetlist(prev => prev.filter(s => s !== song));
+      };
+
+      const saveLiveSetlist = () => {
+        if (liveSetlist.length === 0) return;
+        
+        const today = new Date().toISOString().split('T')[0];
+        const newSetlist = {
+          date: today,
+          songs: liveSetlist,
+          id: Date.now()
+        };
+
+        setSetlists(prev => [newSetlist, ...prev].slice(0, 10));
+        setLiveSetlist([]);
+        setMode('view');
+      };
+
+      // Calculate song availability based on 3-show rule
+      const songStatus = useMemo(() => {
+        const status = {};
+        
+        // Initialize all songs as available
+        ALL_SONGS_WITH_COVERS.forEach(song => {
+          status[song] = {
+            available: true,
+            lastPlayed: null,
+            showsSince: Infinity,
+            inCurrentRun: false,
+            timesPlayed: 0,
+            playFrequency: 0
+          };
+        });
+
+        // Sort setlists by date (newest first) for consistent processing
+        const sortedSetlists = [...setlists].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Count total plays for each song
+        sortedSetlists.forEach(setlist => {
+          setlist.songs.forEach(song => {
+            if (status[song]) {
+              status[song].timesPlayed++;
+            }
+          });
+        });
+
+        // Calculate play frequency
+        const totalShows = sortedSetlists.length;
+        if (totalShows > 0) {
+          ALL_SONGS_WITH_COVERS.forEach(song => {
+            if (status[song]) {
+              status[song].playFrequency = (status[song].timesPlayed / totalShows) * 100;
+            }
+          });
+        }
+
+        // If in a run, check all shows in the run
+        if (currentRun) {
+          const runSetlists = sortedSetlists.slice(0, currentRun.days);
+          runSetlists.forEach(setlist => {
+            setlist.songs.forEach(song => {
+              if (status[song]) {
+                status[song].available = false;
+                status[song].inCurrentRun = true;
+                status[song].lastPlayed = setlist.date;
+              }
+            });
+          });
+        } else {
+          // Regular 3-show rule - process all shows to find when each song was last played
+          sortedSetlists.forEach((setlist, index) => {
+            setlist.songs.forEach(song => {
+              if (status[song]) {
+                // Only set the FIRST time we see this song (most recent since sorted newest first)
+                if (status[song].showsSince === Infinity) {
+                  status[song].showsSince = index;
+                  status[song].lastPlayed = setlist.date;
+                  status[song].available = (index >= 3);
+                }
+              }
+            });
+          });
+        }
+
+        // Factor in live setlist - only in live mode
+        if (mode === 'live' && liveSetlist.length > 0) {
+          liveSetlist.forEach(song => {
+            if (status[song]) {
+              status[song].available = false;
+              status[song].lastPlayed = 'Tonight';
+              status[song].showsSince = 0;
+            }
+          });
+        }
+
+        return status;
+      }, [setlists, currentRun, mode, liveSetlist]);
+
+      const filteredSongs = useMemo(() => {
+        let songs = ALL_SONGS_WITH_COVERS.filter(song => 
+          song.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        // Sort based on selected option
+        if (sortBy === 'showsSince') {
+          songs.sort((a, b) => {
+            const aStatus = songStatus[a];
+            const bStatus = songStatus[b];
+            
+            // Priority 1: Songs that have been played AND are available (not in last 3)
+            const aPlayedAndAvailable = aStatus.lastPlayed && aStatus.showsSince > 2;
+            const bPlayedAndAvailable = bStatus.lastPlayed && bStatus.showsSince > 2;
+            
+            // Priority 2: Songs currently resting (played in last 3)
+            const aResting = aStatus.showsSince >= 0 && aStatus.showsSince <= 2;
+            const bResting = bStatus.showsSince >= 0 && bStatus.showsSince <= 2;
+            
+            // Priority 3: Never played (showsSince === Infinity, no lastPlayed)
+            const aNeverPlayed = aStatus.showsSince === Infinity && !aStatus.lastPlayed;
+            const bNeverPlayed = bStatus.showsSince === Infinity && !bStatus.lastPlayed;
+            
+            // Top priority: Played but available (longer time since = higher)
+            if (aPlayedAndAvailable && !bPlayedAndAvailable) return -1;
+            if (!aPlayedAndAvailable && bPlayedAndAvailable) return 1;
+            if (aPlayedAndAvailable && bPlayedAndAvailable) {
+              // Among available, sort by longest time since played
+              if (bStatus.showsSince !== aStatus.showsSince) {
+                return bStatus.showsSince - aStatus.showsSince;
+              }
+              return a.localeCompare(b);
+            }
+            
+            // Middle priority: Resting songs
+            if (aResting && !bResting) return -1;
+            if (!aResting && bResting) return 1;
+            if (aResting && bResting) {
+              // Among resting, sort by shows since (furthest from availability first)
+              if (bStatus.showsSince !== aStatus.showsSince) {
+                return bStatus.showsSince - aStatus.showsSince;
+              }
+              return a.localeCompare(b);
+            }
+            
+            // Bottom priority: Never played
+            if (aNeverPlayed && !bNeverPlayed) return 1;
+            if (!aNeverPlayed && bNeverPlayed) return -1;
+            if (aNeverPlayed && bNeverPlayed) {
+              return a.localeCompare(b);
+            }
+            
+            return a.localeCompare(b);
+          });
+        } else if (sortBy === 'status') {
+          songs.sort((a, b) => {
+            const aStatus = songStatus[a];
+            const bStatus = songStatus[b];
+            
+            // Available first, then resting, then played
+            if (aStatus.available && !bStatus.available) return -1;
+            if (!aStatus.available && bStatus.available) return 1;
+            if (!aStatus.available && !bStatus.available) {
+              if (aStatus.showsSince !== bStatus.showsSince) {
+                return bStatus.showsSince - aStatus.showsSince;
+              }
+            }
+            return a.localeCompare(b);
+          });
+        } else {
+          // Alphabetical
+          songs.sort();
+        }
+
+        return songs;
+      }, [searchTerm, sortBy, songStatus]);
+
+      const stats = useMemo(() => {
+        const available = Object.values(songStatus).filter(s => s.available).length;
+        const resting = Object.values(songStatus).filter(s => !s.available && s.showsSince > 0).length;
+        const played = Object.values(songStatus).filter(s => s.showsSince === 0).length;
+        
+        return { available, resting, played, total: ALL_SONGS_WITH_COVERS.length };
+      }, [songStatus]);
+
+      return (
+        <div className="container">
+          {/* Unmatched Songs Modal */}
+          {unmatchedSongs.length > 0 && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '2rem'
+            }}>
+              <div style={{
+                background: 'var(--bg-card)',
+                border: '2px solid var(--accent-orange)',
+                borderRadius: '12px',
+                padding: '2rem',
+                maxWidth: '600px',
+                width: '100%',
+                maxHeight: '80vh',
+                overflow: 'auto'
+              }}>
+                <h2 style={{ color: 'var(--accent-orange)', marginBottom: '1rem' }}>
+                  ⚠️ Unmatched Songs Found
+                </h2>
+                <p style={{ marginBottom: '1rem', color: 'var(--text-secondary)' }}>
+                  The following songs couldn't be matched to the database. They might be:
+                </p>
+                <ul style={{ marginBottom: '1rem', color: 'var(--text-secondary)', paddingLeft: '1.5rem' }}>
+                  <li>New covers or originals not in the database</li>
+                  <li>Typos or misspellings</li>
+                  <li>Song name variations</li>
+                </ul>
+                
+                <div style={{
+                  background: 'var(--bg-dark)',
+                  padding: '1rem',
+                  borderRadius: '6px',
+                  marginBottom: '1.5rem',
+                  maxHeight: '300px',
+                  overflow: 'auto'
+                }}>
+                  {unmatchedSongs.map((song, i) => (
+                    <div key={i} style={{
+                      padding: '0.5rem',
+                      borderBottom: i < unmatchedSongs.length - 1 ? '1px solid var(--border)' : 'none',
+                      color: 'var(--text-primary)'
+                    }}>
+                      • {song}
+                    </div>
+                  ))}
+                </div>
+
+                <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                  What would you like to do?
+                </p>
+
+                <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={addUnmatchedSongsAndContinue}
+                    style={{ width: '100%' }}
+                  >
+                    ✓ Add These Songs to Database
+                  </button>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={skipUnmatchedAndContinue}
+                    style={{ width: '100%' }}
+                  >
+                    Skip These Songs
+                  </button>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => setUnmatchedSongs([])}
+                    style={{ width: '100%' }}
+                  >
+                    Cancel (Go Back and Fix)
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <header>
+            <h1>Panic Setlist Predictor</h1>
+            <p className="subtitle">Track the 3-show rule • Predict available songs • Live updates</p>
+          </header>
+
+          {/* Next Run Prediction Box */}
+          <div className="card" style={{ 
+            marginBottom: '2rem',
+            background: 'linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 140, 66, 0.1))',
+            borderColor: 'var(--accent-orange)'
+          }}>
+            <h2 style={{ color: 'var(--accent-red)' }}>🎸 Next Run Prediction</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '2rem', alignItems: 'start' }}>
+              <div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <div style={{ 
+                    fontSize: '1.8rem', 
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    letterSpacing: '0.05em',
+                    color: 'var(--accent-orange)',
+                    marginBottom: '0.25rem'
+                  }}>
+                    February 14-15, 2026
+                  </div>
+                  <div style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>
+                    📍 Moody Center, Austin, TX
+                  </div>
+                  <div style={{ 
+                    fontSize: '0.9rem', 
+                    color: 'var(--text-muted)',
+                    marginTop: '0.5rem',
+                    fontStyle: 'italic'
+                  }}>
+                    2-night run
+                  </div>
+                </div>
+                
+                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+                  <div className="input-group" style={{ marginBottom: '0.75rem' }}>
+                    <label style={{ fontSize: '0.85rem', marginBottom: '0.25rem' }}>City/Location</label>
+                    <input 
+                      type="text"
+                      placeholder="e.g., Savannah, Austin..."
+                      value={nextRunCity}
+                      onChange={e => setNextRunCity(e.target.value)}
+                      style={{ 
+                        width: '100%',
+                        padding: '0.5rem',
+                        background: 'var(--bg-dark)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.9rem'
+                      }}
+                    />
+                  </div>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => {
+                      // Force re-render by updating a dummy state
+                      setLiveSetlist([...liveSetlist]);
+                    }}
+                    style={{ width: '100%', fontSize: '0.9rem', padding: '0.5rem' }}
+                  >
+                    Update Predictions
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <h3 style={{ 
+                  fontSize: '1rem',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em'
+                }}>
+                  Top 10 Most Likely Songs
+                </h3>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '0.5rem',
+                  fontSize: '0.95rem'
+                }}>
+                  {(() => {
+                    const upcomingCity = nextRunCity.toLowerCase().trim();
+                    
+                    // Calculate likelihood score for each song
+                    const scoredSongs = Object.entries(songStatus)
+                      .filter(([song, status]) => status.available && status.timesPlayed > 0)
+                      .map(([song, status]) => {
+                        let score = 0;
+                        
+                        // Factor 1: Play frequency (0-50 points)
+                        score += status.playFrequency * 0.5;
+                        
+                        // Factor 2: Favorite status (0-30 points)
+                        if (FAVORITES.includes(song)) {
+                          score += 30;
+                        }
+                        
+                        // Factor 3: Time since last played (0-20 points)
+                        if (status.showsSince !== Infinity) {
+                          score += Math.min(20, status.showsSince * 2);
+                        }
+                        
+                        // Factor 4: City-specific bonus (0-40 points)
+                        const citySongs = CITY_SONGS[upcomingCity] || [];
+                        if (citySongs.includes(song)) {
+                          score += 40; // Big boost for city songs!
+                        }
+                        
+                        return { song, score, status, isCity: citySongs.includes(song) };
+                      })
+                      .sort((a, b) => b.score - a.score)
+                      .slice(0, 10);
+
+                    if (scoredSongs.length === 0) {
+                      return (
+                        <div style={{ 
+                          gridColumn: '1 / -1',
+                          color: 'var(--text-muted)', 
+                          fontSize: '0.9rem',
+                          fontStyle: 'italic',
+                          padding: '1rem'
+                        }}>
+                          Add some setlists to see predictions!
+                        </div>
+                      );
+                    }
+
+                    return scoredSongs.map(({ song, status, isCity }, i) => {
+                      // Format last played date to MM/DD/YY
+                      let lastPlayedFormatted = '';
+                      if (status.lastPlayed && status.lastPlayed !== 'Tonight') {
+                        const date = new Date(status.lastPlayed);
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const year = String(date.getFullYear()).slice(-2);
+                        lastPlayedFormatted = `${month}/${day}/${year}`;
+                      }
+
+                      return (
+                        <div key={i} style={{ 
+                          padding: '0.5rem 0.75rem',
+                          background: isCity ? 'rgba(255, 140, 66, 0.15)' : 'var(--bg-dark)',
+                          borderRadius: '6px',
+                          borderLeft: isCity ? '3px solid var(--accent-orange)' : '3px solid var(--accent-yellow)',
+                          fontSize: '0.9rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.25rem'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>
+                              {song}
+                              {isCity && <span style={{ marginLeft: '0.25rem' }}>📍</span>}
+                            </span>
+                            <span style={{ 
+                              fontSize: '0.75rem', 
+                              color: 'var(--text-muted)',
+                              marginLeft: '0.5rem'
+                            }}>
+                              {status.timesPlayed}x
+                            </span>
+                          </div>
+                          {lastPlayedFormatted && (
+                            <div style={{ 
+                              fontSize: '0.7rem', 
+                              color: 'var(--text-muted)',
+                              fontStyle: 'italic'
+                            }}>
+                              {lastPlayedFormatted}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="main-grid">
+            {/* Left Column - Controls */}
+            <div>
+              <div className="card">
+                <h2>Mode</h2>
+                <div className="mode-toggle">
+                  <button 
+                    className={`mode-btn ${mode === 'setup' ? 'active' : ''}`}
+                    onClick={() => setMode('setup')}
+                  >
+                    Setup
+                  </button>
+                  <button 
+                    className={`mode-btn ${mode === 'live' ? 'active' : ''}`}
+                    onClick={startLiveMode}
+                  >
+                    Live Show
+                  </button>
+                  <button 
+                    className={`mode-btn ${mode === 'view' ? 'active' : ''}`}
+                    onClick={() => setMode('view')}
+                  >
+                    View Songs
+                  </button>
+                </div>
+
+                {mode === 'setup' && (
+                  <>
+                    {editingSetlist && (
+                      <div style={{ 
+                        padding: '1rem', 
+                        background: 'rgba(255, 140, 66, 0.1)', 
+                        borderRadius: '6px',
+                        marginBottom: '1rem',
+                        border: '1px solid var(--accent-orange)'
+                      }}>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--accent-orange)', marginBottom: '0.5rem' }}>
+                          ✏️ Editing Setlist
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="input-group">
+                      <label>Date</label>
+                      <input 
+                        type="date" 
+                        value={newDate}
+                        onChange={e => setNewDate(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="input-group">
+                      <label>Songs (comma or line separated)</label>
+                      <textarea 
+                        placeholder="e.g., Chilly Water, Space Wrangler, Pigeons..."
+                        value={newSongs}
+                        onChange={e => setNewSongs(e.target.value)}
+                      />
+                      <div className="help-text">
+                        Paste setlists from Everyday Companion or type them in
+                      </div>
+                    </div>
+
+                    {editingSetlist ? (
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button className="btn btn-primary" onClick={saveEditedSetlist} style={{ flex: 1 }}>
+                          Save Changes
+                        </button>
+                        <button className="btn btn-secondary" onClick={cancelEdit} style={{ flex: 1 }}>
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="btn btn-primary" onClick={addSetlist}>
+                        Add Setlist
+                      </button>
+                    )}
+
+                    <div style={{ marginTop: '2rem' }}>
+                      <label>
+                        <input 
+                          type="checkbox" 
+                          checked={isRun}
+                          onChange={e => {
+                            setIsRun(e.target.checked);
+                            if (e.target.checked) {
+                              setCurrentRun({ days: runDays, city: '' });
+                            } else {
+                              setCurrentRun(null);
+                            }
+                          }}
+                        />
+                        {' '}Currently in a run
+                      </label>
+                      {isRun && (
+                        <>
+                          <div className="input-group" style={{ marginTop: '1rem' }}>
+                            <label>City/Location</label>
+                            <input 
+                              type="text" 
+                              placeholder="e.g., Austin, Savannah, Chicago..."
+                              value={currentRun?.city || ''}
+                              onChange={e => {
+                                setCurrentRun({ ...currentRun, city: e.target.value });
+                              }}
+                            />
+                          </div>
+                          <div className="input-group" style={{ marginTop: '1rem' }}>
+                            <label>Run length (days)</label>
+                            <input 
+                              type="number" 
+                              min="2"
+                              max="10"
+                              value={runDays}
+                              onChange={e => {
+                                const days = parseInt(e.target.value);
+                                setRunDays(days);
+                                setCurrentRun({ ...currentRun, days });
+                              }}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {mode === 'live' && (
+                  <>
+                    <div className="live-indicator">
+                      <span className="live-dot"></span>
+                      Live Show in Progress
+                    </div>
+
+                    <div className="quick-add">
+                      <input 
+                        type="text"
+                        placeholder="Add song to tonight's setlist..."
+                        value={quickAdd}
+                        onChange={e => setQuickAdd(e.target.value)}
+                        onKeyPress={e => {
+                          if (e.key === 'Enter' && quickAdd) {
+                            const match = ALL_SONGS_WITH_COVERS.find(s => 
+                              normalizeSongName(s).includes(normalizeSongName(quickAdd))
+                            );
+                            if (match) addSongToLive(match);
+                          }
+                        }}
+                      />
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => {
+                          const match = ALL_SONGS_WITH_COVERS.find(s => 
+                            normalizeSongName(s).includes(normalizeSongName(quickAdd))
+                          );
+                          if (match) addSongToLive(match);
+                        }}
+                      >
+                        Add
+                      </button>
+                    </div>
+
+                    <div style={{ marginBottom: '1rem' }}>
+                      <strong>Tonight's Setlist ({liveSetlist.length} songs):</strong>
+                      {liveSetlist.length > 0 ? (
+                        <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                          {liveSetlist.map((song, i) => (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', borderBottom: '1px solid var(--border)' }}>
+                              <span>{song}</span>
+                              <button 
+                                onClick={() => removeSongFromLive(song)}
+                                style={{ background: 'none', border: 'none', color: 'var(--played)', cursor: 'pointer' }}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                          No songs added yet
+                        </div>
+                      )}
+                    </div>
+
+                    <button className="btn btn-primary" onClick={saveLiveSetlist}>
+                      Save Tonight's Setlist
+                    </button>
+                    <button className="btn btn-secondary" onClick={() => setLiveSetlist([])}>
+                      Clear
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Recent Setlists */}
+              <div className="card" style={{ marginTop: '2rem' }}>
+                <h2>Recent Shows ({setlists.length})</h2>
+                {setlists.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-state-icon">🎸</div>
+                    <p>No setlists yet</p>
+                    <p style={{ fontSize: '0.85rem' }}>Add your first show to get started</p>
+                  </div>
+                ) : (
+                  <div>
+                    {[...setlists]
+                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .map((setlist, index) => {
+                        // Calculate run day number (reversed so oldest = Day 1)
+                        let runDayNumber = null;
+                        if (currentRun && index < currentRun.days) {
+                          runDayNumber = currentRun.days - index; // Reverse: last in list = Day 1
+                        }
+                        
+                        return (
+                          <div key={setlist.id} className="setlist-display">
+                            <div className="setlist-header">
+                              <span className="setlist-date">
+                                {setlist.date}
+                                {setlist.city && (
+                                  <span style={{ marginLeft: '0.5rem', color: 'var(--accent-orange)' }}>
+                                    📍 {setlist.city}
+                                  </span>
+                                )}
+                                {runDayNumber && (
+                                  <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: 'var(--accent-yellow)' }}>
+                                    (Run Day {runDayNumber}/{currentRun.days})
+                                  </span>
+                                )}
+                              </span>
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button 
+                                  className="btn btn-secondary" 
+                                  style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+                                  onClick={() => startEditingSetlist(setlist)}
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  className="btn btn-secondary" 
+                                  style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+                                  onClick={() => deleteSetlist(setlist.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <div className="setlist-songs">
+                              {setlist.songs.join(', ')}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column - Song List */}
+            <div>
+              <div className="card">
+                <h2>Song Availability</h2>
+                
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-value">{stats.available}</div>
+                    <div className="stat-label">Available</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-value">{stats.resting}</div>
+                    <div className="stat-label">Resting</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-value">{stats.played}</div>
+                    <div className="stat-label">Recently Played</div>
+                  </div>
+                </div>
+
+                <div className="search-box">
+                  <input 
+                    type="text"
+                    placeholder="🔍 Search songs..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                </div>
+
+                <div className="input-group" style={{ marginBottom: '1rem' }}>
+                  <label>Sort By</label>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                    <option value="showsSince">Shows Since Last Played</option>
+                    <option value="status">Availability Status</option>
+                    <option value="alpha">Alphabetical</option>
+                  </select>
+                </div>
+
+                {/* Favorites Section */}
+                {!searchTerm && (
+                  <>
+                    <h3 style={{ 
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: '1.5rem',
+                      color: 'var(--accent-yellow)',
+                      marginBottom: '0.5rem',
+                      borderBottom: '1px solid var(--border)',
+                      paddingBottom: '0.5rem'
+                    }}>
+                      Heavy Rotation
+                    </h3>
+                    <div className="song-list" style={{ maxHeight: '300px', marginBottom: '1.5rem' }}>
+                      {FAVORITES.map(song => {
+                        const status = songStatus[song];
+                        if (!status) return null;
+                        const statusClass = status.available ? 'available' : 
+                                           status.showsSince === 0 ? 'played' : 'resting';
+                        
+                        return (
+                          <div 
+                            key={song} 
+                            className={`song-item ${statusClass}`}
+                            onClick={() => mode === 'live' && status.available && addSongToLive(song)}
+                            style={{ cursor: mode === 'live' && status.available ? 'pointer' : 'default' }}
+                          >
+                            <span className="song-name">{song}</span>
+                            <div className="song-status">
+                              {status.available ? (
+                                <>
+                                  <span className="status-badge available">Available</span>
+                                  {status.lastPlayed && status.showsSince !== Infinity && (
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                      {status.showsSince} shows ago
+                                    </span>
+                                  )}
+                                </>
+                              ) : status.inCurrentRun ? (
+                                <span className="status-badge resting">In Run</span>
+                              ) : status.lastPlayed === 'Tonight' ? (
+                                <span className="status-badge played">Tonight</span>
+                              ) : status.showsSince === 0 ? (
+                                <span className="status-badge played">Most Recent</span>
+                              ) : status.showsSince === Infinity ? (
+                                <span className="status-badge available">Never Played</span>
+                              ) : (
+                                <span className="status-badge resting">
+                                  {status.showsSince === 1 ? '1 show ago' : 
+                                   status.showsSince === 2 ? '2 shows ago' : 
+                                   `${status.showsSince} shows ago`}
+                                </span>
+                              )}
+                              {status.lastPlayed && status.lastPlayed !== 'Tonight' && (
+                                <span style={{ fontSize: '0.75rem' }}>{status.lastPlayed}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <h3 style={{ 
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: '1.5rem',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '0.5rem',
+                      borderBottom: '1px solid var(--border)',
+                      paddingBottom: '0.5rem'
+                    }}>
+                      All Songs
+                    </h3>
+                  </>
+                )}
+
+                <div className="song-list">
+                  {filteredSongs.map(song => {
+                    const status = songStatus[song];
+                    if (!status) return null;
+                    const statusClass = status.available ? 'available' : 
+                                       status.showsSince === 0 ? 'played' : 'resting';
+                    
+                    return (
+                      <div 
+                        key={song} 
+                        className={`song-item ${statusClass}`}
+                        onClick={() => mode === 'live' && status.available && addSongToLive(song)}
+                        style={{ cursor: mode === 'live' && status.available ? 'pointer' : 'default' }}
+                      >
+                        <span className="song-name">{song}</span>
+                        <div className="song-status">
+                          {status.available ? (
+                            <>
+                              <span className="status-badge available">Available</span>
+                              {status.lastPlayed && status.showsSince !== Infinity && (
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                  {status.showsSince} shows ago
+                                </span>
+                              )}
+                            </>
+                          ) : status.inCurrentRun ? (
+                            <span className="status-badge resting">In Run</span>
+                          ) : status.lastPlayed === 'Tonight' ? (
+                            <span className="status-badge played">Tonight</span>
+                          ) : status.showsSince === 0 ? (
+                            <span className="status-badge played">Most Recent</span>
+                          ) : status.showsSince === Infinity ? (
+                            <span className="status-badge available">Never Played</span>
+                          ) : (
+                            <span className="status-badge resting">
+                              {status.showsSince === 1 ? '1 show ago' : 
+                               status.showsSince === 2 ? '2 shows ago' : 
+                               `${status.showsSince} shows ago`}
+                            </span>
+                          )}
+                          {status.timesPlayed > 0 && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              {status.timesPlayed}x played
+                            </span>
+                          )}
+                          {status.lastPlayed && status.lastPlayed !== 'Tonight' && (
+                            <span style={{ fontSize: '0.75rem' }}>{status.lastPlayed}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Reset All Data - Bottom of Page */}
+          <div style={{ 
+            marginTop: '4rem', 
+            paddingTop: '2rem', 
+            borderTop: '1px solid var(--border)',
+            textAlign: 'center'
+          }}>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => {
+                if (confirm('⚠️ DANGER ZONE ⚠️\n\nThis will permanently delete ALL setlists, custom songs, and settings. This action cannot be undone.\n\nAre you absolutely sure?')) {
+                  setSetlists([]);
+                  setCurrentRun(null);
+                  setIsRun(false);
+                  setLiveSetlist([]);
+                  setCustomSongs([]);
+                  setEditingSetlist(null);
+                  localStorage.clear();
+                  alert('All data has been reset.');
+                }
+              }}
+              style={{ 
+                background: '#991b1b', 
+                borderColor: '#7f1d1d',
+                padding: '0.75rem 2rem'
+              }}
+            >
+              🗑️ Reset All Data
+            </button>
+            <div style={{ 
+              fontSize: '0.75rem', 
+              color: 'var(--text-muted)', 
+              marginTop: '0.5rem',
+              fontStyle: 'italic'
+            }}>
+              This will permanently delete all your data
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<PanicSetlistPredictor />, document.getElementById('root'));
+  </script>
+</body>
+</html>
