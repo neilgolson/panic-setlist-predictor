@@ -519,6 +519,57 @@
       "south carolina": []
     };
 
+    // Holiday and theme-based songs (based on lyrics and themes)
+    const THEME_SONGS = {
+      // Valentine's Day / Love songs  
+      valentine: ['Love Tractor', 'Blue Indian', 'Wondering', 'Travelin\' Light', 'Imitation Leather Shoes', 'Climb To Safety'],
+      
+      // Halloween / Dark themes
+      halloween: ['Blackout Blues', 'Chainsaw City', 'Dark Bar', 'Jr'],
+      
+      // New Year's Eve / Party songs
+      newyear: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House'],
+      
+      // Christmas / Winter
+      christmas: ['Christmas Katie'],
+      
+      // Summer themes
+      summer: ['Fishwater', 'Chilly Water', 'Coconut', 'Arleen', 'Greta'],
+      
+      // Drinking songs (St. Patrick's, special occasions)
+      drinking: ['Tall Boy', 'Whiskey For Breakfast', 'C. Brown', 'Barstools And Dreamers', 'Papa\'s Home', 'Diner'],
+      
+      // Traveling / Road songs
+      traveling: ['North', 'Travelin\' Light', 'Driving Song', 'Ride Me High', 'Space Wrangler', 'Papa Johnny Road']
+    };
+
+    // Get date-based theme for a specific date
+    const getDateTheme = (dateString) => {
+      const targetDate = dateString ? new Date(dateString + 'T12:00:00') : new Date();
+      const month = targetDate.getMonth() + 1;
+      const day = targetDate.getDate();
+      
+      // Valentine's Day (Feb 10-14)
+      if (month === 2 && day >= 10 && day <= 14) return 'valentine';
+      
+      // Halloween (Oct 25-31)
+      if (month === 10 && day >= 25) return 'halloween';
+      
+      // New Year's Eve (Dec 29-31, Jan 1)
+      if ((month === 12 && day >= 29) || (month === 1 && day === 1)) return 'newyear';
+      
+      // Christmas (Dec 20-25)
+      if (month === 12 && day >= 20 && day <= 25) return 'christmas';
+      
+      // Summer (June-Aug)
+      if (month >= 6 && month <= 8) return 'summer';
+      
+      // St. Patrick's Day (Mar 15-17)
+      if (month === 3 && day >= 15 && day <= 17) return 'drinking';
+      
+      return null;
+    };
+
     // Complete song database from the lyrics file
     const ALL_SONGS = [
       "Chilly Water", "Travelin' Light", "Space Wrangler", "Coconut", "Porch Song",
@@ -647,6 +698,7 @@
       const [editingSetlist, setEditingSetlist] = useState(null); // ID of setlist being edited
       const [unmatchedSongs, setUnmatchedSongs] = useState([]); // Songs that couldn't be matched
       const [customSongs, setCustomSongs] = useState([]); // User-added songs
+      const [selectedSongHistory, setSelectedSongHistory] = useState(null); // {song: string, dates: [{date, city}]}
 
       // Combine all available songs (base + covers + custom)
       const ALL_SONGS_WITH_COVERS = useMemo(() => {
@@ -680,7 +732,27 @@
         if (saved) {
           const data = JSON.parse(saved);
           setSetlists(data.setlists || []);
-          setCurrentRun(data.currentRun || null);
+          
+          // Auto-detect if run has ended
+          let loadedRun = data.currentRun || null;
+          if (loadedRun && data.setlists && data.setlists.length > 0) {
+            // Sort to get most recent show
+            const sortedShows = [...data.setlists].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const mostRecentShow = sortedShows[0];
+            const mostRecentDate = new Date(mostRecentShow.date);
+            const today = new Date();
+            
+            // Calculate days since most recent show
+            const daysSince = Math.floor((today - mostRecentDate) / (1000 * 60 * 60 * 24));
+            
+            // If more than 1 day since most recent show, the run is over
+            if (daysSince > 1) {
+              loadedRun = null;
+              setIsRun(false);
+            }
+          }
+          
+          setCurrentRun(loadedRun);
           setCustomSongs(data.customSongs || []);
         }
       }, []);
@@ -695,14 +767,95 @@
       }, [setlists, currentRun, customSongs]);
 
       const addSetlist = () => {
-        if (!newDate || !newSongs) return;
+        if (!newSongs) return;
 
-        const rawSongs = newSongs
+        let extractedDate = newDate;
+        let extractedCity = currentRun?.city || '';
+        let extractedVenue = '';
+        let songsText = newSongs;
+
+        // Try to detect Everyday Companion format
+        // Format: MM/DD/YY Venue Name - City, State
+        // or: MM/DD/YY Venue Name, City, State (no dash)
+        const lines = newSongs.split('\n').map(l => l.trim()).filter(l => l);
+        const firstLine = lines[0] || '';
+        
+        // Check if first line contains a date pattern
+        // Updated to handle both "Venue - City" and "Venue, City" formats
+        const dateMatch = firstLine.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(.+?)(?:,\s*|\s+-\s+)(.+?)(?:,\s*([A-Z]{2}))?(?:1:|$)/);
+        
+        if (dateMatch) {
+          const [, month, day, year, venuePart, cityPart, state] = dateMatch;
+          
+          // Convert date to YYYY-MM-DD format
+          const fullYear = year.length === 2 ? `20${year}` : year;
+          extractedDate = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          
+          // Extract venue and city
+          if (venuePart) {
+            extractedVenue = venuePart.trim();
+          }
+          
+          if (cityPart) {
+            extractedCity = cityPart.trim();
+            if (state) {
+              extractedCity = `${cityPart.trim()}, ${state}`;
+            }
+          }
+          
+          // Remove the date/venue from the beginning of the text
+          // Handle case where setlist continues on same line after venue
+          songsText = newSongs.replace(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+.+?(?:,\s*|\s+-\s+).+?(?:,\s*[A-Z]{2})?/, '').trim();
+        }
+
+        // If still no date, check if user filled it manually
+        if (!extractedDate) {
+          alert('Please paste a setlist with a date, or enter the date manually.');
+          return;
+        }
+
+        // Show confirmation dialog with extracted info
+        const confirmMessage = `Confirm setlist details:\n\n` +
+          `Date: ${extractedDate}\n` +
+          `${extractedVenue ? `Venue: ${extractedVenue}\n` : ''}` +
+          `${extractedCity ? `City: ${extractedCity}\n` : ''}` +
+          `\nProceed with adding this setlist?`;
+        
+        if (!confirm(confirmMessage)) {
+          return;
+        }
+
+        const rawSongs = songsText
           .split(/[,\n>]/)  // Also split on > for segues
           .map(s => s.trim())
           .filter(s => s.length > 0)
-          .filter(s => !['1:', '2:', '3:', 'E:', 'Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
-          .map(s => s.replace(/\*+$/, '').trim());  // Remove asterisks at end
+          // Remove set markers from beginning of song names (e.g., "1: Song" -> "Song", "E1: Song" -> "Song")
+          .map(s => s.replace(/^(1|2|3|E\d?):\s*/, '').trim())
+          // Remove trailing set markers from song names (e.g., "Song1:" -> "Song")
+          .map(s => s.replace(/\d+:$/, '').trim())
+          // Remove asterisks at end
+          .map(s => s.replace(/\*+$/, '').trim())
+          // Filter out standalone set markers if they somehow remain
+          .filter(s => !s.match(/^(1|2|3|E\d?):?$/))
+          .filter(s => !['Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
+          // Remove city/state patterns (e.g., "Milwaukee", "WI", "Milwaukee, WI")
+          .filter(s => {
+            // Skip if it's just a city or state abbreviation
+            if (extractedCity && extractedCity.toLowerCase().includes(s.toLowerCase())) {
+              return false;
+            }
+            // Skip if it's just a 2-letter state code
+            if (s.match(/^[A-Z]{2}$/)) {
+              return false;
+            }
+            // Skip if it looks like just a city name (single word, capitalized)
+            if (s.match(/^[A-Z][a-z]+$/) && extractedCity && extractedCity.includes(s)) {
+              return false;
+            }
+            return true;
+          })
+          // Filter out empty strings after all processing
+          .filter(s => s.length > 0);
 
         // Try to match each song
         const matchedSongs = [];
@@ -720,15 +873,22 @@
         // If there are unmatched songs, show them to the user
         if (unmatched.length > 0) {
           setUnmatchedSongs(unmatched);
+          // Store extracted data for later use
+          setNewDate(extractedDate);
+          if (extractedCity) {
+            setCurrentRun({ days: runDays, city: extractedCity });
+            setIsRun(true);
+          }
           // Don't add the setlist yet - wait for user to review unmatched songs
           return;
         }
 
         // Create and add the setlist
         const newSetlist = {
-          date: newDate,
+          date: extractedDate,
           songs: matchedSongs,
-          city: currentRun?.city || '',  // Store city with setlist
+          city: extractedCity,
+          venue: extractedVenue,
           id: Date.now()
         };
 
@@ -870,6 +1030,26 @@
         setSetlists(prev => prev.filter(s => s.id !== id));
       };
 
+      const showSongHistory = (songName) => {
+        // Find all shows where this song was played
+        const playedShows = setlists
+          .filter(setlist => setlist.songs.includes(songName))
+          .map(setlist => ({
+            date: setlist.date,
+            city: setlist.city || '',
+            songs: setlist.songs // Include for debugging
+          }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date)); // Most recent first
+
+        console.log(`Song history for "${songName}":`, playedShows);
+        console.log('All setlists:', setlists);
+        
+        setSelectedSongHistory({
+          song: songName,
+          dates: playedShows
+        });
+      };
+
       const startEditingSetlist = (setlist) => {
         setEditingSetlist(setlist.id);
         setNewDate(setlist.date);
@@ -972,9 +1152,10 @@
         // Sort setlists by date (newest first) for consistent processing
         const sortedSetlists = [...setlists].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        // Count total plays for each song
+        // Count total plays for each song (deduplicate within each setlist)
         sortedSetlists.forEach(setlist => {
-          setlist.songs.forEach(song => {
+          const uniqueSongs = [...new Set(setlist.songs)];
+          uniqueSongs.forEach(song => {
             if (status[song]) {
               status[song].timesPlayed++;
             }
@@ -1032,6 +1213,39 @@
 
         return status;
       }, [setlists, currentRun, mode, liveSetlist]);
+
+      // Calculate top 20 most frequently played songs from the database (must be after songStatus)
+      const heavyRotation = useMemo(() => {
+        // Recalculate play counts fresh from setlists
+        const playCounts = {};
+        
+        setlists.forEach(setlist => {
+          // Deduplicate songs in each setlist to prevent counting duplicates
+          const uniqueSongs = [...new Set(setlist.songs)];
+          uniqueSongs.forEach(song => {
+            playCounts[song] = (playCounts[song] || 0) + 1;
+          });
+        });
+        
+        // Convert to array and sort by play count (descending - most played first)
+        const sortedSongs = Object.entries(playCounts)
+          .filter(([song, count]) => count >= 3) // Minimum 3 plays for Heavy Rotation
+          .sort((a, b) => {
+            const countA = a[1];
+            const countB = b[1];
+            
+            // Sort by play count descending (most played at top)
+            if (countB > countA) return 1;  // b has more plays, so b comes first
+            if (countB < countA) return -1; // a has more plays, so a comes first
+            
+            // If tie, alphabetical
+            return a[0].localeCompare(b[0]);
+          })
+          .slice(0, 20) // Top 20
+          .map(([song]) => song);
+        
+        return sortedSongs;
+      }, [setlists]);
 
       const filteredSongs = useMemo(() => {
         let songs = ALL_SONGS_WITH_COVERS.filter(song => 
@@ -1207,6 +1421,101 @@
             </div>
           )}
 
+          {/* Song History Modal */}
+          {selectedSongHistory && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '2rem'
+            }}>
+              <div style={{
+                background: 'var(--bg-card)',
+                border: '2px solid var(--accent-yellow)',
+                borderRadius: '12px',
+                padding: '2rem',
+                maxWidth: '600px',
+                width: '100%',
+                maxHeight: '80vh',
+                overflow: 'auto'
+              }}>
+                <h2 style={{ color: 'var(--accent-yellow)', marginBottom: '0.5rem' }}>
+                  {selectedSongHistory.song}
+                </h2>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: 'var(--text-secondary)',
+                  marginBottom: '1.5rem'
+                }}>
+                  Played {selectedSongHistory.dates.length} time{selectedSongHistory.dates.length !== 1 ? 's' : ''}
+                </div>
+                
+                <div style={{
+                  background: 'var(--bg-dark)',
+                  padding: '1rem',
+                  borderRadius: '6px',
+                  maxHeight: '400px',
+                  overflow: 'auto'
+                }}>
+                  {selectedSongHistory.dates.length === 0 ? (
+                    <div style={{ 
+                      color: 'var(--text-muted)', 
+                      fontStyle: 'italic',
+                      textAlign: 'center',
+                      padding: '1rem'
+                    }}>
+                      Never played in your setlist history
+                    </div>
+                  ) : (
+                    selectedSongHistory.dates.map((show, i) => (
+                      <div key={i} style={{
+                        padding: '0.75rem',
+                        borderBottom: i < selectedSongHistory.dates.length - 1 ? '1px solid var(--border)' : 'none',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div>
+                          <div style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
+                            {(() => {
+                              // Parse date as local time to avoid timezone shifts
+                              const [year, month, day] = show.date.split('-');
+                              return `${month}/${day}/${year.slice(-2)}`;
+                            })()}
+                          </div>
+                          {show.city && (
+                            <div style={{ 
+                              fontSize: '0.85rem', 
+                              color: 'var(--text-muted)',
+                              marginTop: '0.25rem'
+                            }}>
+                              📍 {show.city}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setSelectedSongHistory(null)}
+                  style={{ width: '100%', marginTop: '1.5rem' }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
           <header>
             <h1>Panic Setlist Predictor</h1>
             <p className="subtitle">Track the 3-show rule • Predict available songs • Live updates</p>
@@ -1218,7 +1527,41 @@
             background: 'linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 140, 66, 0.1))',
             borderColor: 'var(--accent-orange)'
           }}>
-            <h2 style={{ color: 'var(--accent-red)' }}>🎸 Next Run Prediction</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h2 style={{ color: 'var(--accent-red)', margin: 0 }}>🎸 Next Run Prediction</h2>
+              {(() => {
+                const upcomingDate = '2026-02-14';
+                const theme = getDateTheme(upcomingDate);
+                if (!theme) return null;
+                
+                const themeLabels = {
+                  valentine: { emoji: '💜', label: 'Valentine\'s Day', color: 'rgb(147, 51, 234)' },
+                  halloween: { emoji: '🎃', label: 'Halloween', color: 'rgb(249, 115, 22)' },
+                  newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)' },
+                  christmas: { emoji: '🎄', label: 'Christmas', color: 'rgb(220, 38, 38)' },
+                  summer: { emoji: '☀️', label: 'Summer Vibes', color: 'rgb(234, 179, 8)' },
+                  drinking: { emoji: '🍺', label: 'St. Patrick\'s Day', color: 'rgb(34, 197, 94)' }
+                };
+                
+                const themeInfo = themeLabels[theme];
+                if (!themeInfo) return null;
+                
+                return (
+                  <div style={{
+                    padding: '0.5rem 1rem',
+                    background: `${themeInfo.color}15`,
+                    border: `1px solid ${themeInfo.color}`,
+                    borderRadius: '6px',
+                    fontSize: '0.85rem',
+                    fontWeight: '500',
+                    color: themeInfo.color,
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {themeInfo.emoji} {themeInfo.label}
+                  </div>
+                );
+              })()}
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '2rem', alignItems: 'start' }}>
               <div>
                 <div style={{ marginBottom: '1rem' }}>
@@ -1294,18 +1637,62 @@
                 }}>
                   {(() => {
                     const upcomingCity = nextRunCity.toLowerCase().trim();
+                    const upcomingDate = '2026-02-14'; // First night of the run
+                    const runNights = 2; // 2-night run
+                    
+                    console.log('=== PREDICTION CALCULATION ===');
+                    console.log('Total songs in songStatus:', Object.keys(songStatus).length);
                     
                     // Calculate likelihood score for each song
+                    // Include songs available on EITHER night of the run
                     const scoredSongs = Object.entries(songStatus)
-                      .filter(([song, status]) => status.available && status.timesPlayed > 0)
+                      .filter(([song, status]) => {
+                        const isDrums = song === 'Drums';
+                        const hasEnoughPlays = status.timesPlayed >= 2;
+                        const availableNight1 = status.available;
+                        const availableNight2 = status.showsSince === 2;
+                        const passesFilter = !isDrums && hasEnoughPlays && (availableNight1 || availableNight2);
+                        
+                        if (song === 'Climb To Safety') {
+                          console.log('Climb To Safety filter check:', {
+                            isDrums,
+                            timesPlayed: status.timesPlayed,
+                            hasEnoughPlays,
+                            showsSince: status.showsSince,
+                            available: status.available,
+                            availableNight1,
+                            availableNight2,
+                            passesFilter
+                          });
+                        }
+                        
+                        return passesFilter;
+                      })
                       .map(([song, status]) => {
                         let score = 0;
+                        
+                        // Determine which night(s) this song is available
+                        const availableNight1 = status.available;
+                        const availableNight2 = status.showsSince === 2; // Currently resting (2 shows), becomes available on Night 2
+                        const nightsAvailable = availableNight1 ? 'both' : 'night2';
+                        
+                        // Debug logging for songs that should be Night 2
+                        if (song === 'Climb To Safety') {
+                          console.log('Climb To Safety:', {
+                            showsSince: status.showsSince,
+                            available: status.available,
+                            availableNight1,
+                            availableNight2,
+                            nightsAvailable,
+                            timesPlayed: status.timesPlayed
+                          });
+                        }
                         
                         // Factor 1: Play frequency (0-50 points)
                         score += status.playFrequency * 0.5;
                         
                         // Factor 2: Favorite status (0-30 points)
-                        if (FAVORITES.includes(song)) {
+                        if (heavyRotation.includes(song)) {
                           score += 30;
                         }
                         
@@ -1314,16 +1701,59 @@
                           score += Math.min(20, status.showsSince * 2);
                         }
                         
-                        // Factor 4: City-specific bonus (0-40 points)
+                        // Factor 4: City-specific bonus (0-30 points)
                         const citySongs = CITY_SONGS[upcomingCity] || [];
-                        if (citySongs.includes(song)) {
-                          score += 40; // Big boost for city songs!
+                        const isCitySong = citySongs.includes(song);
+                        if (isCitySong) {
+                          score += 30;
                         }
                         
-                        return { song, score, status, isCity: citySongs.includes(song) };
+                        // Factor 5: Holiday/Theme bonus (0-30 points)
+                        const currentTheme = getDateTheme(upcomingDate);
+                        const themeSongs = currentTheme ? (THEME_SONGS[currentTheme] || []) : [];
+                        const isThemeSong = themeSongs.includes(song);
+                        if (isThemeSong) {
+                          score += 30;
+                        }
+                        
+                        // Factor 6: Night 2 availability bonus (0-15 points)
+                        // Boost songs that become available on Night 2 so they appear in predictions
+                        if (nightsAvailable === 'night2') {
+                          score += 15;
+                        }
+                        
+                        // RECALCULATE actual times played from setlists directly
+                        const actualTimesPlayed = setlists.filter(setlist => 
+                          setlist.songs.includes(song)
+                        ).length;
+                        
+                        return { 
+                          song, 
+                          score, 
+                          status: { ...status, timesPlayed: actualTimesPlayed }, 
+                          isCity: isCitySong,
+                          isTheme: isThemeSong,
+                          theme: currentTheme,
+                          nightsAvailable: nightsAvailable
+                        };
                       })
-                      .sort((a, b) => b.score - a.score)
+                      .sort((a, b) => {
+                        // First, sort by night availability (Night 1/both before Night 2)
+                        if (a.nightsAvailable === 'both' && b.nightsAvailable === 'night2') return -1;
+                        if (a.nightsAvailable === 'night2' && b.nightsAvailable === 'both') return 1;
+                        
+                        // Then by score
+                        return b.score - a.score;
+                      })
                       .slice(0, 10);
+                    
+                    console.log('Final top 10:', scoredSongs.map(s => ({ 
+                      song: s.song, 
+                      score: s.score, 
+                      nights: s.nightsAvailable,
+                      showsSince: s.status.showsSince 
+                    })));
+                    console.log('Night 2 songs:', scoredSongs.filter(s => s.nightsAvailable === 'night2').map(s => s.song));
 
                     if (scoredSongs.length === 0) {
                       return (
@@ -1339,50 +1769,76 @@
                       );
                     }
 
-                    return scoredSongs.map(({ song, status, isCity }, i) => {
+                    return scoredSongs.map(({ song, status, isCity, isTheme, theme, nightsAvailable }, i) => {
                       // Format last played date to MM/DD/YY
                       let lastPlayedFormatted = '';
                       if (status.lastPlayed && status.lastPlayed !== 'Tonight') {
-                        const date = new Date(status.lastPlayed);
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const year = String(date.getFullYear()).slice(-2);
-                        lastPlayedFormatted = `${month}/${day}/${year}`;
+                        // Parse date as local time to avoid timezone shifts
+                        const [year, month, day] = status.lastPlayed.split('-');
+                        lastPlayedFormatted = `${month}/${day}/${year.slice(-2)}`;
+                      }
+
+                      // Determine background color and border
+                      let bgColor = 'var(--bg-dark)';
+                      let borderColor = 'var(--accent-yellow)';
+                      let icon = '';
+                      
+                      if (isTheme) {
+                        bgColor = 'rgba(147, 51, 234, 0.15)'; // Purple for theme songs
+                        borderColor = 'rgb(147, 51, 234)';
+                        icon = theme === 'valentine' ? '💜' : 
+                               theme === 'halloween' ? '🎃' :
+                               theme === 'newyear' ? '🎉' :
+                               theme === 'christmas' ? '🎄' :
+                               theme === 'summer' ? '☀️' :
+                               theme === 'drinking' ? '🍺' : '🎵';
+                      } else if (isCity) {
+                        bgColor = 'rgba(255, 140, 66, 0.15)'; // Orange for city songs
+                        borderColor = 'var(--accent-orange)';
+                        icon = '📍';
                       }
 
                       return (
                         <div key={i} style={{ 
                           padding: '0.5rem 0.75rem',
-                          background: isCity ? 'rgba(255, 140, 66, 0.15)' : 'var(--bg-dark)',
+                          background: bgColor,
                           borderRadius: '6px',
-                          borderLeft: isCity ? '3px solid var(--accent-orange)' : '3px solid var(--accent-yellow)',
-                          fontSize: '0.9rem',
+                          borderLeft: `3px solid ${borderColor}`,
+                          fontSize: '0.85rem',
                           display: 'flex',
-                          flexDirection: 'column',
-                          gap: '0.25rem'
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: '0.5rem'
                         }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span>
-                              {song}
-                              {isCity && <span style={{ marginLeft: '0.25rem' }}>📍</span>}
-                            </span>
-                            <span style={{ 
-                              fontSize: '0.75rem', 
-                              color: 'var(--text-muted)',
-                              marginLeft: '0.5rem'
-                            }}>
-                              {status.timesPlayed}x
-                            </span>
-                          </div>
-                          {lastPlayedFormatted && (
-                            <div style={{ 
-                              fontSize: '0.7rem', 
-                              color: 'var(--text-muted)',
-                              fontStyle: 'italic'
-                            }}>
-                              {lastPlayedFormatted}
-                            </div>
-                          )}
+                          <span style={{ flex: 1, minWidth: 0 }}>
+                            {song}
+                            {icon && <span style={{ marginLeft: '0.25rem' }}>{icon}</span>}
+                            {nightsAvailable === 'night2' && (
+                              <span style={{ 
+                                marginLeft: '0.5rem',
+                                fontSize: '0.65rem',
+                                color: 'var(--accent-orange)',
+                                fontWeight: '500'
+                              }}>
+                                N2
+                              </span>
+                            )}
+                          </span>
+                          <span style={{ 
+                            fontSize: '0.7rem', 
+                            color: 'var(--text-muted)',
+                            fontStyle: 'italic',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {lastPlayedFormatted || 'Never'}
+                          </span>
+                          <span style={{ 
+                            fontSize: '0.7rem', 
+                            color: 'var(--text-muted)',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {Math.floor(status.timesPlayed)}x
+                          </span>
                         </div>
                       );
                     });
@@ -1435,23 +1891,18 @@
                     )}
 
                     <div className="input-group">
-                      <label>Date</label>
-                      <input 
-                        type="date" 
-                        value={newDate}
-                        onChange={e => setNewDate(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="input-group">
-                      <label>Songs (comma or line separated)</label>
+                      <label>Paste Setlist (Everyday Companion format supported)</label>
                       <textarea 
-                        placeholder="e.g., Chilly Water, Space Wrangler, Pigeons..."
+                        placeholder="Paste entire setlist from Everyday Companion or enter songs manually...
+Example:
+11/23/25 Fox Theater - Boulder, CO
+Chilly Water, Pigeons, Space Wrangler..."
                         value={newSongs}
                         onChange={e => setNewSongs(e.target.value)}
+                        style={{ minHeight: '200px' }}
                       />
                       <div className="help-text">
-                        Paste setlists from Everyday Companion or type them in
+                        Paste from Everyday Companion (with date/venue) or type songs manually
                       </div>
                     </div>
 
@@ -1466,7 +1917,7 @@
                       </div>
                     ) : (
                       <button className="btn btn-primary" onClick={addSetlist}>
-                        Add Setlist
+                        Parse & Add Setlist
                       </button>
                     )}
 
@@ -1587,9 +2038,9 @@
                 )}
               </div>
 
-              {/* Recent Setlists */}
+              {/* Recent Setlists - Last 4 */}
               <div className="card" style={{ marginTop: '2rem' }}>
-                <h2>Recent Shows ({setlists.length})</h2>
+                <h2>Recent Shows</h2>
                 {setlists.length === 0 ? (
                   <div className="empty-state">
                     <div className="empty-state-icon">🎸</div>
@@ -1600,6 +2051,7 @@
                   <div>
                     {[...setlists]
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .slice(0, 4) // Only show last 4
                       .map((setlist, index) => {
                         // Calculate run day number (reversed so oldest = Day 1)
                         let runDayNumber = null;
@@ -1623,22 +2075,6 @@
                                   </span>
                                 )}
                               </span>
-                              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button 
-                                  className="btn btn-secondary" 
-                                  style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
-                                  onClick={() => startEditingSetlist(setlist)}
-                                >
-                                  Edit
-                                </button>
-                                <button 
-                                  className="btn btn-secondary" 
-                                  style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
-                                  onClick={() => deleteSetlist(setlist.id)}
-                                >
-                                  Delete
-                                </button>
-                              </div>
                             </div>
                             <div className="setlist-songs">
                               {setlist.songs.join(', ')}
@@ -1671,26 +2107,8 @@
                   </div>
                 </div>
 
-                <div className="search-box">
-                  <input 
-                    type="text"
-                    placeholder="🔍 Search songs..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
-                <div className="input-group" style={{ marginBottom: '1rem' }}>
-                  <label>Sort By</label>
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                    <option value="showsSince">Shows Since Last Played</option>
-                    <option value="status">Availability Status</option>
-                    <option value="alpha">Alphabetical</option>
-                  </select>
-                </div>
-
-                {/* Favorites Section */}
-                {!searchTerm && (
+                {/* Heavy Rotation Section - Top 20 Most Played */}
+                {!searchTerm && heavyRotation.length > 0 && (
                   <>
                     <h3 style={{ 
                       fontFamily: "'Bebas Neue', sans-serif",
@@ -1702,8 +2120,16 @@
                     }}>
                       Heavy Rotation
                     </h3>
+                    <div style={{ 
+                      fontSize: '0.8rem', 
+                      color: 'var(--text-muted)', 
+                      marginBottom: '0.5rem',
+                      fontStyle: 'italic'
+                    }}>
+                      Songs played 3+ times (Top 20 most frequently played)
+                    </div>
                     <div className="song-list" style={{ maxHeight: '300px', marginBottom: '1.5rem' }}>
-                      {FAVORITES.map(song => {
+                      {heavyRotation.map(song => {
                         const status = songStatus[song];
                         if (!status) return null;
                         const statusClass = status.available ? 'available' : 
@@ -1713,8 +2139,14 @@
                           <div 
                             key={song} 
                             className={`song-item ${statusClass}`}
-                            onClick={() => mode === 'live' && status.available && addSongToLive(song)}
-                            style={{ cursor: mode === 'live' && status.available ? 'pointer' : 'default' }}
+                            onClick={() => {
+                              if (mode === 'live' && status.available) {
+                                addSongToLive(song);
+                              } else {
+                                showSongHistory(song);
+                              }
+                            }}
+                            style={{ cursor: 'pointer' }}
                           >
                             <span className="song-name">{song}</span>
                             <div className="song-status">
@@ -1751,6 +2183,24 @@
                       })}
                     </div>
 
+                    <div className="search-box">
+                      <input 
+                        type="text"
+                        placeholder="🔍 Search songs..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="input-group" style={{ marginBottom: '1rem' }}>
+                      <label>Sort By</label>
+                      <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                        <option value="showsSince">Shows Since Last Played</option>
+                        <option value="status">Availability Status</option>
+                        <option value="alpha">Alphabetical</option>
+                      </select>
+                    </div>
+
                     <h3 style={{ 
                       fontFamily: "'Bebas Neue', sans-serif",
                       fontSize: '1.5rem',
@@ -1775,8 +2225,14 @@
                       <div 
                         key={song} 
                         className={`song-item ${statusClass}`}
-                        onClick={() => mode === 'live' && status.available && addSongToLive(song)}
-                        style={{ cursor: mode === 'live' && status.available ? 'pointer' : 'default' }}
+                        onClick={() => {
+                          if (mode === 'live' && status.available) {
+                            addSongToLive(song);
+                          } else {
+                            showSongHistory(song);
+                          }
+                        }}
+                        style={{ cursor: 'pointer' }}
                       >
                         <span className="song-name">{song}</span>
                         <div className="song-status">
@@ -1818,16 +2274,196 @@
                   })}
                 </div>
               </div>
+
+              {/* All Shows Section */}
+              <div className="card" style={{ marginTop: '2rem' }}>
+                <h2>All Shows ({setlists.length})</h2>
+                {setlists.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-state-icon">🎸</div>
+                    <p>No setlists yet</p>
+                    <p style={{ fontSize: '0.85rem' }}>Add your first show to get started</p>
+                  </div>
+                ) : (
+                  <div style={{ maxHeight: '600px', overflow: 'auto' }}>
+                    {[...setlists]
+                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .map((setlist, index) => {
+                        // Calculate run day number (reversed so oldest = Day 1)
+                        let runDayNumber = null;
+                        if (currentRun && index < currentRun.days) {
+                          runDayNumber = currentRun.days - index;
+                        }
+                        
+                        const isEditing = editingSetlist === setlist.id;
+                        
+                        return (
+                          <div key={setlist.id} className="setlist-display" style={{
+                            background: isEditing ? 'rgba(255, 140, 66, 0.1)' : 'var(--bg-dark)',
+                            border: isEditing ? '1px solid var(--accent-orange)' : '1px solid var(--border)'
+                          }}>
+                            {isEditing ? (
+                              // Edit mode
+                              <div>
+                                <div style={{ marginBottom: '1rem', color: 'var(--accent-orange)', fontSize: '0.9rem' }}>
+                                  ✏️ Editing Setlist
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '0.75rem' }}>
+                                  <label>Date</label>
+                                  <input 
+                                    type="date" 
+                                    value={newDate}
+                                    onChange={e => setNewDate(e.target.value)}
+                                  />
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '0.75rem' }}>
+                                  <label>Songs (comma-separated)</label>
+                                  <textarea 
+                                    value={newSongs}
+                                    onChange={e => setNewSongs(e.target.value)}
+                                    style={{ minHeight: '100px' }}
+                                  />
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '0.75rem' }}>
+                                  <label>City/Location (optional)</label>
+                                  <input 
+                                    type="text"
+                                    value={currentRun?.city || ''}
+                                    onChange={e => setCurrentRun({ ...currentRun, city: e.target.value })}
+                                    placeholder="e.g., Atlanta, GA"
+                                  />
+                                </div>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                  <button className="btn btn-primary" onClick={saveEditedSetlist} style={{ flex: 1 }}>
+                                    Save Changes
+                                  </button>
+                                  <button className="btn btn-secondary" onClick={cancelEdit} style={{ flex: 1 }}>
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              // Display mode
+                              <>
+                                <div className="setlist-header">
+                                  <span className="setlist-date">
+                                    {setlist.date}
+                                    {setlist.city && (
+                                      <span style={{ marginLeft: '0.5rem', color: 'var(--accent-orange)' }}>
+                                        📍 {setlist.city}
+                                      </span>
+                                    )}
+                                    {runDayNumber && (
+                                      <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: 'var(--accent-yellow)' }}>
+                                        (Run Day {runDayNumber}/{currentRun.days})
+                                      </span>
+                                    )}
+                                  </span>
+                                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button 
+                                      className="btn btn-secondary" 
+                                      style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+                                      onClick={() => startEditingSetlist(setlist)}
+                                    >
+                                      Edit
+                                    </button>
+                                    <button 
+                                      className="btn btn-secondary" 
+                                      style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+                                      onClick={() => deleteSetlist(setlist.id)}
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="setlist-songs">
+                                  {setlist.songs.join(', ')}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Reset All Data - Bottom of Page */}
+          {/* Data Management - Bottom of Page */}
           <div style={{ 
             marginTop: '4rem', 
             paddingTop: '2rem', 
             borderTop: '1px solid var(--border)',
-            textAlign: 'center'
+            textAlign: 'center',
+            display: 'flex',
+            gap: '1rem',
+            justifyContent: 'center',
+            flexWrap: 'wrap'
           }}>
+            <button 
+              className="btn btn-primary"
+              onClick={() => {
+                // Show all dates with show counts
+                const dateMap = {};
+                setlists.forEach(setlist => {
+                  const date = setlist.date;
+                  if (!dateMap[date]) {
+                    dateMap[date] = { count: 0, setlists: [] };
+                  }
+                  dateMap[date].count++;
+                  dateMap[date].setlists.push(setlist);
+                });
+                
+                const dates = Object.keys(dateMap).sort().reverse();
+                let message = '📅 ALL SHOW DATES IN DATABASE:\n\n';
+                dates.forEach(date => {
+                  const info = dateMap[date];
+                  message += `${date} - ${info.count} setlist${info.count > 1 ? 's' : ''}\n`;
+                  if (info.count > 1) {
+                    message += `  ⚠️ DUPLICATE! (${info.setlists.map(s => s.id).join(', ')})\n`;
+                  }
+                });
+                
+                alert(message);
+              }}
+              style={{ 
+                background: '#0369a1', 
+                borderColor: '#075985',
+                padding: '0.75rem 2rem'
+              }}
+            >
+              📅 Show All Dates
+            </button>
+            
+            <button 
+              className="btn btn-primary"
+              onClick={() => {
+                if (confirm('🔧 Fix Data Issues\n\nThis will:\n- Remove duplicate songs from each setlist\n- Clean up any corrupted data\n- Keep all your setlists intact\n\nContinue?')) {
+                  // Fix each setlist by deduplicating songs
+                  const fixedSetlists = setlists.map(setlist => ({
+                    ...setlist,
+                    songs: [...new Set(setlist.songs)] // Remove duplicates
+                  }));
+                  
+                  // Count how many songs were removed
+                  const before = setlists.reduce((sum, s) => sum + s.songs.length, 0);
+                  const after = fixedSetlists.reduce((sum, s) => sum + s.songs.length, 0);
+                  const removed = before - after;
+                  
+                  setSetlists(fixedSetlists);
+                  alert(`✅ Data fixed!\n\nRemoved ${removed} duplicate song entries from your setlists.\n\nYour play counts should now be accurate.`);
+                }
+              }}
+              style={{ 
+                background: '#059669', 
+                borderColor: '#047857',
+                padding: '0.75rem 2rem'
+              }}
+            >
+              🔧 Fix Duplicate Songs
+            </button>
+            
             <button 
               className="btn btn-secondary"
               onClick={() => {
@@ -1850,14 +2486,15 @@
             >
               🗑️ Reset All Data
             </button>
-            <div style={{ 
-              fontSize: '0.75rem', 
-              color: 'var(--text-muted)', 
-              marginTop: '0.5rem',
-              fontStyle: 'italic'
-            }}>
-              This will permanently delete all your data
-            </div>
+          </div>
+          <div style={{ 
+            fontSize: '0.75rem', 
+            color: 'var(--text-muted)', 
+            marginTop: '0.5rem',
+            textAlign: 'center',
+            fontStyle: 'italic'
+          }}>
+            Fix duplicates first • Reset deletes everything permanently
           </div>
         </div>
       );
