@@ -2668,6 +2668,66 @@ Chilly Water, Pigeons, Space Wrangler..."
             <button 
               className="btn btn-primary"
               onClick={() => {
+                // Comprehensive export for analysis
+                const exportData = {
+                  exportDate: new Date().toISOString(),
+                  totalShows: setlists.length,
+                  setlists: [...setlists].sort((a, b) => new Date(a.date) - new Date(b.date)).map(s => ({
+                    id: s.id,
+                    date: s.date,
+                    city: s.city || '',
+                    venue: s.venue || '',
+                    songs: s.songs
+                  })),
+                  themeSongs: themeSongs,
+                  accuracyScores: Object.entries(showAccuracy)
+                    .filter(([id, acc]) => acc !== null)
+                    .map(([id, acc]) => {
+                      const setlist = setlists.find(s => s.id === parseInt(id));
+                      return {
+                        showId: id,
+                        date: setlist?.date,
+                        city: setlist?.city,
+                        matches: acc.matches,
+                        total: acc.total,
+                        percentage: parseFloat(acc.percentage)
+                      };
+                    }),
+                  overallStats: {
+                    totalAnalyzedShows: Object.values(showAccuracy).filter(a => a !== null).length,
+                    totalCorrect: Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.matches, 0),
+                    totalPlayed: Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.total, 0),
+                    overallAccuracy: (Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.matches, 0) / 
+                                     Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.total, 0) * 100).toFixed(2)
+                  }
+                };
+                
+                // Download as JSON
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `panic-data-export-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                
+                alert(`📊 Data Export Complete!\n\n` +
+                      `Total Shows: ${exportData.totalShows}\n` +
+                      `Analyzed Shows: ${exportData.overallStats.totalAnalyzedShows}\n` +
+                      `Overall Accuracy: ${exportData.overallStats.overallAccuracy}%\n\n` +
+                      `File downloaded as JSON for analysis.`);
+              }}
+              style={{ 
+                background: '#7c3aed', 
+                borderColor: '#6d28d9',
+                padding: '0.75rem 2rem'
+              }}
+            >
+              📤 Export Data for Analysis
+            </button>
+            
+            <button 
+              className="btn btn-primary"
+              onClick={() => {
                 if (confirm('🔧 Fix Data Issues\n\nThis will:\n- Remove duplicate songs from each setlist\n- Clean up any corrupted data\n- Keep all your setlists intact\n\nContinue?')) {
                   // Fix each setlist by deduplicating songs
                   const fixedSetlists = setlists.map(setlist => ({
