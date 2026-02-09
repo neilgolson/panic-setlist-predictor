@@ -1373,6 +1373,119 @@
         return { available, resting, played, total: ALL_SONGS_WITH_COVERS.length };
       }, [songStatus]);
 
+      // Calculate accuracy for each show with 20+ shows of history
+      const showAccuracy = useMemo(() => {
+        const sortedSetlists = [...setlists].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const accuracyMap = {};
+        
+        sortedSetlists.forEach((targetSetlist, targetIndex) => {
+          // Need at least 20 shows of history
+          if (targetIndex < 20) {
+            accuracyMap[targetSetlist.id] = null;
+            return;
+          }
+          
+          // Get history (all shows before this one)
+          const historySetlists = sortedSetlists.slice(0, targetIndex);
+          
+          // Build songStatus from history
+          const historySongStatus = {};
+          ALL_SONGS_WITH_COVERS.forEach(song => {
+            historySongStatus[song] = {
+              available: true,
+              lastPlayed: null,
+              showsSince: Infinity,
+              timesPlayed: 0,
+              playFrequency: 0
+            };
+          });
+          
+          // Count plays
+          historySetlists.forEach(setlist => {
+            const uniqueSongs = [...new Set(setlist.songs)];
+            uniqueSongs.forEach(song => {
+              if (historySongStatus[song]) {
+                historySongStatus[song].timesPlayed++;
+              }
+            });
+          });
+          
+          // Calculate frequency
+          const totalHistoryShows = historySetlists.length;
+          ALL_SONGS_WITH_COVERS.forEach(song => {
+            if (historySongStatus[song]) {
+              historySongStatus[song].playFrequency = 
+                (historySongStatus[song].timesPlayed / totalHistoryShows) * 100;
+            }
+          });
+          
+          // Apply 3-show rule
+          const reversedHistory = [...historySetlists].reverse();
+          reversedHistory.forEach((setlist, reverseIndex) => {
+            const forwardIndex = historySetlists.length - 1 - reverseIndex;
+            setlist.songs.forEach(song => {
+              if (historySongStatus[song] && historySongStatus[song].showsSince === Infinity) {
+                historySongStatus[song].showsSince = forwardIndex;
+                historySongStatus[song].lastPlayed = setlist.date;
+                historySongStatus[song].available = (forwardIndex >= 3);
+              }
+            });
+          });
+          
+          // Calculate Heavy Rotation
+          const historyHeavyRotation = Object.entries(historySongStatus)
+            .filter(([song, status]) => status.timesPlayed >= 3)
+            .sort((a, b) => b[1].timesPlayed - a[1].timesPlayed || a[0].localeCompare(b[0]))
+            .slice(0, 20)
+            .map(([song]) => song);
+          
+          // Run prediction algorithm
+          const predictions = Object.entries(historySongStatus)
+            .filter(([song, status]) => {
+              if (song === 'Drums') return false;
+              if (status.timesPlayed < 2) return false;
+              return status.available || status.showsSince === 2;
+            })
+            .map(([song, status]) => {
+              let score = 0;
+              score += status.playFrequency * 0.5;
+              if (historyHeavyRotation.includes(song)) score += 30;
+              if (status.showsSince !== Infinity) score += Math.min(20, status.showsSince * 2);
+              
+              const cityMatches = historySetlists.some(s => 
+                s.city && targetSetlist.city && 
+                s.city.toLowerCase() === targetSetlist.city.toLowerCase() && 
+                s.songs.includes(song)
+              );
+              if (cityMatches) score += 30;
+              
+              const theme = getDateTheme(targetSetlist.date);
+              let themeList = theme ? (themeSongs[theme] || []) : [];
+              if (isBeachCity(targetSetlist.city)) {
+                themeList = [...themeList, ...(themeSongs['beach'] || [])];
+              }
+              if (themeList.includes(song)) score += 30;
+              
+              return { song, score };
+            })
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(p => p.song);
+          
+          // Check accuracy
+          const actualSongs = [...new Set(targetSetlist.songs)];
+          const matches = actualSongs.filter(song => predictions.includes(song));
+          
+          accuracyMap[targetSetlist.id] = {
+            matches: matches.length,
+            total: actualSongs.length,
+            percentage: ((matches.length / actualSongs.length) * 100).toFixed(0)
+          };
+        });
+        
+        return accuracyMap;
+      }, [setlists, themeSongs, ALL_SONGS_WITH_COVERS]);
+
       return (
         <div className="container">
           {/* Unmatched Songs Modal */}
@@ -2172,16 +2285,7 @@ Chilly Water, Pigeons, Space Wrangler..."
                   </>
                 )}
 
-                {/* Search Box - Always Visible */}
-                <div className="search-box">
-                  <input 
-                    type="text"
-                    placeholder="🔍 Search songs..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
+                {/* Sort By - First */}
                 <div className="input-group" style={{ marginBottom: '1rem' }}>
                   <label>Sort By</label>
                   <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
@@ -2189,6 +2293,16 @@ Chilly Water, Pigeons, Space Wrangler..."
                     <option value="status">Availability Status</option>
                     <option value="alpha">Alphabetical</option>
                   </select>
+                </div>
+
+                {/* Search Box - Second */}
+                <div className="search-box">
+                  <input 
+                    type="text"
+                    placeholder="🔍 Search songs..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
                 </div>
 
                 <h3 style={{ 
@@ -2333,6 +2447,20 @@ Chilly Water, Pigeons, Space Wrangler..."
                                     {setlist.city && (
                                       <span style={{ marginLeft: '0.5rem', color: 'var(--accent-orange)' }}>
                                         📍 {setlist.city}
+                                      </span>
+                                    )}
+                                    {showAccuracy[setlist.id] && (
+                                      <span style={{ 
+                                        marginLeft: '0.75rem',
+                                        padding: '0.25rem 0.5rem',
+                                        background: showAccuracy[setlist.id].percentage >= 50 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                        border: `1px solid ${showAccuracy[setlist.id].percentage >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'}`,
+                                        borderRadius: '4px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '600',
+                                        color: showAccuracy[setlist.id].percentage >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'
+                                      }}>
+                                        📊 {showAccuracy[setlist.id].matches}/{showAccuracy[setlist.id].total} ({showAccuracy[setlist.id].percentage}%)
                                       </span>
                                     )}
                                   </span>
@@ -2535,186 +2663,6 @@ Chilly Water, Pigeons, Space Wrangler..."
               }}
             >
               📅 Show All Dates
-            </button>
-            
-            <button 
-              className="btn btn-primary"
-              onClick={() => {
-                // Run accuracy analysis
-                const sortedSetlists = [...setlists].sort((a, b) => new Date(a.date) - new Date(b.date));
-                const results = [];
-                
-                sortedSetlists.forEach((targetSetlist, targetIndex) => {
-                  // Need at least 20 shows of history
-                  if (targetIndex < 20) return;
-                  
-                  // Get history (all shows before this one)
-                  const historySetlists = sortedSetlists.slice(0, targetIndex);
-                  
-                  // Build songStatus from history
-                  const historySongStatus = {};
-                  ALL_SONGS_WITH_COVERS.forEach(song => {
-                    historySongStatus[song] = {
-                      available: true,
-                      lastPlayed: null,
-                      showsSince: Infinity,
-                      timesPlayed: 0,
-                      playFrequency: 0
-                    };
-                  });
-                  
-                  // Count plays and calculate frequency
-                  historySetlists.forEach(setlist => {
-                    const uniqueSongs = [...new Set(setlist.songs)];
-                    uniqueSongs.forEach(song => {
-                      if (historySongStatus[song]) {
-                        historySongStatus[song].timesPlayed++;
-                      }
-                    });
-                  });
-                  
-                  const totalHistoryShows = historySetlists.length;
-                  ALL_SONGS_WITH_COVERS.forEach(song => {
-                    if (historySongStatus[song]) {
-                      historySongStatus[song].playFrequency = 
-                        (historySongStatus[song].timesPlayed / totalHistoryShows) * 100;
-                    }
-                  });
-                  
-                  // Apply 3-show rule
-                  historySetlists.forEach((setlist, index) => {
-                    setlist.songs.forEach(song => {
-                      if (historySongStatus[song]) {
-                        if (historySongStatus[song].showsSince === Infinity) {
-                          historySongStatus[song].showsSince = index;
-                          historySongStatus[song].lastPlayed = setlist.date;
-                          historySongStatus[song].available = (index >= 3);
-                        }
-                      }
-                    });
-                  });
-                  
-                  // Calculate Heavy Rotation from history
-                  const historyHeavyRotation = Object.entries(historySongStatus)
-                    .filter(([song, status]) => status.timesPlayed >= 3)
-                    .sort((a, b) => {
-                      if (b[1].timesPlayed !== a[1].timesPlayed) {
-                        return b[1].timesPlayed - a[1].timesPlayed;
-                      }
-                      return a[0].localeCompare(b[0]);
-                    })
-                    .slice(0, 20)
-                    .map(([song]) => song);
-                  
-                  // Run prediction algorithm
-                  const predictions = Object.entries(historySongStatus)
-                    .filter(([song, status]) => {
-                      if (song === 'Drums') return false;
-                      if (status.timesPlayed < 2) return false;
-                      const availableNight1 = status.available;
-                      const availableNight2 = status.showsSince === 2;
-                      return availableNight1 || availableNight2;
-                    })
-                    .map(([song, status]) => {
-                      let score = 0;
-                      
-                      // Factor 1: Play Frequency (0-50)
-                      score += status.playFrequency * 0.5;
-                      
-                      // Factor 2: Heavy Rotation (0-30)
-                      if (historyHeavyRotation.includes(song)) {
-                        score += 30;
-                      }
-                      
-                      // Factor 3: Time Since (0-20)
-                      if (status.showsSince !== Infinity) {
-                        score += Math.min(20, status.showsSince * 2);
-                      }
-                      
-                      // Factor 4: City Match (0-30)
-                      const cityMatches = historySetlists.some(s => 
-                        s.city && targetSetlist.city && 
-                        s.city.toLowerCase() === targetSetlist.city.toLowerCase() && 
-                        s.songs.includes(song)
-                      );
-                      if (cityMatches) score += 30;
-                      
-                      // Factor 5: Theme (0-30)
-                      const theme = getDateTheme(targetSetlist.date);
-                      let themeList = theme ? (themeSongs[theme] || []) : [];
-                      if (isBeachCity(targetSetlist.city)) {
-                        themeList = [...themeList, ...(themeSongs['beach'] || [])];
-                      }
-                      if (themeList.includes(song)) score += 30;
-                      
-                      return { song, score };
-                    })
-                    .sort((a, b) => b.score - a.score)
-                    .slice(0, 10)
-                    .map(p => p.song);
-                  
-                  // Check accuracy
-                  const actualSongs = [...new Set(targetSetlist.songs)];
-                  const matches = actualSongs.filter(song => predictions.includes(song));
-                  
-                  results.push({
-                    date: targetSetlist.date,
-                    city: targetSetlist.city || 'Unknown',
-                    predicted: predictions,
-                    actual: actualSongs,
-                    matches: matches.length,
-                    totalPlayed: actualSongs.length,
-                    accuracy: ((matches.length / actualSongs.length) * 100).toFixed(1)
-                  });
-                });
-                
-                // Generate report
-                if (results.length === 0) {
-                  alert('Need at least 20 shows of history before any show to run accuracy analysis.');
-                  return;
-                }
-                
-                const totalMatches = results.reduce((sum, r) => sum + r.matches, 0);
-                const totalPlayed = results.reduce((sum, r) => sum + r.totalPlayed, 0);
-                const overallAccuracy = ((totalMatches / totalPlayed) * 100).toFixed(1);
-                
-                let report = `📊 PREDICTION ACCURACY ANALYSIS\n\n`;
-                report += `Analyzed ${results.length} shows (each with 20+ shows of history)\n\n`;
-                report += `OVERALL: ${totalMatches} correct out of ${totalPlayed} played = ${overallAccuracy}% accurate\n\n`;
-                report += `═══════════════════════════════\n\n`;
-                
-                results.forEach(r => {
-                  report += `${r.date} - ${r.city}\n`;
-                  report += `  ${r.matches}/${r.totalPlayed} correct (${r.accuracy}%)\n`;
-                  report += `  Predicted: ${r.predicted.slice(0, 5).join(', ')}...\n`;
-                  report += `  Matched: ${r.predicted.filter(p => r.actual.includes(p)).join(', ') || 'none'}\n\n`;
-                });
-                
-                // Also create a downloadable CSV
-                let csv = 'Date,City,Correct,Total Played,Accuracy %,Matched Songs\n';
-                results.forEach(r => {
-                  const matched = r.predicted.filter(p => r.actual.includes(p)).join('; ');
-                  csv += `${r.date},"${r.city}",${r.matches},${r.totalPlayed},${r.accuracy},"${matched}"\n`;
-                });
-                csv += `\nOVERALL,,${totalMatches},${totalPlayed},${overallAccuracy},\n`;
-                
-                // Download CSV
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'prediction-accuracy-analysis.csv';
-                a.click();
-                
-                alert(report);
-              }}
-              style={{ 
-                background: '#7c3aed', 
-                borderColor: '#6d28d9',
-                padding: '0.75rem 2rem'
-              }}
-            >
-              📊 Run Accuracy Analysis
             </button>
             
             <button 
