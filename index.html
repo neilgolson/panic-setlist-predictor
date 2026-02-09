@@ -894,7 +894,7 @@
         // Add and sort by date (newest first)
         setSetlists(prev => {
           const updated = [newSetlist, ...prev];
-          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date));
           
           // Auto-detect runs: check if consecutive shows have the same city
           if (sorted.length >= 2 && newSetlist.city) {
@@ -951,7 +951,7 @@
 
         setSetlists(prev => {
           const updated = [newSetlist, ...prev];
-          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date));
           
           if (sorted.length >= 2 && newSetlist.city) {
             let consecutiveSameCity = 1;
@@ -998,7 +998,7 @@
 
         setSetlists(prev => {
           const updated = [newSetlist, ...prev];
-          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+          const sorted = updated.sort((a, b) => new Date(b.date) - new Date(a.date));
           
           if (sorted.length >= 2 && newSetlist.city) {
             let consecutiveSameCity = 1;
