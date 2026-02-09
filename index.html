@@ -770,6 +770,10 @@
       const [themeSongs, setThemeSongs] = useState(DEFAULT_THEME_SONGS); // Editable theme song lists
       const [editingTheme, setEditingTheme] = useState(null); // {key: 'valentine', label: 'Valentine's Day', songs: [...]}
       const [themeSearchTerm, setThemeSearchTerm] = useState('');
+      const [pairSongA, setPairSongA] = useState('');
+      const [pairSongB, setPairSongB] = useState('');
+      const [pairSearchA, setPairSearchA] = useState('');
+      const [pairSearchB, setPairSearchB] = useState('');
 
       // Combine all available songs (base + covers + custom)
       const ALL_SONGS_WITH_COVERS = useMemo(() => {
@@ -1191,6 +1195,26 @@
           songs: [...themeSongs[themeKey]]
         });
         setThemeSearchTerm('');
+        setPairSongA('');
+        setPairSongB('');
+        setPairSearchA('');
+        setPairSearchB('');
+      };
+
+      const addPairToTheme = () => {
+        if (editingTheme && pairSongA && pairSongB) {
+          const pairString = `${pairSongA}<->${pairSongB}`;
+          if (!editingTheme.songs.includes(pairString)) {
+            setEditingTheme({
+              ...editingTheme,
+              songs: [...editingTheme.songs, pairString]
+            });
+          }
+          setPairSongA('');
+          setPairSongB('');
+          setPairSearchA('');
+          setPairSearchB('');
+        }
       };
 
       const addSongToTheme = (song) => {
@@ -2284,128 +2308,349 @@
                   </button>
                 </div>
 
-                {/* Search to Add Songs */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ 
-                    display: 'block', 
-                    marginBottom: '0.5rem',
-                    fontSize: '0.9rem',
-                    fontWeight: '600'
-                  }}>
-                    Add Song from Database
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="🔍 Search songs..."
-                    value={themeSearchTerm}
-                    onChange={(e) => setThemeSearchTerm(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      background: 'var(--bg-dark)',
-                      border: '1px solid var(--border)',
-                      borderRadius: '6px',
-                      color: 'var(--text-primary)',
-                      fontSize: '0.9rem',
-                      marginBottom: '0.5rem'
-                    }}
-                  />
-                  {themeSearchTerm && (
-                    <div style={{
-                      background: 'var(--bg-dark)',
-                      border: '1px solid var(--border)',
-                      borderRadius: '6px',
-                      maxHeight: '200px',
-                      overflow: 'auto'
-                    }}>
-                      {ALL_SONGS_WITH_COVERS
-                        .filter(song => song.toLowerCase().includes(themeSearchTerm.toLowerCase()))
-                        .slice(0, 20)
-                        .map(song => (
-                          <div
-                            key={song}
-                            onClick={() => {
-                              addSongToTheme(song);
-                              setThemeSearchTerm('');
-                            }}
-                            style={{
-                              padding: '0.5rem',
-                              cursor: 'pointer',
-                              borderBottom: '1px solid var(--border)',
-                              transition: 'background 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                          >
-                            {song}
-                            {editingTheme.songs.includes(song) && (
-                              <span style={{ marginLeft: '0.5rem', color: 'var(--accent-green)' }}>✓ Added</span>
-                            )}
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Current Songs List */}
-                <div>
-                  <label style={{ 
-                    display: 'block', 
-                    marginBottom: '0.5rem',
-                    fontSize: '0.9rem',
-                    fontWeight: '600'
-                  }}>
-                    Current Songs ({editingTheme.songs.length})
-                  </label>
-                  <div style={{
-                    background: 'var(--bg-dark)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '6px',
-                    padding: '0.5rem',
-                    maxHeight: '300px',
-                    overflow: 'auto'
-                  }}>
-                    {editingTheme.songs.length === 0 ? (
-                      <div style={{ 
-                        padding: '1rem', 
-                        textAlign: 'center', 
-                        color: 'var(--text-muted)',
-                        fontStyle: 'italic'
+                {editingTheme.key === 'sequentialPairs' ? (
+                  /* Special UI for Sequential Pairs */
+                  <>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
                       }}>
-                        No songs added yet. Search and add songs above.
-                      </div>
-                    ) : (
-                      editingTheme.songs.map(song => (
-                        <div
-                          key={song}
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: '0.5rem',
-                            borderBottom: '1px solid var(--border)'
-                          }}
-                        >
-                          <span>{song}</span>
-                          <button
-                            onClick={() => removeSongFromTheme(song)}
-                            style={{
-                              background: 'rgba(239, 68, 68, 0.2)',
-                              border: '1px solid rgb(239, 68, 68)',
-                              color: 'rgb(239, 68, 68)',
-                              padding: '0.25rem 0.5rem',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              fontSize: '0.75rem'
+                        Add New Pair
+                      </label>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                        <div style={{ flex: 1 }}>
+                          <input
+                            type="text"
+                            placeholder="Song A"
+                            value={themeSearchTerm.split('|||')[0] || ''}
+                            onChange={(e) => {
+                              const songB = themeSearchTerm.split('|||')[1] || '';
+                              setThemeSearchTerm(`${e.target.value}|||${songB}`);
                             }}
-                          >
-                            Remove
-                          </button>
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              background: 'var(--bg-dark)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              color: 'var(--text-primary)',
+                              fontSize: '0.9rem'
+                            }}
+                          />
                         </div>
-                      ))
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center',
+                          color: 'var(--accent-purple)',
+                          fontSize: '1.2rem',
+                          fontWeight: '700'
+                        }}>
+                          ↔
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <input
+                            type="text"
+                            placeholder="Song B"
+                            value={themeSearchTerm.split('|||')[1] || ''}
+                            onChange={(e) => {
+                              const songA = themeSearchTerm.split('|||')[0] || '';
+                              setThemeSearchTerm(`${songA}|||${e.target.value}`);
+                            }}
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              background: 'var(--bg-dark)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              color: 'var(--text-primary)',
+                              fontSize: '0.9rem'
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const [songA, songB] = themeSearchTerm.split('|||').map(s => s.trim());
+                          if (songA && songB) {
+                            const pair = `${songA}<->${songB}`;
+                            if (!editingTheme.songs.includes(pair)) {
+                              setEditingTheme({
+                                ...editingTheme,
+                                songs: [...editingTheme.songs, pair]
+                              });
+                              setThemeSearchTerm('');
+                            }
+                          }
+                        }}
+                        disabled={!themeSearchTerm.split('|||')[0]?.trim() || !themeSearchTerm.split('|||')[1]?.trim()}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          background: 'var(--accent-purple)',
+                          border: 'none',
+                          borderRadius: '6px',
+                          color: 'white',
+                          cursor: 'pointer',
+                          fontSize: '0.9rem',
+                          fontWeight: '600',
+                          opacity: (!themeSearchTerm.split('|||')[0]?.trim() || !themeSearchTerm.split('|||')[1]?.trim()) ? 0.5 : 1
+                        }}
+                      >
+                        Add Pair
+                      </button>
+                    </div>
+
+                    {/* Search suggestions for current input */}
+                    {(themeSearchTerm.split('|||')[0] || themeSearchTerm.split('|||')[1]) && (
+                      <div style={{ marginBottom: '1rem' }}>
+                        <label style={{ 
+                          display: 'block', 
+                          marginBottom: '0.5rem',
+                          fontSize: '0.85rem',
+                          color: 'var(--text-muted)'
+                        }}>
+                          Song suggestions (click to use):
+                        </label>
+                        <div style={{
+                          background: 'var(--bg-dark)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '6px',
+                          maxHeight: '150px',
+                          overflow: 'auto'
+                        }}>
+                          {(() => {
+                            const currentInput = themeSearchTerm.split('|||').find(s => s.trim());
+                            if (!currentInput) return null;
+                            
+                            return ALL_SONGS_WITH_COVERS
+                              .filter(song => song.toLowerCase().includes(currentInput.toLowerCase()))
+                              .slice(0, 10)
+                              .map(song => (
+                                <div
+                                  key={song}
+                                  onClick={() => {
+                                    const parts = themeSearchTerm.split('|||');
+                                    // Determine which field was being typed in
+                                    if (parts[1]?.trim() && !parts[0]?.trim()) {
+                                      // Typing in Song B
+                                      setThemeSearchTerm(`|||${song}`);
+                                    } else {
+                                      // Typing in Song A or both empty
+                                      setThemeSearchTerm(`${song}|||${parts[1] || ''}`);
+                                    }
+                                  }}
+                                  style={{
+                                    padding: '0.5rem',
+                                    cursor: 'pointer',
+                                    borderBottom: '1px solid var(--border)',
+                                    fontSize: '0.85rem'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)'}
+                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                  {song}
+                                </div>
+                              ));
+                          })()}
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
+
+                    {/* Current Pairs List */}
+                    <div>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
+                      }}>
+                        Current Pairs ({editingTheme.songs.length})
+                      </label>
+                      <div style={{
+                        background: 'var(--bg-dark)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        padding: '0.5rem',
+                        maxHeight: '300px',
+                        overflow: 'auto'
+                      }}>
+                        {editingTheme.songs.length === 0 ? (
+                          <div style={{ 
+                            padding: '1rem', 
+                            textAlign: 'center', 
+                            color: 'var(--text-muted)',
+                            fontStyle: 'italic'
+                          }}>
+                            No pairs added yet. Add pairs above.
+                          </div>
+                        ) : (
+                          editingTheme.songs.map((pair, idx) => {
+                            const [songA, songB] = pair.split('<->');
+                            return (
+                              <div
+                                key={idx}
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  padding: '0.5rem',
+                                  borderBottom: '1px solid var(--border)'
+                                }}
+                              >
+                                <span style={{ fontSize: '0.9rem' }}>
+                                  {songA} <span style={{ color: 'var(--accent-purple)', fontWeight: '700' }}>↔</span> {songB}
+                                </span>
+                                <button
+                                  onClick={() => removeSongFromTheme(pair)}
+                                  style={{
+                                    background: 'rgba(239, 68, 68, 0.2)',
+                                    border: '1px solid rgb(239, 68, 68)',
+                                    color: 'rgb(239, 68, 68)',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.75rem'
+                                  }}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* Regular song list UI for other themes */
+                  <>
+                    {/* Search to Add Songs */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
+                      }}>
+                        Add Song from Database
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="🔍 Search songs..."
+                        value={themeSearchTerm}
+                        onChange={(e) => setThemeSearchTerm(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          background: 'var(--bg-dark)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '6px',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.9rem',
+                          marginBottom: '0.5rem'
+                        }}
+                      />
+                      {themeSearchTerm && (
+                        <div style={{
+                          background: 'var(--bg-dark)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '6px',
+                          maxHeight: '200px',
+                          overflow: 'auto'
+                        }}>
+                          {ALL_SONGS_WITH_COVERS
+                            .filter(song => song.toLowerCase().includes(themeSearchTerm.toLowerCase()))
+                            .slice(0, 20)
+                            .map(song => (
+                              <div
+                                key={song}
+                                onClick={() => {
+                                  addSongToTheme(song);
+                                  setThemeSearchTerm('');
+                                }}
+                                style={{
+                                  padding: '0.5rem',
+                                  cursor: 'pointer',
+                                  borderBottom: '1px solid var(--border)',
+                                  transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                              >
+                                {song}
+                                {editingTheme.songs.includes(song) && (
+                                  <span style={{ marginLeft: '0.5rem', color: 'var(--accent-green)' }}>✓ Added</span>
+                                )}
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Current Songs List */}
+                    <div>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
+                      }}>
+                        Current Songs ({editingTheme.songs.length})
+                      </label>
+                      <div style={{
+                        background: 'var(--bg-dark)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        padding: '0.5rem',
+                        maxHeight: '300px',
+                        overflow: 'auto'
+                      }}>
+                        {editingTheme.songs.length === 0 ? (
+                          <div style={{ 
+                            padding: '1rem', 
+                            textAlign: 'center', 
+                            color: 'var(--text-muted)',
+                            fontStyle: 'italic'
+                          }}>
+                            No songs added yet. Search and add songs above.
+                          </div>
+                        ) : (
+                          editingTheme.songs.map(song => (
+                            <div
+                              key={song}
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '0.5rem',
+                                borderBottom: '1px solid var(--border)'
+                              }}
+                            >
+                              <span>{song}</span>
+                              <button
+                                onClick={() => removeSongFromTheme(song)}
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.2)',
+                                  border: '1px solid rgb(239, 68, 68)',
+                                  color: 'rgb(239, 68, 68)',
+                                  padding: '0.25rem 0.5rem',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                  fontSize: '0.75rem'
+                                }}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {/* Save/Cancel Buttons */}
                 <div style={{ 
@@ -2437,14 +2682,21 @@
             <p className="subtitle">Track the 3-show rule • Predict available songs • Live updates</p>
           </header>
 
-          {/* Next Run Prediction Box */}
+          {/* Next Run Prediction / Tonight's Show Box */}
           <div className="card" style={{ 
             marginBottom: '2rem',
-            background: 'linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 140, 66, 0.1))',
-            borderColor: 'var(--accent-orange)'
+            background: mode === 'live' && liveSetlist.length > 0 
+              ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1))'
+              : 'linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 140, 66, 0.1))',
+            borderColor: mode === 'live' && liveSetlist.length > 0 ? 'var(--accent-green)' : 'var(--accent-orange)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{ color: 'var(--accent-red)', margin: 0 }}>🎸 Next Run Prediction</h2>
+              <h2 style={{ 
+                color: mode === 'live' && liveSetlist.length > 0 ? 'var(--accent-green)' : 'var(--accent-red)', 
+                margin: 0 
+              }}>
+                {mode === 'live' && liveSetlist.length > 0 ? '🎸 Tonight\'s Show (Live)' : '🎸 Next Run Prediction'}
+              </h2>
               {(() => {
                 const upcomingDate = '2026-02-14';
                 const theme = getDateTheme(upcomingDate);
@@ -2528,15 +2780,78 @@
               </div>
               
               <div>
-                <h3 style={{ 
-                  fontSize: '1rem',
-                  color: 'var(--text-secondary)',
-                  marginBottom: '0.75rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em'
-                }}>
-                  Top 10 Most Likely Songs
-                </h3>
+                {mode === 'live' && liveSetlist.length > 0 ? (
+                  /* Live Show Mode - Show what's been played vs predicted */
+                  <>
+                    <h3 style={{ 
+                      fontSize: '1rem',
+                      color: 'var(--accent-green)',
+                      marginBottom: '0.75rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em'
+                    }}>
+                      Songs Played Tonight ({liveSetlist.length})
+                    </h3>
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: '1fr',
+                      gap: '0.5rem',
+                      fontSize: '0.95rem',
+                      marginBottom: '1.5rem'
+                    }}>
+                      {liveSetlist.map((song, i) => (
+                        <div 
+                          key={i}
+                          style={{
+                            padding: '0.5rem 0.75rem',
+                            background: 'rgba(34, 197, 94, 0.1)',
+                            border: '1px solid var(--accent-green)',
+                            borderRadius: '6px',
+                            color: 'var(--accent-green)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <span>{i + 1}. {song}</span>
+                          <button
+                            onClick={() => setLiveSetlist(liveSetlist.filter((_, idx) => idx !== i))}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--text-muted)',
+                              cursor: 'pointer',
+                              fontSize: '0.85rem',
+                              padding: '0.25rem'
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <h3 style={{ 
+                      fontSize: '1rem',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '0.75rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em'
+                    }}>
+                      Top Remaining Predictions
+                    </h3>
+                  </>
+                ) : (
+                  <h3 style={{ 
+                    fontSize: '1rem',
+                    color: 'var(--text-secondary)',
+                    marginBottom: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em'
+                  }}>
+                    Top 10 Most Likely Songs
+                  </h3>
+                )}
                 <div style={{ 
                   display: 'grid', 
                   gridTemplateColumns: '1fr 1fr',
@@ -2778,19 +3093,13 @@
                     className={`mode-btn ${mode === 'setup' ? 'active' : ''}`}
                     onClick={() => setMode('setup')}
                   >
-                    Setup
+                    Add History
                   </button>
                   <button 
                     className={`mode-btn ${mode === 'live' ? 'active' : ''}`}
                     onClick={startLiveMode}
                   >
                     Live Show
-                  </button>
-                  <button 
-                    className={`mode-btn ${mode === 'view' ? 'active' : ''}`}
-                    onClick={() => setMode('view')}
-                  >
-                    View Songs
                   </button>
                 </div>
 
@@ -3151,8 +3460,8 @@ Chilly Water, Pigeons, Space Wrangler..."
 
               {/* All Shows Section */}
               <div className="card" style={{ marginTop: '2rem' }}>
-                <h2>All Shows ({setlists.length})</h2>
-                {setlists.length === 0 ? (
+                <h2>All Shows ({mode === 'live' && liveSetlist.length > 0 ? setlists.length + 1 : setlists.length})</h2>
+                {setlists.length === 0 && !(mode === 'live' && liveSetlist.length > 0) ? (
                   <div className="empty-state">
                     <div className="empty-state-icon">🎸</div>
                     <p>No setlists yet</p>
@@ -3160,6 +3469,68 @@ Chilly Water, Pigeons, Space Wrangler..."
                   </div>
                 ) : (
                   <div style={{ maxHeight: '600px', overflow: 'auto' }}>
+                    {/* Tonight's Show (Live Mode) */}
+                    {mode === 'live' && liveSetlist.length > 0 && (
+                      <div className="setlist-display" style={{
+                        background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1))',
+                        border: '2px solid var(--accent-green)',
+                        marginBottom: '1rem'
+                      }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center',
+                          marginBottom: '0.75rem'
+                        }}>
+                          <div>
+                            <div style={{ 
+                              fontSize: '1.1rem', 
+                              fontWeight: '600',
+                              color: 'var(--accent-green)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem'
+                            }}>
+                              <span style={{ fontSize: '1.3rem' }}>🎸</span>
+                              Tonight's Show (Live)
+                            </div>
+                            <div style={{ 
+                              fontSize: '0.85rem', 
+                              color: 'var(--text-secondary)',
+                              marginTop: '0.25rem'
+                            }}>
+                              {new Date().toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                              })}
+                              {nextRunCity && (
+                                <span> • {nextRunCity}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ 
+                          color: 'var(--text-primary)',
+                          lineHeight: '1.6'
+                        }}>
+                          {liveSetlist.join(', ')}
+                        </div>
+                        <div style={{
+                          marginTop: '0.75rem',
+                          padding: '0.5rem',
+                          background: 'rgba(34, 197, 94, 0.1)',
+                          borderRadius: '4px',
+                          fontSize: '0.85rem',
+                          color: 'var(--accent-green)',
+                          fontStyle: 'italic'
+                        }}>
+                          💡 This show will be saved when you click "Save Tonight's Setlist"
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Historical Shows */}
                     {[...setlists]
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
                       .map((setlist, index) => {
