@@ -1404,6 +1404,37 @@
           // Get history (all shows before this one)
           const historySetlists = sortedSetlists.slice(0, targetIndex);
           
+          // Detect if target show is part of a run
+          // A run is consecutive dates in the same city (within 2 days of each other)
+          const targetDate = new Date(targetSetlist.date);
+          const targetCity = (targetSetlist.city || '').toLowerCase().trim();
+          
+          const runShows = [];
+          if (targetCity) {
+            // Look backwards for consecutive shows in same city
+            for (let i = targetIndex - 1; i >= 0; i--) {
+              const prevShow = sortedSetlists[i];
+              const prevDate = new Date(prevShow.date);
+              const prevCity = (prevShow.city || '').toLowerCase().trim();
+              const daysDiff = (targetDate - prevDate) / (1000 * 60 * 60 * 24);
+              
+              // If same city and within 2 days, it's part of the run
+              if (prevCity === targetCity && daysDiff <= 2) {
+                runShows.unshift(prevShow); // Add to beginning
+              } else if (runShows.length > 0) {
+                // Found a gap, stop looking
+                break;
+              }
+            }
+          }
+          
+          // Collect songs already played in this run
+          const songsPlayedInRun = new Set();
+          runShows.forEach(show => {
+            const uniqueSongs = [...new Set(show.songs)];
+            uniqueSongs.forEach(song => songsPlayedInRun.add(song));
+          });
+          
           // Build songStatus from history
           const historySongStatus = {};
           ALL_SONGS_WITH_COVERS.forEach(song => {
@@ -1412,7 +1443,8 @@
               lastPlayed: null,
               showsSince: Infinity,
               timesPlayed: 0,
-              playFrequency: 0
+              playFrequency: 0,
+              playedInRun: songsPlayedInRun.has(song) // Track if played in current run
             };
           });
           
@@ -1435,22 +1467,41 @@
             }
           });
           
-          // Apply 3-show rule
-          const reversedHistory = [...historySetlists].reverse();
-          reversedHistory.forEach((setlist, reverseIndex) => {
-            const forwardIndex = historySetlists.length - 1 - reverseIndex;
-            setlist.songs.forEach(song => {
-              if (historySongStatus[song] && historySongStatus[song].showsSince === Infinity) {
-                historySongStatus[song].showsSince = forwardIndex;
+          // Apply 3-show rule - calculate shows since last played
+          // We need to iterate FORWARD through history to track when each song was last played
+          historySetlists.forEach((setlist, index) => {
+            const uniqueSongs = [...new Set(setlist.songs)];
+            uniqueSongs.forEach(song => {
+              if (historySongStatus[song]) {
+                // Mark this song as played at this index
+                historySongStatus[song].lastPlayedIndex = index;
                 historySongStatus[song].lastPlayed = setlist.date;
-                historySongStatus[song].available = (forwardIndex >= 3);
               }
             });
           });
           
-          // Calculate Heavy Rotation
+          // Now calculate showsSince for each song from the perspective of AFTER all history
+          const totalShows = historySetlists.length;
+          ALL_SONGS_WITH_COVERS.forEach(song => {
+            if (historySongStatus[song]) {
+              if (historySongStatus[song].lastPlayedIndex !== undefined) {
+                // Shows since = total shows - last played index - 1
+                historySongStatus[song].showsSince = totalShows - historySongStatus[song].lastPlayedIndex - 1;
+                historySongStatus[song].available = historySongStatus[song].showsSince >= 3;
+              } else {
+                // Never played in history
+                historySongStatus[song].showsSince = Infinity;
+                historySongStatus[song].available = true;
+              }
+            }
+          });
+          
+          // Calculate Heavy Rotation (exclude Drums and Jam)
           const historyHeavyRotation = Object.entries(historySongStatus)
-            .filter(([song, status]) => status.timesPlayed >= 3)
+            .filter(([song, status]) => {
+              if (song === 'Drums' || song === 'Jam') return false;
+              return status.timesPlayed >= 3;
+            })
             .sort((a, b) => b[1].timesPlayed - a[1].timesPlayed || a[0].localeCompare(b[0]))
             .slice(0, 20)
             .map(([song]) => song);
@@ -1460,6 +1511,7 @@
             .filter(([song, status]) => {
               if (song === 'Drums' || song === 'Jam') return false;
               if (status.timesPlayed < 2) return false;
+              if (status.playedInRun) return false; // Exclude songs already played in this run
               return status.available || status.showsSince === 2;
             })
             .map(([song, status]) => {
@@ -1500,7 +1552,9 @@
             coverage: ((matches.length / actualSongs.length) * 100).toFixed(0), // What % of their setlist we predicted
             predictions: predictions, // Store the actual predictions
             actualSongs: actualSongs, // Store the actual songs played
-            matchedSongs: matches // Store which songs matched
+            matchedSongs: matches, // Store which songs matched
+            runShows: runShows, // Store run information
+            songsPlayedInRun: Array.from(songsPlayedInRun) // Songs excluded due to run
           };
         });
         
@@ -1722,10 +1776,32 @@
                 <div style={{ 
                   fontSize: '0.9rem', 
                   color: 'var(--text-secondary)',
-                  marginBottom: '1.5rem'
+                  marginBottom: '0.5rem'
                 }}>
                   {selectedPredictionDetail.date} • {selectedPredictionDetail.city}
                 </div>
+                {selectedPredictionDetail.runInfo && selectedPredictionDetail.runInfo.length > 0 && (
+                  <div style={{
+                    padding: '0.75rem',
+                    background: 'rgba(255, 140, 66, 0.1)',
+                    border: '1px solid var(--accent-orange)',
+                    borderRadius: '6px',
+                    marginBottom: '1.5rem',
+                    fontSize: '0.85rem'
+                  }}>
+                    <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: 'var(--accent-orange)' }}>
+                      🔗 Multi-Night Run Detected
+                    </div>
+                    <div style={{ color: 'var(--text-secondary)' }}>
+                      Previous nights in {selectedPredictionDetail.city}: {selectedPredictionDetail.runInfo.map(s => s.date).join(', ')}
+                    </div>
+                    {selectedPredictionDetail.excludedSongs && selectedPredictionDetail.excludedSongs.length > 0 && (
+                      <div style={{ marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                        {selectedPredictionDetail.excludedSongs.length} songs excluded (already played in run)
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 <div style={{
                   display: 'grid',
@@ -2650,7 +2726,9 @@ Chilly Water, Pigeons, Space Wrangler..."
                                             actualSongs: showAccuracy[setlist.id].actualSongs,
                                             matchedSongs: showAccuracy[setlist.id].matchedSongs,
                                             matches: showAccuracy[setlist.id].matches,
-                                            accuracy: showAccuracy[setlist.id].predictionAccuracy
+                                            accuracy: showAccuracy[setlist.id].predictionAccuracy,
+                                            runInfo: showAccuracy[setlist.id].runShows,
+                                            excludedSongs: showAccuracy[setlist.id].songsPlayedInRun
                                           });
                                         }}
                                         style={{ 
