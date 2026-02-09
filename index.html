@@ -889,6 +889,18 @@
           
           // Remove the first line (date/venue/city) from songs text
           songsText = lines.slice(1).join('\n').trim();
+          
+          // Also try to remove venue/city from the beginning of the songs text if it appears
+          // This handles cases where venue/city info bleeds into the song list
+          if (extractedVenue && songsText.toLowerCase().startsWith(extractedVenue.toLowerCase())) {
+            songsText = songsText.substring(extractedVenue.length).replace(/^[,\s]+/, '');
+          }
+          if (extractedCity) {
+            const cityWithoutState = extractedCity.split(',')[0].trim();
+            if (songsText.toLowerCase().startsWith(cityWithoutState.toLowerCase())) {
+              songsText = songsText.substring(cityWithoutState.length).replace(/^[,\s]+/, '');
+            }
+          }
         }
 
         // If still no date, check if user filled it manually
@@ -921,20 +933,57 @@
           // Filter out standalone set markers if they somehow remain
           .filter(s => !s.match(/^(1|2|3|E\d?):?$/))
           .filter(s => !['Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
-          // Remove city/state patterns (e.g., "Milwaukee", "WI", "Milwaukee, WI")
+          // Remove city/state patterns and venue/date info
           .filter(s => {
-            // Skip if it's just a city or state abbreviation
-            if (extractedCity && extractedCity.toLowerCase().includes(s.toLowerCase())) {
-              return false;
-            }
             // Skip if it's just a 2-letter state code
             if (s.match(/^[A-Z]{2}$/)) {
               return false;
             }
-            // Skip if it looks like just a city name (single word, capitalized)
-            if (s.match(/^[A-Z][a-z]+$/) && extractedCity && extractedCity.includes(s)) {
+            
+            // Skip if it looks like a date pattern (MM/DD/YY or variations)
+            if (s.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)) {
               return false;
             }
+            
+            // Skip if it's the extracted city (case insensitive, exact match)
+            if (extractedCity) {
+              const cityLower = extractedCity.toLowerCase().trim();
+              const sLower = s.toLowerCase().trim();
+              
+              // Exact match
+              if (sLower === cityLower) {
+                return false;
+              }
+              
+              // Check if s is part of the city name (e.g., "Port Chester" vs "Port" or "Chester")
+              const cityParts = cityLower.split(/[\s,]+/);
+              if (cityParts.includes(sLower)) {
+                return false;
+              }
+              
+              // Check if s contains the city or vice versa
+              if (cityLower.includes(sLower) || sLower.includes(cityLower)) {
+                return false;
+              }
+            }
+            
+            // Skip if it's the extracted venue (case insensitive)
+            if (extractedVenue) {
+              const venueLower = extractedVenue.toLowerCase().trim();
+              const sLower = s.toLowerCase().trim();
+              
+              // Check if s is part of venue name
+              if (venueLower.includes(sLower) || sLower.includes(venueLower)) {
+                return false;
+              }
+              
+              // Check venue parts
+              const venueParts = venueLower.split(/[\s,]+/);
+              if (venueParts.includes(sLower)) {
+                return false;
+              }
+            }
+            
             return true;
           })
           // Filter out empty strings after all processing
@@ -1422,6 +1471,18 @@
                 return bStatus.showsSince - aStatus.showsSince;
               }
             }
+            return a.localeCompare(b);
+          });
+        } else if (sortBy === 'timesPlayed') {
+          songs.sort((a, b) => {
+            const aStatus = songStatus[a];
+            const bStatus = songStatus[b];
+            
+            // Sort by times played descending (most played first)
+            if (bStatus.timesPlayed !== aStatus.timesPlayed) {
+              return bStatus.timesPlayed - aStatus.timesPlayed;
+            }
+            // If tie, alphabetical
             return a.localeCompare(b);
           });
         } else {
@@ -2674,6 +2735,7 @@ Chilly Water, Pigeons, Space Wrangler..."
                   <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
                     <option value="showsSince">Shows Since Last Played</option>
                     <option value="status">Availability Status</option>
+                    <option value="timesPlayed">Most Times Played</option>
                     <option value="alpha">Alphabetical</option>
                   </select>
                 </div>
