@@ -752,6 +752,7 @@
       const [unmatchedSongs, setUnmatchedSongs] = useState([]); // Songs that couldn't be matched
       const [customSongs, setCustomSongs] = useState([]); // User-added songs
       const [selectedSongHistory, setSelectedSongHistory] = useState(null); // {song: string, dates: [{date, city}]}
+      const [selectedPredictionDetail, setSelectedPredictionDetail] = useState(null); // {show, predictions, actual}
       const [themeSongs, setThemeSongs] = useState(DEFAULT_THEME_SONGS); // Editable theme song lists
 
       // Combine all available songs (base + covers + custom)
@@ -1496,7 +1497,10 @@
             totalPredicted: 10,
             totalPlayed: actualSongs.length,
             predictionAccuracy: ((matches.length / 10) * 100).toFixed(0), // How many of our top 10 were correct
-            coverage: ((matches.length / actualSongs.length) * 100).toFixed(0) // What % of their setlist we predicted
+            coverage: ((matches.length / actualSongs.length) * 100).toFixed(0), // What % of their setlist we predicted
+            predictions: predictions, // Store the actual predictions
+            actualSongs: actualSongs, // Store the actual songs played
+            matchedSongs: matches // Store which songs matched
           };
         });
         
@@ -1680,6 +1684,176 @@
                   className="btn btn-secondary"
                   onClick={() => setSelectedSongHistory(null)}
                   style={{ width: '100%', marginTop: '1.5rem' }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Prediction Detail Modal */}
+          {selectedPredictionDetail && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '2rem'
+            }}>
+              <div style={{
+                background: 'var(--bg-card)',
+                border: '2px solid var(--accent-purple)',
+                borderRadius: '12px',
+                padding: '2rem',
+                maxWidth: '900px',
+                width: '100%',
+                maxHeight: '80vh',
+                overflow: 'auto'
+              }}>
+                <h2 style={{ color: 'var(--accent-purple)', marginBottom: '0.5rem' }}>
+                  📊 Prediction Analysis
+                </h2>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: 'var(--text-secondary)',
+                  marginBottom: '1.5rem'
+                }}>
+                  {selectedPredictionDetail.date} • {selectedPredictionDetail.city}
+                </div>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '1.5rem',
+                  marginBottom: '1.5rem'
+                }}>
+                  {/* Predictions Column */}
+                  <div>
+                    <h3 style={{ 
+                      color: 'var(--text-primary)', 
+                      marginBottom: '0.75rem',
+                      fontSize: '1rem',
+                      borderBottom: '2px solid var(--accent-purple)',
+                      paddingBottom: '0.5rem'
+                    }}>
+                      Top 10 Predictions
+                    </h3>
+                    <div style={{
+                      background: 'var(--bg-dark)',
+                      padding: '1rem',
+                      borderRadius: '6px'
+                    }}>
+                      {selectedPredictionDetail.predictions.map((song, i) => {
+                        const wasPlayed = selectedPredictionDetail.matchedSongs.includes(song);
+                        return (
+                          <div key={i} style={{
+                            padding: '0.5rem',
+                            marginBottom: '0.25rem',
+                            background: wasPlayed ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+                            border: wasPlayed ? '1px solid rgb(34, 197, 94)' : '1px solid transparent',
+                            borderRadius: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                          }}>
+                            <span style={{ 
+                              color: 'var(--text-muted)', 
+                              fontSize: '0.8rem',
+                              minWidth: '1.5rem'
+                            }}>
+                              {i + 1}.
+                            </span>
+                            <span style={{ 
+                              color: wasPlayed ? 'rgb(34, 197, 94)' : 'var(--text-primary)',
+                              fontWeight: wasPlayed ? '600' : 'normal'
+                            }}>
+                              {song}
+                            </span>
+                            {wasPlayed && (
+                              <span style={{ marginLeft: 'auto', fontSize: '0.9rem' }}>✓</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Actual Setlist Column */}
+                  <div>
+                    <h3 style={{ 
+                      color: 'var(--text-primary)', 
+                      marginBottom: '0.75rem',
+                      fontSize: '1rem',
+                      borderBottom: '2px solid var(--accent-orange)',
+                      paddingBottom: '0.5rem'
+                    }}>
+                      Actual Setlist ({selectedPredictionDetail.actualSongs.length} songs)
+                    </h3>
+                    <div style={{
+                      background: 'var(--bg-dark)',
+                      padding: '1rem',
+                      borderRadius: '6px',
+                      maxHeight: '400px',
+                      overflow: 'auto'
+                    }}>
+                      {selectedPredictionDetail.actualSongs.map((song, i) => {
+                        const wasPredicted = selectedPredictionDetail.matchedSongs.includes(song);
+                        return (
+                          <div key={i} style={{
+                            padding: '0.5rem',
+                            marginBottom: '0.25rem',
+                            background: wasPredicted ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+                            border: wasPredicted ? '1px solid rgb(34, 197, 94)' : '1px solid transparent',
+                            borderRadius: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                          }}>
+                            <span style={{ 
+                              color: wasPredicted ? 'rgb(34, 197, 94)' : 'var(--text-primary)',
+                              fontWeight: wasPredicted ? '600' : 'normal'
+                            }}>
+                              {song}
+                            </span>
+                            {wasPredicted && (
+                              <span style={{ marginLeft: 'auto', fontSize: '0.9rem' }}>✓</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{
+                  padding: '1rem',
+                  background: selectedPredictionDetail.accuracy >= 50 ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                  border: `1px solid ${selectedPredictionDetail.accuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'}`,
+                  borderRadius: '6px',
+                  marginBottom: '1.5rem',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>
+                    {selectedPredictionDetail.matches}/10
+                  </div>
+                  <div style={{ 
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.9rem'
+                  }}>
+                    {selectedPredictionDetail.accuracy}% Prediction Accuracy
+                  </div>
+                </div>
+
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setSelectedPredictionDetail(null)}
+                  style={{ width: '100%' }}
                 >
                   Close
                 </button>
@@ -2467,7 +2641,19 @@ Chilly Water, Pigeons, Space Wrangler..."
                                       </span>
                                     )}
                                     {showAccuracy[setlist.id] && (
-                                      <span style={{ 
+                                      <span 
+                                        onClick={() => {
+                                          setSelectedPredictionDetail({
+                                            date: setlist.date,
+                                            city: setlist.city || 'Unknown',
+                                            predictions: showAccuracy[setlist.id].predictions,
+                                            actualSongs: showAccuracy[setlist.id].actualSongs,
+                                            matchedSongs: showAccuracy[setlist.id].matchedSongs,
+                                            matches: showAccuracy[setlist.id].matches,
+                                            accuracy: showAccuracy[setlist.id].predictionAccuracy
+                                          });
+                                        }}
+                                        style={{ 
                                         marginLeft: '0.75rem',
                                         padding: '0.25rem 0.5rem',
                                         background: showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
@@ -2475,8 +2661,13 @@ Chilly Water, Pigeons, Space Wrangler..."
                                         borderRadius: '4px',
                                         fontSize: '0.75rem',
                                         fontWeight: '600',
-                                        color: showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'
-                                      }}>
+                                        color: showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.1s ease'
+                                      }}
+                                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                      >
                                         📊 {showAccuracy[setlist.id].matches}/10 ({showAccuracy[setlist.id].predictionAccuracy}%)
                                       </span>
                                     )}
