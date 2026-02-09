@@ -2769,6 +2769,14 @@ Chilly Water, Pigeons, Space Wrangler..."
                           >
                             <span className="song-name">{song}</span>
                             <div className="song-status">
+                              <span style={{ 
+                                fontSize: '0.75rem', 
+                                color: 'var(--accent-yellow)',
+                                fontWeight: '600',
+                                marginRight: '0.5rem'
+                              }}>
+                                {status.timesPlayed}x
+                              </span>
                               {status.available ? (
                                 <>
                                   <span className="status-badge available">Available</span>
