@@ -768,6 +768,8 @@
       const [selectedSongHistory, setSelectedSongHistory] = useState(null); // {song: string, dates: [{date, city}]}
       const [selectedPredictionDetail, setSelectedPredictionDetail] = useState(null); // {show, predictions, actual}
       const [themeSongs, setThemeSongs] = useState(DEFAULT_THEME_SONGS); // Editable theme song lists
+      const [editingTheme, setEditingTheme] = useState(null); // {key: 'valentine', label: 'Valentine's Day', songs: [...]}
+      const [themeSearchTerm, setThemeSearchTerm] = useState('');
 
       // Combine all available songs (base + covers + custom)
       const ALL_SONGS_WITH_COVERS = useMemo(() => {
@@ -1180,6 +1182,50 @@
           song: songName,
           dates: playedShows
         });
+      };
+
+      const startEditingTheme = (themeKey, themeLabel) => {
+        setEditingTheme({
+          key: themeKey,
+          label: themeLabel,
+          songs: [...themeSongs[themeKey]]
+        });
+        setThemeSearchTerm('');
+      };
+
+      const addSongToTheme = (song) => {
+        if (editingTheme && !editingTheme.songs.includes(song)) {
+          setEditingTheme({
+            ...editingTheme,
+            songs: [...editingTheme.songs, song]
+          });
+        }
+      };
+
+      const removeSongFromTheme = (song) => {
+        if (editingTheme) {
+          setEditingTheme({
+            ...editingTheme,
+            songs: editingTheme.songs.filter(s => s !== song)
+          });
+        }
+      };
+
+      const saveThemeEdits = () => {
+        if (editingTheme) {
+          const updatedThemes = {
+            ...themeSongs,
+            [editingTheme.key]: editingTheme.songs
+          };
+          setThemeSongs(updatedThemes);
+          localStorage.setItem('themeSongs', JSON.stringify(updatedThemes));
+          setEditingTheme(null);
+        }
+      };
+
+      const cancelThemeEdit = () => {
+        setEditingTheme(null);
+        setThemeSearchTerm('');
       };
 
       const startEditingSetlist = (setlist) => {
@@ -2189,6 +2235,203 @@
             </div>
           )}
 
+          {/* Theme Edit Modal */}
+          {editingTheme && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '2rem'
+            }}>
+              <div style={{
+                background: 'var(--bg-card)',
+                border: '2px solid var(--accent-purple)',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                maxWidth: '700px',
+                width: '100%',
+                maxHeight: '85vh',
+                overflow: 'auto'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '1rem'
+                }}>
+                  <h2 style={{ color: 'var(--accent-purple)', margin: 0 }}>
+                    Edit {editingTheme.label}
+                  </h2>
+                  <button 
+                    onClick={cancelThemeEdit}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+
+                {/* Search to Add Songs */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem',
+                    fontSize: '0.9rem',
+                    fontWeight: '600'
+                  }}>
+                    Add Song from Database
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="🔍 Search songs..."
+                    value={themeSearchTerm}
+                    onChange={(e) => setThemeSearchTerm(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      background: 'var(--bg-dark)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '6px',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.9rem',
+                      marginBottom: '0.5rem'
+                    }}
+                  />
+                  {themeSearchTerm && (
+                    <div style={{
+                      background: 'var(--bg-dark)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '6px',
+                      maxHeight: '200px',
+                      overflow: 'auto'
+                    }}>
+                      {ALL_SONGS_WITH_COVERS
+                        .filter(song => song.toLowerCase().includes(themeSearchTerm.toLowerCase()))
+                        .slice(0, 20)
+                        .map(song => (
+                          <div
+                            key={song}
+                            onClick={() => {
+                              addSongToTheme(song);
+                              setThemeSearchTerm('');
+                            }}
+                            style={{
+                              padding: '0.5rem',
+                              cursor: 'pointer',
+                              borderBottom: '1px solid var(--border)',
+                              transition: 'background 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          >
+                            {song}
+                            {editingTheme.songs.includes(song) && (
+                              <span style={{ marginLeft: '0.5rem', color: 'var(--accent-green)' }}>✓ Added</span>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Current Songs List */}
+                <div>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem',
+                    fontSize: '0.9rem',
+                    fontWeight: '600'
+                  }}>
+                    Current Songs ({editingTheme.songs.length})
+                  </label>
+                  <div style={{
+                    background: 'var(--bg-dark)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '6px',
+                    padding: '0.5rem',
+                    maxHeight: '300px',
+                    overflow: 'auto'
+                  }}>
+                    {editingTheme.songs.length === 0 ? (
+                      <div style={{ 
+                        padding: '1rem', 
+                        textAlign: 'center', 
+                        color: 'var(--text-muted)',
+                        fontStyle: 'italic'
+                      }}>
+                        No songs added yet. Search and add songs above.
+                      </div>
+                    ) : (
+                      editingTheme.songs.map(song => (
+                        <div
+                          key={song}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '0.5rem',
+                            borderBottom: '1px solid var(--border)'
+                          }}
+                        >
+                          <span>{song}</span>
+                          <button
+                            onClick={() => removeSongFromTheme(song)}
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.2)',
+                              border: '1px solid rgb(239, 68, 68)',
+                              color: 'rgb(239, 68, 68)',
+                              padding: '0.25rem 0.5rem',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '0.75rem'
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Save/Cancel Buttons */}
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '0.5rem', 
+                  marginTop: '1.5rem' 
+                }}>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={saveThemeEdits}
+                    style={{ flex: 1 }}
+                  >
+                    Save Changes
+                  </button>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={cancelThemeEdit}
+                    style={{ flex: 1 }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <header>
             <h1>Panic Setlist Predictor</h1>
             <p className="subtitle">Track the 3-show rule • Predict available songs • Live updates</p>
@@ -3107,17 +3350,39 @@ Chilly Water, Pigeons, Space Wrangler..."
                   borderRadius: '12px',
                   padding: '1.5rem'
                 }}>
-                  <h3 style={{
-                    color: themeInfo.color,
-                    marginBottom: '0.5rem',
-                    fontSize: '1.2rem',
+                  <div style={{
                     display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    gap: '0.5rem'
+                    marginBottom: '0.5rem'
                   }}>
-                    <span style={{ fontSize: '1.5rem' }}>{themeInfo.emoji}</span>
-                    {themeInfo.label}
-                  </h3>
+                    <h3 style={{
+                      color: themeInfo.color,
+                      margin: 0,
+                      fontSize: '1.2rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      <span style={{ fontSize: '1.5rem' }}>{themeInfo.emoji}</span>
+                      {themeInfo.label}
+                    </h3>
+                    <button
+                      onClick={() => startEditingTheme(themeKey, themeInfo.label)}
+                      style={{
+                        background: 'none',
+                        border: `1px solid ${themeInfo.color}`,
+                        color: themeInfo.color,
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        fontWeight: '600'
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </div>
                   <div style={{
                     fontSize: '0.75rem',
                     color: 'var(--text-muted)',
