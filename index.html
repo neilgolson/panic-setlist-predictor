@@ -686,6 +686,7 @@
       "Lawyers, Guns, And Money",
       "Down",
       "Drums",
+      "Jam",
       "Arleen",
       "Smokestack Lightning",
       "Blight",
@@ -768,12 +769,24 @@
         );
         if (exactMatch) return exactMatch;
 
-        // Partial match (contains)
-        const partialMatch = ALL_SONGS_WITH_COVERS.find(s =>
-          normalizeSongName(s).includes(normalized) || 
-          normalized.includes(normalizeSongName(s))
-        );
-        if (partialMatch) return partialMatch;
+        // Partial match (contains) - but require reasonable length to avoid "Jam" matching "Jamais Vu"
+        // Only do substring matching if input is at least 5 chars OR if it's an exact word boundary match
+        if (normalized.length >= 5) {
+          const partialMatch = ALL_SONGS_WITH_COVERS.find(s =>
+            normalizeSongName(s).includes(normalized) || 
+            normalized.includes(normalizeSongName(s))
+          );
+          if (partialMatch) return partialMatch;
+        } else {
+          // For short inputs (< 5 chars), only match if it's a complete word
+          const wordMatch = ALL_SONGS_WITH_COVERS.find(s => {
+            const songNormalized = normalizeSongName(s);
+            // Split into words and check if input matches any complete word
+            const songWords = songNormalized.split(/\s+/);
+            return songWords.includes(normalized);
+          });
+          if (wordMatch) return wordMatch;
+        }
 
         // Return null if no match found
         return null;
@@ -1264,6 +1277,8 @@
           // Deduplicate songs in each setlist to prevent counting duplicates
           const uniqueSongs = [...new Set(setlist.songs)];
           uniqueSongs.forEach(song => {
+            // Exclude instrumental segments
+            if (song === 'Drums' || song === 'Jam') return;
             playCounts[song] = (playCounts[song] || 0) + 1;
           });
         });
@@ -1442,7 +1457,7 @@
           // Run prediction algorithm
           const predictions = Object.entries(historySongStatus)
             .filter(([song, status]) => {
-              if (song === 'Drums') return false;
+              if (song === 'Drums' || song === 'Jam') return false;
               if (status.timesPlayed < 2) return false;
               return status.available || status.showsSince === 2;
             })
@@ -1793,15 +1808,15 @@
                     // Include songs available on EITHER night of the run
                     const scoredSongs = Object.entries(songStatus)
                       .filter(([song, status]) => {
-                        const isDrums = song === 'Drums';
+                        const isInstrumental = song === 'Drums' || song === 'Jam';
                         const hasEnoughPlays = status.timesPlayed >= 2;
                         const availableNight1 = status.available;
                         const availableNight2 = status.showsSince === 2;
-                        const passesFilter = !isDrums && hasEnoughPlays && (availableNight1 || availableNight2);
+                        const passesFilter = !isInstrumental && hasEnoughPlays && (availableNight1 || availableNight2);
                         
                         if (song === 'Climb To Safety') {
                           console.log('Climb To Safety filter check:', {
-                            isDrums,
+                            isInstrumental,
                             timesPlayed: status.timesPlayed,
                             hasEnoughPlays,
                             showsSince: status.showsSince,
