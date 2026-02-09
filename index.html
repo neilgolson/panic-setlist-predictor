@@ -798,17 +798,18 @@
         let songsText = newSongs;
 
         // Try to detect Everyday Companion format
-        // Format: MM/DD/YY Venue Name - City, State
-        // or: MM/DD/YY Venue Name, City, State (no dash)
+        // Format can be:
+        // Line 1: MM/DD/YY Venue Name, City, State
+        // Line 2: 1: Song1, Song2...
+        // OR single line: MM/DD/YY Venue, City, State1: Song1...
         const lines = newSongs.split('\n').map(l => l.trim()).filter(l => l);
         const firstLine = lines[0] || '';
         
         // Check if first line contains a date pattern
-        // Updated to handle formats like: "08/23/25 MGM Music Hall at Fenway Park, Boston, MA1:"
-        const dateMatch = firstLine.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(.+?),\s*([^,]+?),?\s*([A-Z]{2})?([123E]:|$)/);
+        const dateMatch = firstLine.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(.+?),\s*([^,]+?)(?:,\s*([A-Z]{2}))?$/);
         
         if (dateMatch) {
-          const [fullMatch, month, day, year, venuePart, cityPart, state, setMarker] = dateMatch;
+          const [fullMatch, month, day, year, venuePart, cityPart, state] = dateMatch;
           
           // Convert date to YYYY-MM-DD format
           const fullYear = year.length === 2 ? `20${year}` : year;
@@ -826,8 +827,8 @@
             }
           }
           
-          // Remove everything up to and including the set marker
-          songsText = newSongs.replace(fullMatch, '').trim();
+          // Remove the first line (date/venue/city) from songs text
+          songsText = lines.slice(1).join('\n').trim();
         }
 
         // If still no date, check if user filled it manually
