@@ -558,7 +558,21 @@
       christmas: ['Christmas Katie'],
       
       // New Year's (Dec 28 - Jan 4)
-      newyear: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House']
+      newyear: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House'],
+      
+      // Sequential Pairs - Songs that typically follow each other
+      // Format: "Song A<->Song B" means they're paired (either order)
+      // If one is played, treat the other as if it was also played (both on cooldown)
+      sequentialPairs: [
+        'Machine<->Barstools And Dreamers',
+        'Protein Drink<->Sewing Machine',
+        'Goodpeople<->Dark Bar',
+        'Travelin\' Man<->The Waker',
+        'Jack<->Bear\'s Gone Fishin\'',
+        'Bear\'s Gone Fishin\'<->Tie Your Shoes',
+        'Party At Your Mama\'s House<->Stop Breakin\' Down Blues',
+        'Surprise Valley<->Blackout Blues'
+      ]
     };
 
     // Coastal cities within 30 miles of ocean (for beach theme)
@@ -1266,8 +1280,45 @@
           });
         }
 
+        // Apply sequential pairing rules - if one song in a pair was played recently, 
+        // treat its partner as if it was also played (both on cooldown together)
+        const pairs = themeSongs['sequentialPairs'] || [];
+        const lastThreeShows = sortedSetlists.slice(0, 3); // Most recent 3 shows
+        const recentlyPlayedSongs = new Set();
+        lastThreeShows.forEach(setlist => {
+          setlist.songs.forEach(song => recentlyPlayedSongs.add(song));
+        });
+        
+        // Parse pairs and apply cooldown
+        pairs.forEach(pairString => {
+          if (pairString.includes('<->')) {
+            const [songA, songB] = pairString.split('<->').map(s => s.trim());
+            
+            // If Song A was played recently, treat Song B as if it was also played
+            if (recentlyPlayedSongs.has(songA) && status[songB]) {
+              const songAStatus = status[songA];
+              if (songAStatus && songAStatus.showsSince !== Infinity) {
+                // Copy the showsSince from the played song to its partner
+                status[songB].showsSince = Math.min(status[songB].showsSince, songAStatus.showsSince);
+                status[songB].available = (status[songB].showsSince >= 3);
+                status[songB].lastPlayed = songAStatus.lastPlayed;
+              }
+            }
+            
+            // If Song B was played recently, treat Song A as if it was also played
+            if (recentlyPlayedSongs.has(songB) && status[songA]) {
+              const songBStatus = status[songB];
+              if (songBStatus && songBStatus.showsSince !== Infinity) {
+                status[songA].showsSince = Math.min(status[songA].showsSince, songBStatus.showsSince);
+                status[songA].available = (status[songA].showsSince >= 3);
+                status[songA].lastPlayed = songBStatus.lastPlayed;
+              }
+            }
+          }
+        });
+
         return status;
-      }, [setlists, mode, liveSetlist]);
+      }, [setlists, mode, liveSetlist, themeSongs]);
 
       // Calculate top 20 most frequently played songs from the database (must be after songStatus)
       const heavyRotation = useMemo(() => {
@@ -1496,6 +1547,45 @@
             }
           });
           
+          // Apply sequential pairing rules - if one song in a pair was played recently in history,
+          // treat its partner as if it was also played (both on cooldown together)
+          const pairs = themeSongs['sequentialPairs'] || [];
+          const lastThreeHistory = historySetlists.slice(-3); // Last 3 shows in history
+          const recentlyPlayedInHistory = new Set();
+          lastThreeHistory.forEach(setlist => {
+            setlist.songs.forEach(song => recentlyPlayedInHistory.add(song));
+          });
+          
+          pairs.forEach(pairString => {
+            if (pairString.includes('<->')) {
+              const [songA, songB] = pairString.split('<->').map(s => s.trim());
+              
+              // If Song A was played recently, treat Song B as if it was also played
+              if (recentlyPlayedInHistory.has(songA) && historySongStatus[songB]) {
+                const songAStatus = historySongStatus[songA];
+                if (songAStatus && songAStatus.showsSince !== Infinity) {
+                  historySongStatus[songB].showsSince = Math.min(
+                    historySongStatus[songB].showsSince, 
+                    songAStatus.showsSince
+                  );
+                  historySongStatus[songB].available = (historySongStatus[songB].showsSince >= 3);
+                }
+              }
+              
+              // If Song B was played recently, treat Song A as if it was also played
+              if (recentlyPlayedInHistory.has(songB) && historySongStatus[songA]) {
+                const songBStatus = historySongStatus[songB];
+                if (songBStatus && songBStatus.showsSince !== Infinity) {
+                  historySongStatus[songA].showsSince = Math.min(
+                    historySongStatus[songA].showsSince, 
+                    songBStatus.showsSince
+                  );
+                  historySongStatus[songA].available = (historySongStatus[songA].showsSince >= 3);
+                }
+              }
+            }
+          });
+          
           // Calculate Heavy Rotation (exclude Drums and Jam)
           const historyHeavyRotation = Object.entries(historySongStatus)
             .filter(([song, status]) => {
@@ -1518,7 +1608,7 @@
               let score = 0;
               score += status.playFrequency * 0.5;
               if (historyHeavyRotation.includes(song)) score += 30;
-              if (status.showsSince !== Infinity) score += Math.min(20, status.showsSince * 2);
+              if (status.showsSince !== Infinity) score += Math.min(15, status.showsSince * 2.5);
               
               const cityMatches = historySetlists.some(s => 
                 s.city && targetSetlist.city && 
@@ -2109,9 +2199,9 @@
                           score += 30;
                         }
                         
-                        // Factor 3: Time since last played (0-20 points)
+                        // Factor 3: Time since last played (0-15 points, caps at 6 shows)
                         if (status.showsSince !== Infinity) {
-                          score += Math.min(20, status.showsSince * 2);
+                          score += Math.min(15, status.showsSince * 2.5);
                         }
                         
                         // Factor 4: City-specific bonus (0-30 points)
@@ -2817,7 +2907,8 @@ Chilly Water, Pigeons, Space Wrangler..."
                 beach: { emoji: '🏖️', label: 'Beach', color: 'rgb(14, 165, 233)', dateRange: 'Coastal cities only' },
                 halloween: { emoji: '🎃', label: 'Halloween', color: 'rgb(249, 115, 22)', dateRange: 'Oct 27 - Nov 4' },
                 christmas: { emoji: '🎄', label: 'Christmas', color: 'rgb(22, 163, 74)', dateRange: 'Dec 21-29' },
-                newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)', dateRange: 'Dec 28 - Jan 5' }
+                newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)', dateRange: 'Dec 28 - Jan 5' },
+                sequentialPairs: { emoji: '🔗', label: 'Sequential Pairs', color: 'rgb(139, 92, 246)', dateRange: 'Format: Song A<->Song B' }
               }).map(([themeKey, themeInfo]) => (
                 <div key={themeKey} style={{
                   background: 'var(--bg-dark)',
