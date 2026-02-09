@@ -1174,33 +1174,19 @@
           });
         }
 
-        // If in a run, check all shows in the run
-        if (currentRun) {
-          const runSetlists = sortedSetlists.slice(0, currentRun.days);
-          runSetlists.forEach(setlist => {
-            setlist.songs.forEach(song => {
-              if (status[song]) {
-                status[song].available = false;
-                status[song].inCurrentRun = true;
+        // Apply 3-show rule - process all shows to find when each song was last played
+        sortedSetlists.forEach((setlist, index) => {
+          setlist.songs.forEach(song => {
+            if (status[song]) {
+              // Only set the FIRST time we see this song (most recent since sorted newest first)
+              if (status[song].showsSince === Infinity) {
+                status[song].showsSince = index;
                 status[song].lastPlayed = setlist.date;
+                status[song].available = (index >= 3);
               }
-            });
+            }
           });
-        } else {
-          // Regular 3-show rule - process all shows to find when each song was last played
-          sortedSetlists.forEach((setlist, index) => {
-            setlist.songs.forEach(song => {
-              if (status[song]) {
-                // Only set the FIRST time we see this song (most recent since sorted newest first)
-                if (status[song].showsSince === Infinity) {
-                  status[song].showsSince = index;
-                  status[song].lastPlayed = setlist.date;
-                  status[song].available = (index >= 3);
-                }
-              }
-            });
-          });
-        }
+        });
 
         // Factor in live setlist - only in live mode
         if (mode === 'live' && liveSetlist.length > 0) {
@@ -1214,7 +1200,7 @@
         }
 
         return status;
-      }, [setlists, currentRun, mode, liveSetlist]);
+      }, [setlists, mode, liveSetlist]);
 
       // Calculate top 20 most frequently played songs from the database (must be after songStatus)
       const heavyRotation = useMemo(() => {
@@ -1608,16 +1594,6 @@
                       }}
                     />
                   </div>
-                  <button 
-                    className="btn btn-primary"
-                    onClick={() => {
-                      // Force re-render by updating a dummy state
-                      setLiveSetlist([...liveSetlist]);
-                    }}
-                    style={{ width: '100%', fontSize: '0.9rem', padding: '0.5rem' }}
-                  >
-                    Update Predictions
-                  </button>
                 </div>
               </div>
               
