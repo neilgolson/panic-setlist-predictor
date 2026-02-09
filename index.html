@@ -1920,53 +1920,6 @@ Chilly Water, Pigeons, Space Wrangler..."
                         Parse & Add Setlist
                       </button>
                     )}
-
-                    <div style={{ marginTop: '2rem' }}>
-                      <label>
-                        <input 
-                          type="checkbox" 
-                          checked={isRun}
-                          onChange={e => {
-                            setIsRun(e.target.checked);
-                            if (e.target.checked) {
-                              setCurrentRun({ days: runDays, city: '' });
-                            } else {
-                              setCurrentRun(null);
-                            }
-                          }}
-                        />
-                        {' '}Currently in a run
-                      </label>
-                      {isRun && (
-                        <>
-                          <div className="input-group" style={{ marginTop: '1rem' }}>
-                            <label>City/Location</label>
-                            <input 
-                              type="text" 
-                              placeholder="e.g., Austin, Savannah, Chicago..."
-                              value={currentRun?.city || ''}
-                              onChange={e => {
-                                setCurrentRun({ ...currentRun, city: e.target.value });
-                              }}
-                            />
-                          </div>
-                          <div className="input-group" style={{ marginTop: '1rem' }}>
-                            <label>Run length (days)</label>
-                            <input 
-                              type="number" 
-                              min="2"
-                              max="10"
-                              value={runDays}
-                              onChange={e => {
-                                const days = parseInt(e.target.value);
-                                setRunDays(days);
-                                setCurrentRun({ ...currentRun, days });
-                              }}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
                   </>
                 )}
 
@@ -2053,12 +2006,6 @@ Chilly Water, Pigeons, Space Wrangler..."
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
                       .slice(0, 4) // Only show last 4
                       .map((setlist, index) => {
-                        // Calculate run day number (reversed so oldest = Day 1)
-                        let runDayNumber = null;
-                        if (currentRun && index < currentRun.days) {
-                          runDayNumber = currentRun.days - index; // Reverse: last in list = Day 1
-                        }
-                        
                         return (
                           <div key={setlist.id} className="setlist-display">
                             <div className="setlist-header">
@@ -2067,11 +2014,6 @@ Chilly Water, Pigeons, Space Wrangler..."
                                 {setlist.city && (
                                   <span style={{ marginLeft: '0.5rem', color: 'var(--accent-orange)' }}>
                                     📍 {setlist.city}
-                                  </span>
-                                )}
-                                {runDayNumber && (
-                                  <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: 'var(--accent-yellow)' }}>
-                                    (Run Day {runDayNumber}/{currentRun.days})
                                   </span>
                                 )}
                               </span>
@@ -2289,12 +2231,6 @@ Chilly Water, Pigeons, Space Wrangler..."
                     {[...setlists]
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
                       .map((setlist, index) => {
-                        // Calculate run day number (reversed so oldest = Day 1)
-                        let runDayNumber = null;
-                        if (currentRun && index < currentRun.days) {
-                          runDayNumber = currentRun.days - index;
-                        }
-                        
                         const isEditing = editingSetlist === setlist.id;
                         
                         return (
@@ -2351,11 +2287,6 @@ Chilly Water, Pigeons, Space Wrangler..."
                                     {setlist.city && (
                                       <span style={{ marginLeft: '0.5rem', color: 'var(--accent-orange)' }}>
                                         📍 {setlist.city}
-                                      </span>
-                                    )}
-                                    {runDayNumber && (
-                                      <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: 'var(--accent-yellow)' }}>
-                                        (Run Day {runDayNumber}/{currentRun.days})
                                       </span>
                                     )}
                                   </span>
@@ -2469,8 +2400,6 @@ Chilly Water, Pigeons, Space Wrangler..."
               onClick={() => {
                 if (confirm('⚠️ DANGER ZONE ⚠️\n\nThis will permanently delete ALL setlists, custom songs, and settings. This action cannot be undone.\n\nAre you absolutely sure?')) {
                   setSetlists([]);
-                  setCurrentRun(null);
-                  setIsRun(false);
                   setLiveSetlist([]);
                   setCustomSongs([]);
                   setEditingSetlist(null);
