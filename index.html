@@ -1410,52 +1410,108 @@
         );
 
         // Sort based on selected option
-        if (sortBy === 'showsSince') {
+        if (sortBy === 'likelihood') {
+          // Calculate prediction score for each song using the full algorithm
           songs.sort((a, b) => {
             const aStatus = songStatus[a];
             const bStatus = songStatus[b];
             
-            // Priority 1: Songs that have been played AND are available (not in last 3)
-            const aPlayedAndAvailable = aStatus.lastPlayed && aStatus.showsSince > 2;
-            const bPlayedAndAvailable = bStatus.lastPlayed && bStatus.showsSince > 2;
+            // Calculate score for song A
+            let aScore = 0;
+            aScore += aStatus.playFrequency * 0.5; // Play frequency (0-50)
+            if (heavyRotation.includes(a)) aScore += 30; // Heavy rotation (30)
+            if (aStatus.showsSince !== Infinity) aScore += Math.min(15, aStatus.showsSince * 2.5); // Time since (0-15)
             
-            // Priority 2: Songs currently resting (played in last 3)
-            const aResting = aStatus.showsSince >= 0 && aStatus.showsSince <= 2;
-            const bResting = bStatus.showsSince >= 0 && bStatus.showsSince <= 2;
+            // Calculate score for song B
+            let bScore = 0;
+            bScore += bStatus.playFrequency * 0.5;
+            if (heavyRotation.includes(b)) bScore += 30;
+            if (bStatus.showsSince !== Infinity) bScore += Math.min(15, bStatus.showsSince * 2.5);
             
-            // Priority 3: Never played (showsSince === Infinity, no lastPlayed)
-            const aNeverPlayed = aStatus.showsSince === Infinity && !aStatus.lastPlayed;
-            const bNeverPlayed = bStatus.showsSince === Infinity && !bStatus.lastPlayed;
+            // Sort by score descending (highest first)
+            if (bScore !== aScore) {
+              return bScore - aScore;
+            }
+            // Tie: alphabetical
+            return a.localeCompare(b);
+          });
+        } else if (sortBy === 'showsSince') {
+          songs.sort((a, b) => {
+            const aStatus = songStatus[a];
+            const bStatus = songStatus[b];
             
-            // Top priority: Played but available (longer time since = higher)
-            if (aPlayedAndAvailable && !bPlayedAndAvailable) return -1;
-            if (!aPlayedAndAvailable && bPlayedAndAvailable) return 1;
-            if (aPlayedAndAvailable && bPlayedAndAvailable) {
-              // Among available, sort by longest time since played
-              if (bStatus.showsSince !== aStatus.showsSince) {
-                return bStatus.showsSince - aStatus.showsSince;
+            // Tier 1: Songs played 3+ times
+            const aTier1 = aStatus.timesPlayed >= 3;
+            const bTier1 = bStatus.timesPlayed >= 3;
+            
+            // Tier 2: Songs played exactly 3 times
+            const aTier2 = aStatus.timesPlayed === 3;
+            const bTier2 = bStatus.timesPlayed === 3;
+            
+            // Tier 3: Songs played exactly 2 times
+            const aTier3 = aStatus.timesPlayed === 2;
+            const bTier3 = bStatus.timesPlayed === 2;
+            
+            // Tier 4: Songs played exactly 1 time
+            const aTier4 = aStatus.timesPlayed === 1;
+            const bTier4 = bStatus.timesPlayed === 1;
+            
+            // Priority 1: Songs played 3+ times
+            if (aTier1 && !bTier1) return -1;
+            if (!aTier1 && bTier1) return 1;
+            if (aTier1 && bTier1) {
+              // Within Tier 1, sort by availability status first
+              const aPlayedAndAvailable = aStatus.lastPlayed && aStatus.showsSince > 2;
+              const bPlayedAndAvailable = bStatus.lastPlayed && bStatus.showsSince > 2;
+              const aResting = aStatus.showsSince >= 0 && aStatus.showsSince <= 2;
+              const bResting = bStatus.showsSince >= 0 && bStatus.showsSince <= 2;
+              
+              // Available songs first
+              if (aPlayedAndAvailable && !bPlayedAndAvailable) return -1;
+              if (!aPlayedAndAvailable && bPlayedAndAvailable) return 1;
+              if (aPlayedAndAvailable && bPlayedAndAvailable) {
+                // Among available, sort by longest time since played
+                if (bStatus.showsSince !== aStatus.showsSince) {
+                  return bStatus.showsSince - aStatus.showsSince;
+                }
+                return a.localeCompare(b);
               }
-              return a.localeCompare(b);
-            }
-            
-            // Middle priority: Resting songs
-            if (aResting && !bResting) return -1;
-            if (!aResting && bResting) return 1;
-            if (aResting && bResting) {
-              // Among resting, sort by shows since (furthest from availability first)
-              if (bStatus.showsSince !== aStatus.showsSince) {
-                return bStatus.showsSince - aStatus.showsSince;
+              
+              // Then resting songs
+              if (aResting && !bResting) return -1;
+              if (!aResting && bResting) return 1;
+              if (aResting && bResting) {
+                if (bStatus.showsSince !== aStatus.showsSince) {
+                  return bStatus.showsSince - aStatus.showsSince;
+                }
+                return a.localeCompare(b);
               }
+              
               return a.localeCompare(b);
             }
             
-            // Bottom priority: Never played
-            if (aNeverPlayed && !bNeverPlayed) return 1;
-            if (!aNeverPlayed && bNeverPlayed) return -1;
-            if (aNeverPlayed && bNeverPlayed) {
+            // Priority 2: Songs played exactly 3 times
+            if (aTier2 && !bTier2) return -1;
+            if (!aTier2 && bTier2) return 1;
+            if (aTier2 && bTier2) {
               return a.localeCompare(b);
             }
             
+            // Priority 3: Songs played exactly 2 times
+            if (aTier3 && !bTier3) return -1;
+            if (!aTier3 && bTier3) return 1;
+            if (aTier3 && bTier3) {
+              return a.localeCompare(b);
+            }
+            
+            // Priority 4: Songs played exactly 1 time
+            if (aTier4 && !bTier4) return -1;
+            if (!aTier4 && bTier4) return 1;
+            if (aTier4 && bTier4) {
+              return a.localeCompare(b);
+            }
+            
+            // Never played - alphabetical
             return a.localeCompare(b);
           });
         } else if (sortBy === 'status') {
@@ -1938,18 +1994,37 @@
                     {/* Score Badge */}
                     <div style={{
                       padding: '0.5rem 1rem',
-                      background: selectedPredictionDetail.accuracy >= 50 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                      border: `2px solid ${selectedPredictionDetail.accuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'}`,
+                      background: (() => {
+                        const acc = parseInt(selectedPredictionDetail.accuracy);
+                        if (acc >= 50) return 'rgba(34, 197, 94, 0.2)'; // Green
+                        if (acc >= 20) return 'rgba(234, 179, 8, 0.2)'; // Yellow
+                        return 'rgba(239, 68, 68, 0.2)'; // Red
+                      })(),
+                      border: (() => {
+                        const acc = parseInt(selectedPredictionDetail.accuracy);
+                        if (acc >= 50) return '2px solid rgb(34, 197, 94)'; // Green
+                        if (acc >= 20) return '2px solid rgb(234, 179, 8)'; // Yellow
+                        return '2px solid rgb(239, 68, 68)'; // Red
+                      })(),
                       borderRadius: '6px',
                       textAlign: 'center'
                     }}>
                       <div style={{ 
                         fontSize: '1.3rem', 
                         fontWeight: '700',
-                        color: selectedPredictionDetail.accuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+                        color: (() => {
+                          const acc = parseInt(selectedPredictionDetail.accuracy);
+                          if (acc >= 50) return 'rgb(34, 197, 94)'; // Green
+                          if (acc >= 20) return 'rgb(234, 179, 8)'; // Yellow
+                          return 'rgb(239, 68, 68)'; // Red
+                        })(),
                         lineHeight: '1'
                       }}>
-                        {selectedPredictionDetail.matches}/10
+                        {(() => {
+                          const acc = parseInt(selectedPredictionDetail.accuracy);
+                          const emoji = (acc >= 90) ? '⭐⭐🎸 ' : '';
+                          return `${emoji}${selectedPredictionDetail.matches}/10`;
+                        })()}
                       </div>
                       <div style={{ 
                         fontSize: '0.7rem',
@@ -2733,6 +2808,7 @@ Chilly Water, Pigeons, Space Wrangler..."
                 <div className="input-group" style={{ marginBottom: '1rem' }}>
                   <label>Sort By</label>
                   <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                    <option value="likelihood">Likelihood (Prediction Score)</option>
                     <option value="showsSince">Shows Since Last Played</option>
                     <option value="status">Availability Status</option>
                     <option value="timesPlayed">Most Times Played</option>
@@ -2912,19 +2988,38 @@ Chilly Water, Pigeons, Space Wrangler..."
                                         style={{ 
                                         marginLeft: '0.75rem',
                                         padding: '0.25rem 0.5rem',
-                                        background: showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                        border: `1px solid ${showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'}`,
+                                        background: (() => {
+                                          const acc = parseInt(showAccuracy[setlist.id].predictionAccuracy);
+                                          if (acc >= 50) return 'rgba(34, 197, 94, 0.2)'; // Green
+                                          if (acc >= 20) return 'rgba(234, 179, 8, 0.2)'; // Yellow
+                                          return 'rgba(239, 68, 68, 0.2)'; // Red
+                                        })(),
+                                        border: (() => {
+                                          const acc = parseInt(showAccuracy[setlist.id].predictionAccuracy);
+                                          if (acc >= 50) return '1px solid rgb(34, 197, 94)'; // Green
+                                          if (acc >= 20) return '1px solid rgb(234, 179, 8)'; // Yellow
+                                          return '1px solid rgb(239, 68, 68)'; // Red
+                                        })(),
                                         borderRadius: '4px',
                                         fontSize: '0.75rem',
                                         fontWeight: '600',
-                                        color: showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+                                        color: (() => {
+                                          const acc = parseInt(showAccuracy[setlist.id].predictionAccuracy);
+                                          if (acc >= 50) return 'rgb(34, 197, 94)'; // Green
+                                          if (acc >= 20) return 'rgb(234, 179, 8)'; // Yellow
+                                          return 'rgb(239, 68, 68)'; // Red
+                                        })(),
                                         cursor: 'pointer',
                                         transition: 'transform 0.1s ease'
                                       }}
                                       onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                                       onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                       >
-                                        📊 {showAccuracy[setlist.id].matches}/10 ({showAccuracy[setlist.id].predictionAccuracy}%)
+                                        {(() => {
+                                          const acc = parseInt(showAccuracy[setlist.id].predictionAccuracy);
+                                          const emoji = (acc >= 90) ? '⭐⭐🎸 ' : '📊 ';
+                                          return `${emoji}${showAccuracy[setlist.id].matches}/10 (${showAccuracy[setlist.id].predictionAccuracy}%)`;
+                                        })()}
                                       </span>
                                     )}
                                   </span>
