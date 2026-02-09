@@ -2320,27 +2320,85 @@
                       }}>
                         Add New Pair
                       </label>
-                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', position: 'relative' }}>
+                        {/* Song A with independent search */}
+                        <div style={{ flex: 1, position: 'relative' }}>
                           <input
                             type="text"
-                            placeholder="Song A"
-                            value={themeSearchTerm.split('|||')[0] || ''}
-                            onChange={(e) => {
-                              const songB = themeSearchTerm.split('|||')[1] || '';
-                              setThemeSearchTerm(`${e.target.value}|||${songB}`);
-                            }}
+                            placeholder={pairSongA || "Search Song A..."}
+                            value={pairSearchA}
+                            onChange={(e) => setPairSearchA(e.target.value)}
+                            onFocus={() => setPairSearchA('')}
                             style={{
                               width: '100%',
                               padding: '0.5rem',
-                              background: 'var(--bg-dark)',
-                              border: '1px solid var(--border)',
+                              background: pairSongA ? 'rgba(147, 51, 234, 0.1)' : 'var(--bg-dark)',
+                              border: pairSongA ? '1px solid var(--accent-purple)' : '1px solid var(--border)',
                               borderRadius: '6px',
                               color: 'var(--text-primary)',
                               fontSize: '0.9rem'
                             }}
                           />
+                          {pairSongA && !pairSearchA && (
+                            <button
+                              onClick={() => { setPairSongA(''); setPairSearchA(''); }}
+                              style={{
+                                position: 'absolute',
+                                right: '0.5rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--text-muted)',
+                                cursor: 'pointer',
+                                fontSize: '1rem',
+                                padding: '0.25rem'
+                              }}
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {pairSearchA && !pairSongA && (
+                            <div style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              zIndex: 1000,
+                              background: 'var(--bg-card)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              marginTop: '0.25rem',
+                              maxHeight: '200px',
+                              overflow: 'auto',
+                              boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                            }}>
+                              {ALL_SONGS_WITH_COVERS
+                                .filter(song => song.toLowerCase().includes(pairSearchA.toLowerCase()))
+                                .slice(0, 15)
+                                .map(song => (
+                                  <div
+                                    key={song}
+                                    onClick={() => {
+                                      setPairSongA(song);
+                                      setPairSearchA('');
+                                    }}
+                                    style={{
+                                      padding: '0.5rem',
+                                      cursor: 'pointer',
+                                      borderBottom: '1px solid var(--border)',
+                                      fontSize: '0.85rem'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                  >
+                                    {song}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
                         </div>
+                        
                         <div style={{ 
                           display: 'flex', 
                           alignItems: 'center',
@@ -2350,42 +2408,88 @@
                         }}>
                           ↔
                         </div>
-                        <div style={{ flex: 1 }}>
+                        
+                        {/* Song B with independent search */}
+                        <div style={{ flex: 1, position: 'relative' }}>
                           <input
                             type="text"
-                            placeholder="Song B"
-                            value={themeSearchTerm.split('|||')[1] || ''}
-                            onChange={(e) => {
-                              const songA = themeSearchTerm.split('|||')[0] || '';
-                              setThemeSearchTerm(`${songA}|||${e.target.value}`);
-                            }}
+                            placeholder={pairSongB || "Search Song B..."}
+                            value={pairSearchB}
+                            onChange={(e) => setPairSearchB(e.target.value)}
+                            onFocus={() => setPairSearchB('')}
                             style={{
                               width: '100%',
                               padding: '0.5rem',
-                              background: 'var(--bg-dark)',
-                              border: '1px solid var(--border)',
+                              background: pairSongB ? 'rgba(147, 51, 234, 0.1)' : 'var(--bg-dark)',
+                              border: pairSongB ? '1px solid var(--accent-purple)' : '1px solid var(--border)',
                               borderRadius: '6px',
                               color: 'var(--text-primary)',
                               fontSize: '0.9rem'
                             }}
                           />
+                          {pairSongB && !pairSearchB && (
+                            <button
+                              onClick={() => { setPairSongB(''); setPairSearchB(''); }}
+                              style={{
+                                position: 'absolute',
+                                right: '0.5rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--text-muted)',
+                                cursor: 'pointer',
+                                fontSize: '1rem',
+                                padding: '0.25rem'
+                              }}
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {pairSearchB && !pairSongB && (
+                            <div style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              zIndex: 1000,
+                              background: 'var(--bg-card)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              marginTop: '0.25rem',
+                              maxHeight: '200px',
+                              overflow: 'auto',
+                              boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                            }}>
+                              {ALL_SONGS_WITH_COVERS
+                                .filter(song => song.toLowerCase().includes(pairSearchB.toLowerCase()))
+                                .slice(0, 15)
+                                .map(song => (
+                                  <div
+                                    key={song}
+                                    onClick={() => {
+                                      setPairSongB(song);
+                                      setPairSearchB('');
+                                    }}
+                                    style={{
+                                      padding: '0.5rem',
+                                      cursor: 'pointer',
+                                      borderBottom: '1px solid var(--border)',
+                                      fontSize: '0.85rem'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                  >
+                                    {song}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <button
-                        onClick={() => {
-                          const [songA, songB] = themeSearchTerm.split('|||').map(s => s.trim());
-                          if (songA && songB) {
-                            const pair = `${songA}<->${songB}`;
-                            if (!editingTheme.songs.includes(pair)) {
-                              setEditingTheme({
-                                ...editingTheme,
-                                songs: [...editingTheme.songs, pair]
-                              });
-                              setThemeSearchTerm('');
-                            }
-                          }
-                        }}
-                        disabled={!themeSearchTerm.split('|||')[0]?.trim() || !themeSearchTerm.split('|||')[1]?.trim()}
+                        onClick={addPairToTheme}
+                        disabled={!pairSongA || !pairSongB}
                         style={{
                           width: '100%',
                           padding: '0.5rem',
@@ -2393,71 +2497,15 @@
                           border: 'none',
                           borderRadius: '6px',
                           color: 'white',
-                          cursor: 'pointer',
+                          cursor: (!pairSongA || !pairSongB) ? 'not-allowed' : 'pointer',
                           fontSize: '0.9rem',
                           fontWeight: '600',
-                          opacity: (!themeSearchTerm.split('|||')[0]?.trim() || !themeSearchTerm.split('|||')[1]?.trim()) ? 0.5 : 1
+                          opacity: (!pairSongA || !pairSongB) ? 0.5 : 1
                         }}
                       >
                         Add Pair
                       </button>
                     </div>
-
-                    {/* Search suggestions for current input */}
-                    {(themeSearchTerm.split('|||')[0] || themeSearchTerm.split('|||')[1]) && (
-                      <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ 
-                          display: 'block', 
-                          marginBottom: '0.5rem',
-                          fontSize: '0.85rem',
-                          color: 'var(--text-muted)'
-                        }}>
-                          Song suggestions (click to use):
-                        </label>
-                        <div style={{
-                          background: 'var(--bg-dark)',
-                          border: '1px solid var(--border)',
-                          borderRadius: '6px',
-                          maxHeight: '150px',
-                          overflow: 'auto'
-                        }}>
-                          {(() => {
-                            const currentInput = themeSearchTerm.split('|||').find(s => s.trim());
-                            if (!currentInput) return null;
-                            
-                            return ALL_SONGS_WITH_COVERS
-                              .filter(song => song.toLowerCase().includes(currentInput.toLowerCase()))
-                              .slice(0, 10)
-                              .map(song => (
-                                <div
-                                  key={song}
-                                  onClick={() => {
-                                    const parts = themeSearchTerm.split('|||');
-                                    // Determine which field was being typed in
-                                    if (parts[1]?.trim() && !parts[0]?.trim()) {
-                                      // Typing in Song B
-                                      setThemeSearchTerm(`|||${song}`);
-                                    } else {
-                                      // Typing in Song A or both empty
-                                      setThemeSearchTerm(`${song}|||${parts[1] || ''}`);
-                                    }
-                                  }}
-                                  style={{
-                                    padding: '0.5rem',
-                                    cursor: 'pointer',
-                                    borderBottom: '1px solid var(--border)',
-                                    fontSize: '0.85rem'
-                                  }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(147, 51, 234, 0.1)'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                  {song}
-                                </div>
-                              ));
-                          })()}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Current Pairs List */}
                     <div>
@@ -3159,10 +3207,10 @@ Chilly Water, Pigeons, Space Wrangler..."
                       Live Show in Progress
                     </div>
 
-                    <div className="quick-add">
+                    <div className="quick-add" style={{ position: 'relative' }}>
                       <input 
                         type="text"
-                        placeholder="Add song to tonight's setlist..."
+                        placeholder="Search and add song to tonight's setlist..."
                         value={quickAdd}
                         onChange={e => setQuickAdd(e.target.value)}
                         onKeyPress={e => {
@@ -3170,17 +3218,79 @@ Chilly Water, Pigeons, Space Wrangler..."
                             const match = ALL_SONGS_WITH_COVERS.find(s => 
                               normalizeSongName(s).includes(normalizeSongName(quickAdd))
                             );
-                            if (match) addSongToLive(match);
+                            if (match) {
+                              addSongToLive(match);
+                              setQuickAdd('');
+                            }
                           }
                         }}
                       />
+                      {quickAdd && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: '80px',
+                          zIndex: 1000,
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '6px',
+                          marginTop: '0.25rem',
+                          maxHeight: '250px',
+                          overflow: 'auto',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                        }}>
+                          {ALL_SONGS_WITH_COVERS
+                            .filter(song => song.toLowerCase().includes(quickAdd.toLowerCase()))
+                            .slice(0, 20)
+                            .map(song => {
+                              const status = songStatus[song];
+                              const isAvailable = status?.available;
+                              const isInSetlist = liveSetlist.includes(song);
+                              
+                              return (
+                                <div
+                                  key={song}
+                                  onClick={() => {
+                                    if (!isInSetlist) {
+                                      addSongToLive(song);
+                                      setQuickAdd('');
+                                    }
+                                  }}
+                                  style={{
+                                    padding: '0.5rem',
+                                    cursor: isInSetlist ? 'not-allowed' : 'pointer',
+                                    borderBottom: '1px solid var(--border)',
+                                    fontSize: '0.85rem',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    opacity: isInSetlist ? 0.5 : 1
+                                  }}
+                                  onMouseEnter={(e) => !isInSetlist && (e.currentTarget.style.background = 'rgba(34, 197, 94, 0.1)')}
+                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                  <span>{song}</span>
+                                  {isInSetlist ? (
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)' }}>✓ Added</span>
+                                  ) : !isAvailable ? (
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Resting</span>
+                                  ) : null}
+                                </div>
+                              );
+                            })}
+                        </div>
+                      )}
                       <button 
                         className="btn btn-primary"
                         onClick={() => {
                           const match = ALL_SONGS_WITH_COVERS.find(s => 
                             normalizeSongName(s).includes(normalizeSongName(quickAdd))
                           );
-                          if (match) addSongToLive(match);
+                          if (match) {
+                            addSongToLive(match);
+                            setQuickAdd('');
+                          }
                         }}
                       >
                         Add
@@ -3310,13 +3420,7 @@ Chilly Water, Pigeons, Space Wrangler..."
                           <div 
                             key={song} 
                             className={`song-item ${statusClass}`}
-                            onClick={() => {
-                              if (mode === 'live' && status.available) {
-                                addSongToLive(song);
-                              } else {
-                                showSongHistory(song);
-                              }
-                            }}
+                            onClick={() => showSongHistory(song)}
                             style={{ cursor: 'pointer' }}
                           >
                             <span className="song-name">{song}</span>
@@ -3408,13 +3512,7 @@ Chilly Water, Pigeons, Space Wrangler..."
                       <div 
                         key={song} 
                         className={`song-item ${statusClass}`}
-                        onClick={() => {
-                          if (mode === 'live' && status.available) {
-                            addSongToLive(song);
-                          } else {
-                            showSongHistory(song);
-                          }
-                        }}
+                        onClick={() => showSongHistory(song)}
                         style={{ cursor: 'pointer' }}
                       >
                         <span className="song-name">{song}</span>
