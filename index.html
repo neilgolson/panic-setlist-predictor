@@ -1493,8 +1493,10 @@
           
           accuracyMap[targetSetlist.id] = {
             matches: matches.length,
-            total: actualSongs.length,
-            percentage: ((matches.length / actualSongs.length) * 100).toFixed(0)
+            totalPredicted: 10,
+            totalPlayed: actualSongs.length,
+            predictionAccuracy: ((matches.length / 10) * 100).toFixed(0), // How many of our top 10 were correct
+            coverage: ((matches.length / actualSongs.length) * 100).toFixed(0) // What % of their setlist we predicted
           };
         });
         
@@ -2468,14 +2470,14 @@ Chilly Water, Pigeons, Space Wrangler..."
                                       <span style={{ 
                                         marginLeft: '0.75rem',
                                         padding: '0.25rem 0.5rem',
-                                        background: showAccuracy[setlist.id].percentage >= 50 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                        border: `1px solid ${showAccuracy[setlist.id].percentage >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'}`,
+                                        background: showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                        border: `1px solid ${showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'}`,
                                         borderRadius: '4px',
                                         fontSize: '0.75rem',
                                         fontWeight: '600',
-                                        color: showAccuracy[setlist.id].percentage >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'
+                                        color: showAccuracy[setlist.id].predictionAccuracy >= 50 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)'
                                       }}>
-                                        📊 {showAccuracy[setlist.id].matches}/{showAccuracy[setlist.id].total} ({showAccuracy[setlist.id].percentage}%)
+                                        📊 {showAccuracy[setlist.id].matches}/10 ({showAccuracy[setlist.id].predictionAccuracy}%)
                                       </span>
                                     )}
                                   </span>
@@ -2704,16 +2706,21 @@ Chilly Water, Pigeons, Space Wrangler..."
                         date: setlist?.date,
                         city: setlist?.city,
                         matches: acc.matches,
-                        total: acc.total,
-                        percentage: parseFloat(acc.percentage)
+                        totalPredicted: acc.totalPredicted,
+                        totalPlayed: acc.totalPlayed,
+                        predictionAccuracy: parseFloat(acc.predictionAccuracy),
+                        coverage: parseFloat(acc.coverage)
                       };
                     }),
                   overallStats: {
                     totalAnalyzedShows: Object.values(showAccuracy).filter(a => a !== null).length,
                     totalCorrect: Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.matches, 0),
-                    totalPlayed: Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.total, 0),
-                    overallAccuracy: (Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.matches, 0) / 
-                                     Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.total, 0) * 100).toFixed(2)
+                    totalPredictions: Object.values(showAccuracy).filter(a => a !== null).length * 10,
+                    totalPlayed: Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.totalPlayed, 0),
+                    overallPredictionAccuracy: (Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.matches, 0) / 
+                                               (Object.values(showAccuracy).filter(a => a !== null).length * 10) * 100).toFixed(2),
+                    overallCoverage: (Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.matches, 0) / 
+                                     Object.values(showAccuracy).filter(a => a !== null).reduce((sum, a) => sum + a.totalPlayed, 0) * 100).toFixed(2)
                   }
                 };
                 
@@ -2728,7 +2735,8 @@ Chilly Water, Pigeons, Space Wrangler..."
                 alert(`📊 Data Export Complete!\n\n` +
                       `Total Shows: ${exportData.totalShows}\n` +
                       `Analyzed Shows: ${exportData.overallStats.totalAnalyzedShows}\n` +
-                      `Overall Accuracy: ${exportData.overallStats.overallAccuracy}%\n\n` +
+                      `Prediction Accuracy: ${exportData.overallStats.overallPredictionAccuracy}% (correct/10)\n` +
+                      `Coverage: ${exportData.overallStats.overallCoverage}% (of total setlist)\n\n` +
                       `File downloaded as JSON for analysis.`);
               }}
               style={{ 
