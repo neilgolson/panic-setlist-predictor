@@ -781,11 +781,11 @@
         const firstLine = lines[0] || '';
         
         // Check if first line contains a date pattern
-        // Updated to handle both "Venue - City" and "Venue, City" formats
-        const dateMatch = firstLine.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(.+?)(?:,\s*|\s+-\s+)(.+?)(?:,\s*([A-Z]{2}))?(?:1:|$)/);
+        // Updated to handle formats like: "08/23/25 MGM Music Hall at Fenway Park, Boston, MA1:"
+        const dateMatch = firstLine.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(.+?),\s*([^,]+?),?\s*([A-Z]{2})?([123E]:|$)/);
         
         if (dateMatch) {
-          const [, month, day, year, venuePart, cityPart, state] = dateMatch;
+          const [fullMatch, month, day, year, venuePart, cityPart, state, setMarker] = dateMatch;
           
           // Convert date to YYYY-MM-DD format
           const fullYear = year.length === 2 ? `20${year}` : year;
@@ -803,11 +803,8 @@
             }
           }
           
-          // Remove the date/venue from the beginning of the text
-          // Handle case where setlist continues on same line after venue
-          // Match everything from start up to and including "1:" marker
-          const venuePattern = new RegExp(`^${month}/${day}/${year}\\s+.+?(?:1:|2:|E:)`, 's');
-          songsText = newSongs.replace(venuePattern, '').trim();
+          // Remove everything up to and including the set marker
+          songsText = newSongs.replace(fullMatch, '').trim();
         }
 
         // If still no date, check if user filled it manually
