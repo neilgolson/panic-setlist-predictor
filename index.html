@@ -805,7 +805,9 @@
           
           // Remove the date/venue from the beginning of the text
           // Handle case where setlist continues on same line after venue
-          songsText = newSongs.replace(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+.+?(?:,\s*|\s+-\s+).+?(?:,\s*[A-Z]{2})?/, '').trim();
+          // Match everything from start up to and including "1:" marker
+          const venuePattern = new RegExp(`^${month}/${day}/${year}\\s+.+?(?:1:|2:|E:)`, 's');
+          songsText = newSongs.replace(venuePattern, '').trim();
         }
 
         // If still no date, check if user filled it manually
