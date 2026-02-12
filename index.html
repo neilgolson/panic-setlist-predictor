@@ -526,19 +526,19 @@
                   const acc=showAccuracy[sl.id];const pct=acc?parseInt(acc.predictionAccuracy):null;
                   const ac=pct>=50?'rgb(34,197,94)':pct>=20?'rgb(234,179,8)':'rgb(239,68,68)';
                   return(
-                    <div key={sl.id} style={{padding:'.85rem 1rem',borderRadius:10,marginBottom:'.5rem',background:'var(--bg3)',border:'1px solid var(--bdr)',position:'relative'}}>
+                    <div key={sl.id} style={{padding:'.85rem 1rem',borderRadius:10,marginBottom:'.5rem',background:'var(--bg3)',border:'1px solid var(--bdr)'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.3rem'}}>
                         <div>
                           <span style={{fontWeight:700,color:'var(--orange)',fontSize:'.93rem'}}>{sl.date}</span>
                           {sl.city&&<span style={{color:'var(--t3)',fontSize:'.83rem',marginLeft:'.5rem'}}>📍 {sl.city}</span>}
                         </div>
-                        <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                          {acc&&<span onClick={()=>setDetailSheet({date:sl.date,city:sl.city||'',predictions:acc.predictions,actualSongs:acc.actualSongs,matchedSongs:acc.matchedSongs,matches:acc.matches,accuracy:acc.predictionAccuracy,runInfo:acc.runShows,excludedSongs:acc.songsPlayedInRun})} style={{...chip(ac),cursor:'pointer'}}>{acc.matches}/10</span>}
-                          <button onClick={()=>delSetlist(sl.id)} style={{background:'none',border:'none',color:'var(--t3)',cursor:'pointer',fontSize:'.83rem',padding:'.3rem'}}>✕</button>
-                        </div>
+                        {acc&&<span onClick={()=>setDetailSheet({date:sl.date,city:sl.city||'',predictions:acc.predictions,actualSongs:acc.actualSongs,matchedSongs:acc.matchedSongs,matches:acc.matches,accuracy:acc.predictionAccuracy,runInfo:acc.runShows,excludedSongs:acc.songsPlayedInRun})} style={{...chip(ac),cursor:'pointer'}}>{acc.matches}/10</span>}
                       </div>
-                      <div style={{fontSize:'.8rem',color:'var(--t2)',lineHeight:1.5,paddingRight:'3rem'}}>{sl.songs.join(', ')}</div>
-                      <button onClick={()=>setEditingSetlist({...sl,editDate:sl.date,editCity:sl.city||'',editSongs:sl.songs.join('\n')})} style={{position:'absolute',bottom:'.6rem',right:'.7rem',background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:'var(--t3)',cursor:'pointer',fontSize:'.7rem',padding:'3px 8px',fontFamily:"'Crimson Pro',serif",letterSpacing:'.03em'}}>✎ Edit</button>
+                      <div style={{fontSize:'.8rem',color:'var(--t2)',lineHeight:1.5}}>{sl.songs.join(', ')}</div>
+                      <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',marginTop:'.5rem',paddingTop:'.5rem',borderTop:'1px solid var(--bdr)'}}>
+                        <button onClick={()=>setEditingSetlist({...sl,editDate:sl.date,editCity:sl.city||'',editSongs:sl.songs.join('\n')})} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:'var(--t2)',cursor:'pointer',fontSize:'.78rem',padding:'.4rem .85rem',fontFamily:"'Crimson Pro',serif",minHeight:36}}>✎ Edit</button>
+                        <button onClick={()=>delSetlist(sl.id)} style={{background:'none',border:'1px solid rgba(248,113,113,.25)',borderRadius:6,color:'var(--played)',cursor:'pointer',fontSize:'.78rem',padding:'.4rem .85rem',fontFamily:"'Crimson Pro',serif",minHeight:36}}>✕ Delete</button>
+                      </div>
                     </div>
                   );
                 })}
