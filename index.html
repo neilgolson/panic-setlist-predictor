@@ -512,9 +512,6 @@
       // July 4th (Jun 30 - Jul 8)
       july4th: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House', 'North'],
       
-      // Halloween (Oct 27 - Nov 4)
-      halloween: ['Blackout Blues', 'Chainsaw City', 'Dark Bar'],
-      
       // New Year's (Dec 28 - Jan 5)
       newyear: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House'],
       
@@ -594,17 +591,8 @@
       // Valentine's Day (Feb 14 +/- 4 days = Feb 10-18)
       if (month === 2 && isWithinRange(2, 14)) return 'valentine';
       
-      // St. Patrick's Day (Mar 17 +/- 4 days = Mar 13-21)
-      if (month === 3 && isWithinRange(3, 17)) return 'stpatricks';
-      
       // July 4th (Jul 4 +/- 4 days = Jun 30 - Jul 8)
       if ((month === 6 && day >= 30) || (month === 7 && day <= 8)) return 'july4th';
-      
-      // Halloween (Oct 31 +/- 4 days = Oct 27 - Nov 4)
-      if ((month === 10 && day >= 27) || (month === 11 && day <= 4)) return 'halloween';
-      
-      // Christmas (Dec 25 +/- 4 days = Dec 21-29)
-      if (month === 12 && day >= 21 && day <= 29) return 'christmas';
       
       // New Year's (Jan 1 +/- 4 days = Dec 28 - Jan 5)
       if ((month === 12 && day >= 28) || (month === 1 && day <= 5)) return 'newyear';
@@ -642,7 +630,7 @@
       "Three Candles", "Tickle The Truth", "Free Somehow", "Flicker", "Dark Day Program",
       "Her Dance Needs No Body", "Already Fried", "Up All Night", "Saint Ex", "North",
       "Dirty Side Down", "This Cruel Thing", "Visiting Day", "Clinic Cynic", "Shut Up And Drive",
-      "True To My Nature", "When You Coming Home", "Jaded Tourist", "Cotton Was King"
+      "True To My Nature", "When You Coming Home", "Jaded Tourist", "Cotton Was King", "Cosmic Confidante"
     ].sort();
 
     // Common covers and variations (not in official lyrics but played frequently)
@@ -821,11 +809,30 @@
               
               setSetlists(setlistsData.setlists || []);
               
+              // Extract all unique songs from setlists that aren't in master database
+              const allSongsInSetlists = new Set();
+              setlistsData.setlists.forEach(setlist => {
+                setlist.songs.forEach(song => {
+                  allSongsInSetlists.add(song);
+                });
+              });
+              
+              // Find songs that aren't in ALL_SONGS or COMMON_COVERS
+              const missingSongs = Array.from(allSongsInSetlists).filter(song => 
+                !ALL_SONGS.includes(song) && !COMMON_COVERS.includes(song)
+              );
+              
+              console.log('📋 Found', missingSongs.length, 'songs in setlists not in master database');
+              
               // Merge canonical themes with user edits from localStorage
               const localPrefs = localStorage.getItem('panicSetlists');
               if (localPrefs) {
                 const prefs = JSON.parse(localPrefs);
-                setCustomSongs(prefs.customSongs || []);
+                
+                // Merge missing songs from setlists with user's custom songs
+                const userCustomSongs = prefs.customSongs || [];
+                const allCustomSongs = [...new Set([...missingSongs, ...userCustomSongs])];
+                setCustomSongs(allCustomSongs);
                 
                 // Merge: Start with GitHub themes, override with user edits
                 const mergedThemes = { ...themesData };
@@ -836,7 +843,8 @@
                 }
                 setThemeSongs(mergedThemes);
               } else {
-                // No local prefs, just use GitHub themes
+                // No local prefs, just use songs from setlists and GitHub themes
+                setCustomSongs(missingSongs);
                 setThemeSongs(themesData);
               }
               
@@ -1037,15 +1045,29 @@
         // Try to match each song
         const matchedSongs = [];
         const unmatched = [];
+        const newCustomSongs = []; // Track new songs to add
         
         rawSongs.forEach(rawSong => {
           const matched = findSongMatch(rawSong);
           if (matched) {
             matchedSongs.push(matched);
+            // If this matched song is not in the master database, add it to custom songs
+            if (!ALL_SONGS.includes(matched) && !COMMON_COVERS.includes(matched)) {
+              newCustomSongs.push(matched);
+            }
           } else {
             unmatched.push(rawSong);
           }
         });
+        
+        // Add any new songs to customSongs
+        if (newCustomSongs.length > 0) {
+          setCustomSongs(prev => {
+            const allCustom = [...prev, ...newCustomSongs];
+            // Remove duplicates
+            return [...new Set(allCustom)];
+          });
+        }
 
         // If there are unmatched songs, show them to the user
         if (unmatched.length > 0) {
@@ -1166,6 +1188,18 @@
           .map(s => s.replace(/\*+$/, '').trim())
           .map(findSongMatch)
           .filter(s => s); // Remove nulls
+        
+        // Auto-add any matched songs that aren't in master database to customSongs
+        const newCustomSongs = matchedSongs.filter(song => 
+          !ALL_SONGS.includes(song) && !COMMON_COVERS.includes(song)
+        );
+        
+        if (newCustomSongs.length > 0) {
+          setCustomSongs(prev => {
+            const allCustom = [...prev, ...newCustomSongs];
+            return [...new Set(allCustom)]; // Remove duplicates
+          });
+        }
 
         const newSetlist = {
           date: newDate,
@@ -1346,7 +1380,20 @@
           .filter(s => s.length > 0)
           .filter(s => !['1:', '2:', '3:', 'E:', 'Set', 'Set 1', 'Set 2', 'Set 3', 'Encore'].includes(s))
           .map(s => s.replace(/\*+$/, '').trim())
-          .map(findSongMatch);
+          .map(findSongMatch)
+          .filter(s => s); // Remove nulls
+        
+        // Auto-add any matched songs that aren't in master database to customSongs
+        const newCustomSongs = songs.filter(song => 
+          !ALL_SONGS.includes(song) && !COMMON_COVERS.includes(song)
+        );
+        
+        if (newCustomSongs.length > 0) {
+          setCustomSongs(prev => {
+            const allCustom = [...prev, ...newCustomSongs];
+            return [...new Set(allCustom)]; // Remove duplicates
+          });
+        }
 
         setSetlists(prev => {
           const updated = prev.map(s => {
@@ -3343,7 +3390,6 @@
                 const themeLabels = {
                   valentine: { emoji: '💜', label: 'Valentine\'s Day', color: 'rgb(147, 51, 234)' },
                   july4th: { emoji: '🎆', label: 'July 4th', color: 'rgb(239, 68, 68)' },
-                  halloween: { emoji: '🎃', label: 'Halloween', color: 'rgb(249, 115, 22)' },
                   newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)' }
                 };
                 
@@ -3665,7 +3711,6 @@
                         borderColor = 'rgb(147, 51, 234)';
                         icon = theme === 'valentine' ? '💜' : 
                                theme === 'july4th' ? '🎆' :
-                               theme === 'halloween' ? '🎃' :
                                theme === 'newyear' ? '🎉' : '🎵';
                       } else if (isCity) {
                         bgColor = 'rgba(255, 140, 66, 0.15)'; // Orange for city songs
@@ -4444,7 +4489,6 @@ Chilly Water, Pigeons, Space Wrangler..."
               {Object.entries({
                 valentine: { emoji: '💜', label: 'Valentine\'s Day', color: 'rgb(147, 51, 234)', dateRange: 'Feb 10-18' },
                 july4th: { emoji: '🎆', label: 'July 4th', color: 'rgb(239, 68, 68)', dateRange: 'Jun 30 - Jul 8' },
-                halloween: { emoji: '🎃', label: 'Halloween', color: 'rgb(249, 115, 22)', dateRange: 'Oct 27 - Nov 4' },
                 newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)', dateRange: 'Dec 28 - Jan 5' },
                 cityReferences: { emoji: '📍', label: 'City References', color: 'rgb(255, 140, 66)', dateRange: 'Format: Song:City' },
                 stateReferences: { emoji: '🗺️', label: 'State References', color: 'rgb(59, 130, 246)', dateRange: 'Format: Song:STATE' },
