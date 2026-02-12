@@ -809,11 +809,30 @@
               
               setSetlists(setlistsData.setlists || []);
               
+              // Extract all unique songs from setlists that aren't in master database
+              const allSongsInSetlists = new Set();
+              setlistsData.setlists.forEach(setlist => {
+                setlist.songs.forEach(song => {
+                  allSongsInSetlists.add(song);
+                });
+              });
+              
+              // Find songs that aren't in ALL_SONGS or COMMON_COVERS
+              const missingSongs = Array.from(allSongsInSetlists).filter(song => 
+                !ALL_SONGS.includes(song) && !COMMON_COVERS.includes(song)
+              );
+              
+              console.log('📋 Found', missingSongs.length, 'songs in setlists not in master database');
+              
               // Merge canonical themes with user edits from localStorage
               const localPrefs = localStorage.getItem('panicSetlists');
               if (localPrefs) {
                 const prefs = JSON.parse(localPrefs);
-                setCustomSongs(prefs.customSongs || []);
+                
+                // Merge missing songs from setlists with user's custom songs
+                const userCustomSongs = prefs.customSongs || [];
+                const allCustomSongs = [...new Set([...missingSongs, ...userCustomSongs])];
+                setCustomSongs(allCustomSongs);
                 
                 // Merge: Start with GitHub themes, override with user edits
                 const mergedThemes = { ...themesData };
@@ -824,7 +843,8 @@
                 }
                 setThemeSongs(mergedThemes);
               } else {
-                // No local prefs, just use GitHub themes
+                // No local prefs, just use songs from setlists and GitHub themes
+                setCustomSongs(missingSongs);
                 setThemeSongs(themesData);
               }
               
