@@ -827,7 +827,14 @@
       const [quickAdd, setQuickAdd] = useState('');
       const [isRun, setIsRun] = useState(false);
       const [runDays, setRunDays] = useState(4);
-      const [nextRunCity, setNextRunCity] = useState('austin');
+      
+      // Hardcoded next run info (update manually for new shows)
+      const NEXT_RUN_VENUE = 'Moody Center';
+      const NEXT_RUN_CITY = 'Austin';
+      const NEXT_RUN_STATE = 'TX';
+      const NEXT_RUN_DATE_START = '2026-02-14';
+      const NEXT_RUN_DATE_END = '2026-02-15';
+      const NEXT_RUN_NIGHTS = 2;
       const [editingSetlist, setEditingSetlist] = useState(null); // ID of setlist being edited
       const [unmatchedSongs, setUnmatchedSongs] = useState([]); // Songs that couldn't be matched
       const [customSongs, setCustomSongs] = useState([]); // User-added songs
@@ -3458,7 +3465,7 @@
                 {mode === 'live' && liveSetlist.length > 0 ? '🎸 Tonight\'s Show (Live)' : '🎸 Next Run Prediction'}
               </h2>
               {(() => {
-                const upcomingDate = '2026-02-14';
+                const upcomingDate = NEXT_RUN_DATE_START;
                 const theme = getDateTheme(upcomingDate);
                 if (!theme) return null;
                 
@@ -3497,10 +3504,10 @@
                     color: 'var(--accent-orange)',
                     marginBottom: '0.25rem'
                   }}>
-                    February 14-15, 2026
+                    {new Date(NEXT_RUN_DATE_START).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}{NEXT_RUN_NIGHTS > 1 && `-${new Date(NEXT_RUN_DATE_END).toLocaleDateString('en-US', { day: 'numeric' })}`}, {new Date(NEXT_RUN_DATE_START).getFullYear()}
                   </div>
                   <div style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>
-                    📍 Moody Center, Austin, TX
+                    📍 {NEXT_RUN_VENUE}, {NEXT_RUN_CITY}, {NEXT_RUN_STATE}
                   </div>
                   <div style={{ 
                     fontSize: '0.9rem', 
@@ -3508,30 +3515,12 @@
                     marginTop: '0.5rem',
                     fontStyle: 'italic'
                   }}>
-                    2-night run
+                    {NEXT_RUN_NIGHTS}-night run
                   </div>
                 </div>
                 
-                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-                  <div className="input-group" style={{ marginBottom: '0.75rem' }}>
-                    <label style={{ fontSize: '0.85rem', marginBottom: '0.25rem' }}>City/Location</label>
-                    <input 
-                      type="text"
-                      placeholder="e.g., Savannah, Austin..."
-                      value={nextRunCity}
-                      onChange={e => setNextRunCity(e.target.value)}
-                      style={{ 
-                        width: '100%',
-                        padding: '0.5rem',
-                        background: 'var(--bg-dark)',
-                        border: '1px solid var(--border)',
-                        borderRadius: '6px',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.9rem'
-                      }}
-                    />
-                  </div>
-                </div>
+                
+                {/* City is now hardcoded to match venue */}
               </div>
               
               <div>
@@ -3614,9 +3603,9 @@
                   fontSize: '0.95rem'
                 }}>
                   {(() => {
-                    const upcomingCity = nextRunCity.toLowerCase().trim();
-                    const upcomingDate = '2026-02-14'; // First night of the run
-                    const runNights = 2; // 2-night run
+                    const upcomingCity = `${NEXT_RUN_CITY}, ${NEXT_RUN_STATE}`.toLowerCase().trim();
+                    const upcomingDate = NEXT_RUN_DATE_START; // First night of the run
+                    const runNights = NEXT_RUN_NIGHTS;
                     
                     console.log('=== PREDICTION CALCULATION ===');
                     console.log('Total songs in songStatus:', Object.keys(songStatus).length);
@@ -3855,45 +3844,6 @@
             <div>
               <div className="card">
                 <h2>Mode</h2>
-                
-                {/* Cloud Sync Status */}
-                <div style={{
-                  padding: '0.75rem',
-                  marginBottom: '1rem',
-                  background: 'rgba(34, 197, 94, 0.1)',
-                  border: '1px solid var(--accent-green)',
-                  borderRadius: '6px',
-                  fontSize: '0.85rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
-                  <span style={{ fontSize: '1rem' }}>☁️</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', color: 'var(--accent-green)' }}>
-                      Synced from GitHub
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                      {setlists.length} shows • Themes synced • Your edits saved locally
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => window.location.reload()}
-                    style={{
-                      padding: '0.35rem 0.75rem',
-                      background: 'var(--accent-green)',
-                      border: 'none',
-                      borderRadius: '4px',
-                      color: 'white',
-                      fontSize: '0.75rem',
-                      cursor: 'pointer',
-                      fontWeight: '600'
-                    }}
-                    title="Reload page to get latest shows from GitHub"
-                  >
-                    Refresh
-                  </button>
-                </div>
                 
                 <div className="mode-toggle">
                   <button 
@@ -4317,7 +4267,49 @@ Chilly Water, Pigeons, Space Wrangler..."
 
               {/* All Shows Section */}
               <div className="card" style={{ marginTop: '2rem' }}>
-                <h2>All Shows ({mode === 'live' && liveSetlist.length > 0 ? setlists.length + 1 : setlists.length})</h2>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  marginBottom: '1rem',
+                  flexWrap: 'wrap',
+                  gap: '1rem'
+                }}>
+                  <h2 style={{ margin: 0 }}>All Shows ({mode === 'live' && liveSetlist.length > 0 ? setlists.length + 1 : setlists.length})</h2>
+                  
+                  {/* Cloud Sync Status */}
+                  <div style={{
+                    padding: '0.5rem 0.75rem',
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid var(--accent-green)',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    <span style={{ fontSize: '0.9rem' }}>☁️</span>
+                    <div style={{ fontWeight: '600', color: 'var(--accent-green)' }}>
+                      Synced from GitHub
+                    </div>
+                    <button
+                      onClick={() => window.location.reload()}
+                      style={{
+                        padding: '0.25rem 0.5rem',
+                        background: 'var(--accent-green)',
+                        border: 'none',
+                        borderRadius: '4px',
+                        color: 'white',
+                        fontSize: '0.7rem',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                      title="Reload page to get latest shows from GitHub"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                </div>
                 {setlists.length === 0 && !(mode === 'live' && liveSetlist.length > 0) ? (
                   <div className="empty-state">
                     <div className="empty-state-icon">🎸</div>
