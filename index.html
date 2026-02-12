@@ -255,6 +255,15 @@
         setUnmatchedSongs([]);setNewDate('');setNewSongs('');
       };
       const delSetlist=id=>{if(confirm('Delete this setlist?'))setSetlists(p=>p.filter(s=>s.id!==id))};
+      const saveEditSetlist=()=>{
+        if(!editingSetlist)return;
+        const raw=editingSetlist.editSongs.split(/[\n,]/).map(s=>s.trim()).filter(s=>s.length>0);
+        const matched=[],unmatched=[],newC=[];
+        raw.forEach(r=>{const m=findMatch(r);if(m){matched.push(m);if(!ALL_SONGS.includes(m)&&!COMMON_COVERS.includes(m))newC.push(m)}else{matched.push(r);newC.push(r)}});
+        if(newC.length)setCustomSongs(p=>[...new Set([...p,...newC])]);
+        setSetlists(p=>p.map(sl=>sl.id===editingSetlist.id?{...sl,date:editingSetlist.editDate,city:editingSetlist.editCity,songs:matched}:sl));
+        setEditingSetlist(null);
+      };
 
       // Theme editing
       const startThemeEdit=(k,l)=>{setEditingTheme({key:k,label:l,songs:[...(themeSongs[k]||[])]});setThemeSearchTerm('');setThemeSheet(true)};
@@ -457,7 +466,7 @@
                   const acc=showAccuracy[sl.id];const pct=acc?parseInt(acc.predictionAccuracy):null;
                   const ac=pct>=50?'rgb(34,197,94)':pct>=20?'rgb(234,179,8)':'rgb(239,68,68)';
                   return(
-                    <div key={sl.id} style={{padding:'.85rem 1rem',borderRadius:10,marginBottom:'.5rem',background:'var(--bg3)',border:'1px solid var(--bdr)'}}>
+                    <div key={sl.id} style={{padding:'.85rem 1rem',borderRadius:10,marginBottom:'.5rem',background:'var(--bg3)',border:'1px solid var(--bdr)',position:'relative'}}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.3rem'}}>
                         <div>
                           <span style={{fontWeight:700,color:'var(--orange)',fontSize:'.93rem'}}>{sl.date}</span>
@@ -468,7 +477,8 @@
                           <button onClick={()=>delSetlist(sl.id)} style={{background:'none',border:'none',color:'var(--t3)',cursor:'pointer',fontSize:'.83rem',padding:'.3rem'}}>✕</button>
                         </div>
                       </div>
-                      <div style={{fontSize:'.8rem',color:'var(--t2)',lineHeight:1.5}}>{sl.songs.join(', ')}</div>
+                      <div style={{fontSize:'.8rem',color:'var(--t2)',lineHeight:1.5,paddingRight:'3rem'}}>{sl.songs.join(', ')}</div>
+                      <button onClick={()=>setEditingSetlist({...sl,editDate:sl.date,editCity:sl.city||'',editSongs:sl.songs.join('\n')})} style={{position:'absolute',bottom:'.6rem',right:'.7rem',background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:'var(--t3)',cursor:'pointer',fontSize:'.7rem',padding:'3px 8px',fontFamily:"'Crimson Pro',serif",letterSpacing:'.03em'}}>✎ Edit</button>
                     </div>
                   );
                 })}
@@ -519,6 +529,23 @@
             </div>
             <button onClick={addUnmatchedAndContinue} style={{width:'100%',padding:'.85rem',borderRadius:10,border:'none',background:'linear-gradient(135deg,var(--red),var(--orange))',color:'#fff',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',cursor:'pointer',marginBottom:'.5rem'}}>Add to Database</button>
             <button onClick={skipUnmatched} style={{width:'100%',padding:'.85rem',borderRadius:10,background:'var(--bg3)',border:'1px solid var(--bdr)',color:'var(--t2)',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',cursor:'pointer'}}>Skip These</button>
+          </Sheet>
+
+          {/* Edit Setlist */}
+          <Sheet open={!!editingSetlist} onClose={()=>setEditingSetlist(null)} title="✎ Edit Setlist" titleColor="var(--orange)">
+            {editingSetlist&&(<>
+              <div style={{display:'flex',gap:'.5rem',marginBottom:'.75rem'}}>
+                <input type="date" value={editingSetlist.editDate} onChange={e=>setEditingSetlist({...editingSetlist,editDate:e.target.value})} style={{...input,flex:1}}/>
+                <input type="text" placeholder="City, ST" value={editingSetlist.editCity} onChange={e=>setEditingSetlist({...editingSetlist,editCity:e.target.value})} style={{...input,flex:1}}/>
+              </div>
+              <div style={{fontSize:'.73rem',color:'var(--t3)',marginBottom:'.35rem'}}>One song per line, or comma-separated</div>
+              <textarea value={editingSetlist.editSongs} onChange={e=>setEditingSetlist({...editingSetlist,editSongs:e.target.value})} style={{...input,minHeight:250,resize:'vertical',lineHeight:1.6,fontSize:'.9rem'}}/>
+              <div style={{fontSize:'.73rem',color:'var(--t3)',marginTop:'.35rem',marginBottom:'1rem'}}>{editingSetlist.editSongs.split(/[\n,]/).filter(s=>s.trim()).length} songs</div>
+              <div style={{display:'flex',gap:'.5rem',position:'sticky',bottom:0,background:'var(--bg2)',paddingTop:'.75rem',paddingBottom:'.5rem'}}>
+                <button onClick={saveEditSetlist} style={{flex:1,padding:'.85rem',borderRadius:10,border:'none',background:'linear-gradient(135deg,var(--red),var(--orange))',color:'#fff',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',letterSpacing:'.06em',cursor:'pointer'}}>Save Changes</button>
+                <button onClick={()=>setEditingSetlist(null)} style={{flex:1,padding:'.85rem',borderRadius:10,background:'var(--bg3)',border:'1px solid var(--bdr)',color:'var(--t2)',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',cursor:'pointer'}}>Cancel</button>
+              </div>
+            </>)}
           </Sheet>
 
           {/* Song History */}
