@@ -1,0 +1,73 @@
+{
+  "valentine": [
+    "Love Tractor",
+    "Climb To Safety",
+    "Walkin' (For Your Love)",
+    "Mercy",
+    "Barstools And Dreamers",
+    "Who Do You Belong To",
+    "Airplane",
+    "Tie Your Shoes",
+    "Red Hot Mama",
+    "Ride Me High",
+    "Genesis",
+    "Gradle",
+    "Diner",
+    "Blight",
+    "Space Wrangler",
+    "Papa's Home",
+    "Gimme"
+  ],
+  "stpatricks": [
+    "Tall Boy",
+    "C. Brown",
+    "Barstools And Dreamers",
+    "Papa's Home",
+    "Diner"
+  ],
+  "july4th": [
+    "Disco",
+    "Ain't Life Grand",
+    "Tall Boy",
+    "C. Brown",
+    "Party At Your Mama's House",
+    "North"
+  ],
+  "beach": [
+    "Fishwater",
+    "Chilly Water",
+    "Coconut",
+    "Arleen",
+    "Greta",
+    "Papa Johnny Road"
+  ],
+  "halloween": [
+    "Blackout Blues",
+    "Chainsaw City",
+    "Dark Bar"
+  ],
+  "newyear": [
+    "Disco",
+    "Ain't Life Grand",
+    "Tall Boy",
+    "C. Brown",
+    "Party At Your Mama's House"
+  ],
+  "cityReferences": [
+    "Stop-Go:Austin",
+    "Barstools And Dreamers:Boulder",
+    "Driving Song:Athens",
+    "Pickin' Up The Pieces:Atlanta",
+    "Tall Boy:Memphis"
+  ],
+  "sequentialPairs": [
+    "Machine<->Barstools And Dreamers",
+    "Protein Drink<->Sewing Machine",
+    "Goodpeople<->Dark Bar",
+    "Travelin' Man<->The Waker",
+    "Jack<->Bear's Gone Fishin'",
+    "Bear's Gone Fishin'<->Tie Your Shoes",
+    "Party At Your Mama's House<->Stop Breakin' Down Blues",
+    "Surprise Valley<->Blackout Blues"
+  ]
+}
