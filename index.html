@@ -486,39 +486,6 @@
     ];
 
     // Songs with city/location references in lyrics
-    const CITY_SONGS = {
-      "savannah": ["Red Hot Mama"],
-      "athens": ["Coconut", "Space Wrangler"],
-      "atlanta": ["Tall Boy", "C. Brown"],
-      "memphis": ["Red Hot Mama"],
-      "nashville": [],
-      "new orleans": ["Papa Johnny Road", "Red Hot Mama"],
-      "orleans": ["Papa Johnny Road", "Red Hot Mama"],
-      "chicago": [],
-      "austin": ["Stop-Go"],
-      "san francisco": [],
-      "denver": [],
-      "boulder": ["Barstools And Dreamers"],
-      "colorado": ["Holden Oversoul"],
-      "tennessee": ["North", "Up All Night"],
-      "georgia": ["Blue Indian", "Coconut"],
-      "jackson": ["Action Man"],
-      "tallahassee": ["Tall Boy"],
-      "miami": [],
-      "key west": [],
-      "charleston": [],
-      "asheville": [],
-      "raleigh": [],
-      "new york": ["Imitation Leather Shoes", "Sundance"],
-      "california": ["Imitation Leather Shoes"],
-      "boston": [],
-      "texas": [],
-      "florida": [],
-      "carolina": [],
-      "north carolina": [],
-      "south carolina": []
-    };
-
     // Default holiday and theme-based songs (based on lyrics and themes)
     const DEFAULT_THEME_SONGS = {
       // Valentine's Day (Feb 10-18)
@@ -543,7 +510,7 @@
       ],
       
       // St. Patrick's Day (Mar 13-21)
-      stpatricks: ['Tall Boy', 'Whiskey For Breakfast', 'C. Brown', 'Barstools And Dreamers', 'Papa\'s Home', 'Diner'],
+      stpatricks: ['Tall Boy', 'C. Brown', 'Barstools And Dreamers', 'Papa\'s Home', 'Diner'],
       
       // July 4th (Jun 30 - Jul 8)
       july4th: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House', 'North'],
@@ -552,13 +519,20 @@
       beach: ['Fishwater', 'Chilly Water', 'Coconut', 'Arleen', 'Greta', 'Papa Johnny Road'],
       
       // Halloween (Oct 27 - Nov 4)
-      halloween: ['Blackout Blues', 'Chainsaw City', 'Dark Bar', 'Jr'],
+      halloween: ['Blackout Blues', 'Chainsaw City', 'Dark Bar'],
       
-      // Christmas (Dec 21-29)
-      christmas: ['Christmas Katie'],
-      
-      // New Year's (Dec 28 - Jan 4)
+      // New Year's (Dec 28 - Jan 5)
       newyear: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House'],
+      
+      // City References - Songs with city/location mentions in lyrics
+      // Format: "Song:City" - song gets +30 point bonus when predicting for that city
+      cityReferences: [
+        'Stop-Go:Austin',
+        'Barstools And Dreamers:Boulder',
+        'Driving Song:Athens',
+        'Pickin\' Up The Pieces:Atlanta',
+        'Tall Boy:Memphis'
+      ],
       
       // Sequential Pairs - Songs that typically follow each other
       // Format: "Song A<->Song B" means they're paired (either order)
@@ -767,13 +741,16 @@
       const [customSongs, setCustomSongs] = useState([]); // User-added songs
       const [selectedSongHistory, setSelectedSongHistory] = useState(null); // {song: string, dates: [{date, city}]}
       const [selectedPredictionDetail, setSelectedPredictionDetail] = useState(null); // {show, predictions, actual}
-      const [themeSongs, setThemeSongs] = useState(DEFAULT_THEME_SONGS); // Editable theme song lists
+      const [themeSongs, setThemeSongs] = useState({}); // Theme song lists - loaded from GitHub, edits stored locally
       const [editingTheme, setEditingTheme] = useState(null); // {key: 'valentine', label: 'Valentine's Day', songs: [...]}
       const [themeSearchTerm, setThemeSearchTerm] = useState('');
       const [pairSongA, setPairSongA] = useState('');
       const [pairSongB, setPairSongB] = useState('');
       const [pairSearchA, setPairSearchA] = useState('');
       const [pairSearchB, setPairSearchB] = useState('');
+      const [citySong, setCitySong] = useState('');
+      const [cityName, setCityName] = useState('');
+      const [citySongSearch, setCitySongSearch] = useState('');
 
       // Combine all available songs (base + covers + custom)
       const ALL_SONGS_WITH_COVERS = useMemo(() => {
@@ -815,21 +792,40 @@
 
       // Load from storage on mount
       useEffect(() => {
-        // Load from GitHub canonical source first
+        // Load canonical data from GitHub
         const loadFromGitHub = async () => {
           try {
-            const response = await fetch('https://neilgolson.com/setlists.json');
-            if (response.ok) {
-              const data = await response.json();
-              console.log('✅ Loaded canonical setlists from GitHub:', data.setlists.length, 'shows');
-              setSetlists(data.setlists || []);
+            // Load setlists
+            const setlistsResponse = await fetch('https://neilgolson.com/setlists.json');
+            // Load theme songs
+            const themesResponse = await fetch('https://neilgolson.com/theme-songs.json');
+            
+            if (setlistsResponse.ok && themesResponse.ok) {
+              const setlistsData = await setlistsResponse.json();
+              const themesData = await themesResponse.json();
               
-              // Also load user preferences from localStorage (themes, custom songs)
+              console.log('✅ Loaded canonical setlists from GitHub:', setlistsData.setlists.length, 'shows');
+              console.log('✅ Loaded canonical themes from GitHub');
+              
+              setSetlists(setlistsData.setlists || []);
+              
+              // Merge canonical themes with user edits from localStorage
               const localPrefs = localStorage.getItem('panicSetlists');
               if (localPrefs) {
                 const prefs = JSON.parse(localPrefs);
                 setCustomSongs(prefs.customSongs || []);
-                setThemeSongs(prefs.themeSongs || DEFAULT_THEME_SONGS);
+                
+                // Merge: Start with GitHub themes, override with user edits
+                const mergedThemes = { ...themesData };
+                if (prefs.themeEdits) {
+                  Object.keys(prefs.themeEdits).forEach(themeKey => {
+                    mergedThemes[themeKey] = prefs.themeEdits[themeKey];
+                  });
+                }
+                setThemeSongs(mergedThemes);
+              } else {
+                // No local prefs, just use GitHub themes
+                setThemeSongs(themesData);
               }
               
               return true;
@@ -876,14 +872,15 @@
         });
       }, []);
 
-      // Save user preferences to localStorage (NOT setlists - those come from GitHub)
+      // Save user preferences to localStorage (NOT setlists or themes - those come from GitHub)
       useEffect(() => {
+        const existing = JSON.parse(localStorage.getItem('panicSetlists') || '{}');
         localStorage.setItem('panicSetlists', JSON.stringify({
+          ...existing, // Preserve themeEdits
           currentRun,
-          customSongs,
-          themeSongs
+          customSongs
         }));
-      }, [currentRun, customSongs, themeSongs]);
+      }, [currentRun, customSongs]);
 
       const addSetlist = () => {
         if (!newSongs) return;
@@ -1247,6 +1244,21 @@
         }
       };
 
+      const addCityRefToTheme = () => {
+        if (editingTheme && citySong && cityName) {
+          const cityRefString = `${citySong}:${cityName}`;
+          if (!editingTheme.songs.includes(cityRefString)) {
+            setEditingTheme({
+              ...editingTheme,
+              songs: [...editingTheme.songs, cityRefString]
+            });
+          }
+          setCitySong('');
+          setCityName('');
+          setCitySongSearch('');
+        }
+      };
+
       const addSongToTheme = (song) => {
         if (editingTheme && !editingTheme.songs.includes(song)) {
           setEditingTheme({
@@ -1272,7 +1284,13 @@
             [editingTheme.key]: editingTheme.songs
           };
           setThemeSongs(updatedThemes);
-          localStorage.setItem('themeSongs', JSON.stringify(updatedThemes));
+          
+          // Save to localStorage - store as themeEdits (only the differences from GitHub)
+          const localPrefs = JSON.parse(localStorage.getItem('panicSetlists') || '{}');
+          localPrefs.themeEdits = localPrefs.themeEdits || {};
+          localPrefs.themeEdits[editingTheme.key] = editingTheme.songs;
+          localStorage.setItem('panicSetlists', JSON.stringify(localPrefs));
+          
           setEditingTheme(null);
         }
       };
@@ -1985,6 +2003,45 @@
                 <h2 style={{ color: 'var(--accent-yellow)', marginBottom: '0.5rem' }}>
                   {selectedSongHistory.song}
                 </h2>
+                
+                {/* Show city reference if available */}
+                {(() => {
+                  const cityRefs = themeSongs['cityReferences'] || [];
+                  const songRefs = cityRefs
+                    .filter(ref => ref.split(':')[0].trim() === selectedSongHistory.song)
+                    .map(ref => ref.split(':')[1].trim());
+                  
+                  if (songRefs.length > 0) {
+                    return (
+                      <div style={{
+                        padding: '0.75rem',
+                        background: 'rgba(255, 140, 66, 0.1)',
+                        border: '1px solid var(--accent-orange)',
+                        borderRadius: '6px',
+                        marginBottom: '1rem'
+                      }}>
+                        <div style={{ 
+                          fontSize: '0.75rem', 
+                          color: 'var(--accent-orange)',
+                          fontWeight: '600',
+                          marginBottom: '0.25rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em'
+                        }}>
+                          📍 City Reference
+                        </div>
+                        <div style={{ 
+                          fontSize: '0.85rem', 
+                          color: 'var(--text-primary)'
+                        }}>
+                          Gets +30 point bonus in: {songRefs.join(', ')}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 <div style={{ 
                   fontSize: '0.9rem', 
                   color: 'var(--text-secondary)',
@@ -2338,7 +2395,213 @@
                   </button>
                 </div>
 
-                {editingTheme.key === 'sequentialPairs' ? (
+                {editingTheme.key === 'cityReferences' ? (
+                  /* Special UI for City References */
+                  <>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
+                      }}>
+                        Add City Reference
+                      </label>
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '0.5rem', alignItems: 'start', marginBottom: '0.5rem' }}>
+                        {/* Song Search */}
+                        <div style={{ position: 'relative' }}>
+                          <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', display: 'block' }}>
+                            Song
+                          </label>
+                          <input
+                            type="text"
+                            placeholder={citySong || "Search song..."}
+                            value={citySongSearch}
+                            onChange={(e) => setCitySongSearch(e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              background: citySong ? 'rgba(255, 140, 66, 0.1)' : 'var(--bg-dark)',
+                              border: citySong ? '1px solid var(--accent-orange)' : '1px solid var(--border)',
+                              borderRadius: '6px',
+                              color: 'var(--text-primary)',
+                              fontSize: '0.9rem'
+                            }}
+                          />
+                          {citySong && !citySongSearch && (
+                            <button
+                              onClick={() => { setCitySong(''); setCitySongSearch(''); }}
+                              style={{
+                                position: 'absolute',
+                                right: '0.5rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--text-muted)',
+                                cursor: 'pointer',
+                                fontSize: '1rem',
+                                padding: '0.25rem',
+                                marginTop: '0.6rem'
+                              }}
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {citySongSearch && !citySong && (
+                            <div style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              zIndex: 1000,
+                              background: 'var(--bg-card)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              marginTop: '0.25rem',
+                              maxHeight: '200px',
+                              overflow: 'auto',
+                              boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                            }}>
+                              {ALL_SONGS_WITH_COVERS
+                                .filter(song => song.toLowerCase().includes(citySongSearch.toLowerCase()))
+                                .slice(0, 15)
+                                .map(song => (
+                                  <div
+                                    key={song}
+                                    onClick={() => {
+                                      setCitySong(song);
+                                      setCitySongSearch('');
+                                    }}
+                                    style={{
+                                      padding: '0.5rem',
+                                      cursor: 'pointer',
+                                      borderBottom: '1px solid var(--border)',
+                                      fontSize: '0.85rem'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 140, 66, 0.1)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                  >
+                                    {song}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Arrow */}
+                        <div style={{ fontSize: '1.5rem', color: 'var(--accent-orange)', paddingTop: '1.75rem', textAlign: 'center' }}>
+                          →
+                        </div>
+
+                        {/* City Input */}
+                        <div>
+                          <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', display: 'block' }}>
+                            City
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Austin, Memphis..."
+                            value={cityName}
+                            onChange={(e) => setCityName(e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              background: 'var(--bg-dark)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              color: 'var(--text-primary)',
+                              fontSize: '0.9rem'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={addCityRefToTheme}
+                        disabled={!citySong || !cityName}
+                        className="btn btn-primary"
+                        style={{
+                          width: '100%',
+                          opacity: (!citySong || !cityName) ? 0.5 : 1,
+                          cursor: (!citySong || !cityName) ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Add City Reference
+                      </button>
+                    </div>
+
+                    {/* Current City References List */}
+                    <div>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
+                      }}>
+                        Current City References ({editingTheme.songs.length})
+                      </label>
+                      <div style={{
+                        background: 'var(--bg-dark)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        padding: '0.5rem',
+                        maxHeight: '300px',
+                        overflow: 'auto'
+                      }}>
+                        {editingTheme.songs.length === 0 ? (
+                          <div style={{ 
+                            padding: '1rem', 
+                            textAlign: 'center', 
+                            color: 'var(--text-muted)',
+                            fontStyle: 'italic'
+                          }}>
+                            No city references yet. Add songs that mention cities in their lyrics.
+                          </div>
+                        ) : (
+                          editingTheme.songs.map(ref => {
+                            const [song, city] = ref.split(':').map(s => s.trim());
+                            return (
+                              <div
+                                key={ref}
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  padding: '0.75rem',
+                                  borderBottom: '1px solid var(--border)',
+                                  gap: '0.5rem'
+                                }}
+                              >
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                                  <span>{song}</span>
+                                  <span style={{ color: 'var(--accent-orange)', fontWeight: '700' }}>→</span>
+                                  <span style={{ color: 'var(--accent-orange)' }}>📍 {city}</span>
+                                </div>
+                                <button
+                                  onClick={() => removeSongFromTheme(ref)}
+                                  style={{
+                                    background: 'rgba(239, 68, 68, 0.2)',
+                                    border: '1px solid rgb(239, 68, 68)',
+                                    color: 'rgb(239, 68, 68)',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.75rem',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : editingTheme.key === 'sequentialPairs' ? (
                   /* Special UI for Sequential Pairs */
                   <>
                     <div style={{ marginBottom: '1.5rem' }}>
@@ -2730,7 +2993,7 @@
                   </>
                 )}
 
-                {/* Save/Cancel Buttons */}
+                {/* Save/Cancel/Reset Buttons */}
                 <div style={{ 
                   display: 'flex', 
                   gap: '0.5rem', 
@@ -2749,6 +3012,50 @@
                     style={{ flex: 1 }}
                   >
                     Cancel
+                  </button>
+                  <button 
+                    onClick={async () => {
+                      if (confirm('Reset this theme to default? Your custom edits will be lost.')) {
+                        // Reload from GitHub to get defaults
+                        try {
+                          const response = await fetch('https://neilgolson.com/theme-songs.json');
+                          if (response.ok) {
+                            const themesData = await response.json();
+                            const defaultSongs = themesData[editingTheme.key] || [];
+                            
+                            // Update editing state
+                            setEditingTheme({
+                              ...editingTheme,
+                              songs: defaultSongs
+                            });
+                            
+                            // Remove from localStorage edits
+                            const localPrefs = JSON.parse(localStorage.getItem('panicSetlists') || '{}');
+                            if (localPrefs.themeEdits && localPrefs.themeEdits[editingTheme.key]) {
+                              delete localPrefs.themeEdits[editingTheme.key];
+                              localStorage.setItem('panicSetlists', JSON.stringify(localPrefs));
+                            }
+                            
+                            alert('✅ Reset to default');
+                          }
+                        } catch (err) {
+                          alert('Could not load defaults from GitHub');
+                        }
+                      }
+                    }}
+                    style={{
+                      padding: '0.75rem',
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      border: '1px solid rgb(239, 68, 68)',
+                      color: 'rgb(239, 68, 68)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      fontWeight: '600'
+                    }}
+                    title="Reset to GitHub defaults"
+                  >
+                    Reset
                   </button>
                 </div>
               </div>
@@ -3003,8 +3310,17 @@
                         }
                         
                         // Factor 4: City-specific bonus (0-30 points)
-                        const citySongs = CITY_SONGS[upcomingCity] || [];
-                        const isCitySong = citySongs.includes(song);
+                        // Check cityReferences theme for "Song:City" format
+                        const cityRefs = themeSongs['cityReferences'] || [];
+                        let isCitySong = false;
+                        
+                        cityRefs.forEach(ref => {
+                          const [songName, cityName] = ref.split(':').map(s => s.trim());
+                          if (songName === song && upcomingCity.toLowerCase().includes(cityName.toLowerCase())) {
+                            isCitySong = true;
+                          }
+                        });
+                        
                         if (isCitySong) {
                           score += 30;
                         }
@@ -3185,7 +3501,7 @@
                       Synced from GitHub
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                      {setlists.length} shows • All devices see same data
+                      {setlists.length} shows • Themes synced • Your edits saved locally
                     </div>
                   </div>
                   <button
@@ -3879,8 +4195,8 @@ Chilly Water, Pigeons, Space Wrangler..."
                 july4th: { emoji: '🎆', label: 'July 4th', color: 'rgb(239, 68, 68)', dateRange: 'Jun 30 - Jul 8' },
                 beach: { emoji: '🏖️', label: 'Beach', color: 'rgb(14, 165, 233)', dateRange: 'Coastal cities only' },
                 halloween: { emoji: '🎃', label: 'Halloween', color: 'rgb(249, 115, 22)', dateRange: 'Oct 27 - Nov 4' },
-                christmas: { emoji: '🎄', label: 'Christmas', color: 'rgb(22, 163, 74)', dateRange: 'Dec 21-29' },
                 newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)', dateRange: 'Dec 28 - Jan 5' },
+                cityReferences: { emoji: '📍', label: 'City References', color: 'rgb(255, 140, 66)', dateRange: 'Format: Song:City' },
                 sequentialPairs: { emoji: '🔗', label: 'Sequential Pairs', color: 'rgb(139, 92, 246)', dateRange: 'Format: Song A<->Song B' }
               }).map(([themeKey, themeInfo]) => (
                 <div key={themeKey} style={{
