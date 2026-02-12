@@ -317,7 +317,8 @@
       const tabBtn=a=>({display:'flex',flexDirection:'column',alignItems:'center',gap:2,background:'none',border:'none',cursor:'pointer',padding:'4px 12px',color:a?'var(--orange)':'var(--t3)',fontSize:'.65rem',fontFamily:"'Crimson Pro',serif",fontWeight:a?700:400,letterSpacing:'.04em',transition:'color .15s',position:'relative'});
 
       const tabs=[{id:'predict',ic:'🎯',l:'Predict'},{id:'live',ic:'🎸',l:'Live'},{id:'songs',ic:'🎵',l:'Songs'},{id:'shows',ic:'📋',l:'Shows'},{id:'settings',ic:'⚙️',l:'Settings'}];
-      const switchTab=id=>{setTab(id);setSearchTerm('')};
+      const contentRef=useRef(null);
+      const switchTab=id=>{setTab(id);setSearchTerm('');if(contentRef.current)contentRef.current.scrollTop=0};
 
       // ═══════════════════════════════════════
       // RENDER
@@ -341,7 +342,7 @@
             </div>
           </nav>
 
-          <div className="app-content" style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',paddingBottom:'calc(var(--tab-h) + var(--safe-b) + 12px)',marginLeft:'var(--sidebar-w,0px)'}}>
+          <div ref={contentRef} className="app-content" style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',paddingBottom:'calc(var(--tab-h) + var(--safe-b) + 12px)',marginLeft:'var(--sidebar-w,0px)'}}>
 
             {/* Loading / Error states */}
             {loadState==='loading'&&(
@@ -364,8 +365,7 @@
               </div>
             )}
             {/* ═══ PREDICT ═══ */}
-            {tab==='predict'&&loadState==='ok'&&(
-              <div style={{padding:'1rem 1rem 0'}}>
+            <div style={{display:tab==='predict'&&loadState==='ok'?'block':'none',padding:'1rem 1rem 0'}}>
                 <div style={{textAlign:'center',marginBottom:'1.25rem',paddingTop:'.5rem'}}>
                   <h1 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'2.4rem',letterSpacing:'.08em',lineHeight:1,background:'linear-gradient(135deg,var(--red),var(--orange),var(--yellow))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Panic Predictor</h1>
                   <p style={{color:'var(--t3)',fontSize:'.85rem',marginTop:'.25rem'}}>3-show rule • {setlists.length} shows loaded</p>
@@ -413,12 +413,10 @@
                         </div>
                       </div>)
                   })}
-              </div>
-            )}
+            </div>
 
             {/* ═══ LIVE ═══ */}
-            {tab==='live'&&loadState==='ok'&&(
-              <div style={{padding:'1rem 1rem 0'}}>
+            <div style={{display:tab==='live'&&loadState==='ok'?'block':'none',padding:'1rem 1rem 0'}}>
                 <div style={{display:'flex',alignItems:'center',gap:'.7rem',marginBottom:'1rem',paddingTop:'.5rem'}}>
                   <div style={{width:12,height:12,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 8px var(--green)',animation:'blink 1.2s ease-in-out infinite'}}/>
                   <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.8rem',color:'var(--green)',letterSpacing:'.06em'}}>Live Show</h2>
@@ -472,12 +470,10 @@
                     ))}
                   </div>
                 )}
-              </div>
-            )}
+            </div>
 
             {/* ═══ SONGS ═══ */}
-            {tab==='songs'&&loadState==='ok'&&(
-              <div style={{padding:'1rem 1rem 0'}}>
+            <div style={{display:tab==='songs'&&loadState==='ok'?'block':'none',padding:'1rem 1rem 0'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'.5rem',marginBottom:'1rem'}}>
                   <h2 style={sTitle}>All Songs</h2>
                   <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{filteredSongs.length}{searchTerm?` / ${ALL_WITH.length}`:''}</span>
@@ -502,12 +498,10 @@
                     </div>
                   );
                 })}
-              </div>
-            )}
+            </div>
 
             {/* ═══ SHOWS ═══ */}
-            {tab==='shows'&&loadState==='ok'&&(
-              <div style={{padding:'1rem 1rem 0'}}>
+            <div style={{display:tab==='shows'&&loadState==='ok'?'block':'none',padding:'1rem 1rem 0'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem',paddingTop:'.5rem'}}>
                   <h2 style={sTitle}>Show History</h2>
                   <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{setlists.length} shows</span>
@@ -542,12 +536,10 @@
                     </div>
                   );
                 })}
-              </div>
-            )}
+            </div>
 
             {/* ═══ SETTINGS ═══ */}
-            {tab==='settings'&&loadState==='ok'&&(
-              <div style={{padding:'1rem 1rem 0'}}>
+            <div style={{display:tab==='settings'&&loadState==='ok'?'block':'none',padding:'1rem 1rem 0'}}>
                 <h2 style={{...sTitle,paddingTop:'.5rem'}}>Settings</h2>
                 <div style={{fontSize:'.78rem',color:'var(--t2)',marginBottom:'.7rem',fontWeight:600,textTransform:'uppercase',letterSpacing:'.05em'}}>Theme Song Lists</div>
                 {Object.entries({valentine:{e:'💜',l:"Valentine's Day",c:'#a855f7',d:'Feb 10-18'},july4th:{e:'🎆',l:'July 4th',c:'#ef4444',d:'Jun 30-Jul 8'},newyear:{e:'🎉',l:"New Year's",c:'#eab308',d:'Dec 28-Jan 5'},cityReferences:{e:'📍',l:'City References',c:'var(--orange)',d:'Song→City'},stateReferences:{e:'🗺️',l:'State References',c:'#3b82f6',d:'Song→State'},sequentialPairs:{e:'🔗',l:'Sequential Pairs',c:'var(--purple)',d:'Song A↔B'}}).map(([k,info])=>(
@@ -564,8 +556,7 @@
                 <button onClick={()=>{if(confirm('Fix duplicate songs?')){const f=setlists.map(sl=>({...sl,songs:[...new Set(sl.songs)]}));const r=setlists.reduce((s,sl)=>s+sl.songs.length,0)-f.reduce((s,sl)=>s+sl.songs.length,0);setSetlists(f);alert(`Removed ${r} duplicates.`)}}} style={{...input,textAlign:'center',cursor:'pointer',color:'var(--green)',fontWeight:600,marginBottom:'.5rem',border:'1px solid rgba(74,222,128,.2)'}}>🔧 Fix Duplicate Songs</button>
                 <button onClick={()=>window.location.reload()} style={{...input,textAlign:'center',cursor:'pointer',color:'var(--t2)',fontWeight:600,marginBottom:'1.5rem'}}>☁️ Reload from GitHub</button>
                 <div style={{textAlign:'center'}}><button onClick={()=>{if(confirm('⚠️ Delete ALL data permanently?')){setSetlists([]);setLiveSetlist([]);setCustomSongs([]);localStorage.clear();alert('Reset.')}}} style={{background:'none',border:'none',color:'var(--played)',fontSize:'.85rem',cursor:'pointer',padding:'.5rem',textDecoration:'underline'}}>Reset All Data</button></div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* ═══ BOTTOM TAB BAR (mobile) ═══ */}
