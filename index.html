@@ -98,9 +98,9 @@
         (async()=>{
           setLoadState('loading');setLoadError('');
           try{
-            const sr=await fetch('https://neilgolson.com/setlists.json');
+            const sr=await fetch('/setlists.json');
             if(!sr.ok){setLoadError(`setlists.json: HTTP ${sr.status}`);setLoadState('error');return}
-            const tr=await fetch('https://neilgolson.com/theme-songs.json');
+            const tr=await fetch('/theme-songs.json');
             if(!tr.ok){setLoadError(`theme-songs.json: HTTP ${tr.status}`);setLoadState('error');return}
             const sd=await sr.json(),td=await tr.json();
             if(!sd.setlists||!sd.setlists.length){setLoadError('setlists.json loaded but contains no setlists');setLoadState('error');return}
