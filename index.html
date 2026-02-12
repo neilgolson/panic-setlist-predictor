@@ -509,14 +509,8 @@
         'Gimme'
       ],
       
-      // St. Patrick's Day (Mar 13-21)
-      stpatricks: ['Tall Boy', 'C. Brown', 'Barstools And Dreamers', 'Papa\'s Home', 'Diner'],
-      
       // July 4th (Jun 30 - Jul 8)
       july4th: ['Disco', 'Ain\'t Life Grand', 'Tall Boy', 'C. Brown', 'Party At Your Mama\'s House', 'North'],
-      
-      // Beach locations (coastal cities within 30mi of ocean)
-      beach: ['Fishwater', 'Chilly Water', 'Coconut', 'Arleen', 'Greta', 'Papa Johnny Road'],
       
       // Halloween (Oct 27 - Nov 4)
       halloween: ['Blackout Blues', 'Chainsaw City', 'Dark Bar'],
@@ -527,11 +521,26 @@
       // City References - Songs with city/location mentions in lyrics
       // Format: "Song:City" - song gets +30 point bonus when predicting for that city
       cityReferences: [
-        'Stop-Go:Austin',
-        'Barstools And Dreamers:Boulder',
-        'Driving Song:Athens',
-        'Pickin\' Up The Pieces:Atlanta',
-        'Tall Boy:Memphis'
+        'Makes Sense To Me:Atlanta',
+        'Up All Night:Savannah',
+        'Hatfield:San Diego',
+        'Hatfield:Los Angeles',
+        'Fishwater:New Orleans',
+        'Bayou Lena:New Orleans',
+        'Hope In A Hopeless World:New York City',
+        'Action Man:Saratoga',
+        'Bust It Big:New York City'
+      ],
+      
+      // State References - Songs with state mentions
+      // Format: "Song:STATE_CODE" - song gets +30 point bonus when predicting for that state
+      stateReferences: [
+        'Don\'t Tell The Band:GA',
+        'Henry Parsons Died:GA',
+        'Up All Night:GA',
+        'Hatfield:CA',
+        'Rebirtha:KS',
+        'Visiting Day:TN'
       ],
       
       // Sequential Pairs - Songs that typically follow each other
@@ -751,6 +760,9 @@
       const [citySong, setCitySong] = useState('');
       const [cityName, setCityName] = useState('');
       const [citySongSearch, setCitySongSearch] = useState('');
+      const [stateSong, setStateSong] = useState('');
+      const [stateCode, setStateCode] = useState('');
+      const [stateSongSearch, setStateSongSearch] = useState('');
 
       // Combine all available songs (base + covers + custom)
       const ALL_SONGS_WITH_COVERS = useMemo(() => {
@@ -1256,6 +1268,21 @@
           setCitySong('');
           setCityName('');
           setCitySongSearch('');
+        }
+      };
+
+      const addStateRefToTheme = () => {
+        if (editingTheme && stateSong && stateCode) {
+          const stateRefString = `${stateSong}:${stateCode}`;
+          if (!editingTheme.songs.includes(stateRefString)) {
+            setEditingTheme({
+              ...editingTheme,
+              songs: [...editingTheme.songs, stateRefString]
+            });
+          }
+          setStateSong('');
+          setStateCode('');
+          setStateSongSearch('');
         }
       };
 
@@ -2007,11 +2034,17 @@
                 {/* Show city reference if available */}
                 {(() => {
                   const cityRefs = themeSongs['cityReferences'] || [];
-                  const songRefs = cityRefs
+                  const stateRefs = themeSongs['stateReferences'] || [];
+                  
+                  const songCityRefs = cityRefs
                     .filter(ref => ref.split(':')[0].trim() === selectedSongHistory.song)
                     .map(ref => ref.split(':')[1].trim());
                   
-                  if (songRefs.length > 0) {
+                  const songStateRefs = stateRefs
+                    .filter(ref => ref.split(':')[0].trim() === selectedSongHistory.song)
+                    .map(ref => ref.split(':')[1].trim());
+                  
+                  if (songCityRefs.length > 0 || songStateRefs.length > 0) {
                     return (
                       <div style={{
                         padding: '0.75rem',
@@ -2028,13 +2061,25 @@
                           textTransform: 'uppercase',
                           letterSpacing: '0.05em'
                         }}>
-                          📍 City Reference
+                          📍 City/State Reference
                         </div>
                         <div style={{ 
                           fontSize: '0.85rem', 
                           color: 'var(--text-primary)'
                         }}>
-                          Gets +30 point bonus in: {songRefs.join(', ')}
+                          Gets +30 point bonus in:
+                          {songCityRefs.length > 0 && (
+                            <div style={{ marginTop: '0.25rem' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Cities: </span>
+                              {songCityRefs.join(', ')}
+                            </div>
+                          )}
+                          {songStateRefs.length > 0 && (
+                            <div style={{ marginTop: '0.25rem' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>States: </span>
+                              {songStateRefs.join(', ')}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -2395,7 +2440,215 @@
                   </button>
                 </div>
 
-                {editingTheme.key === 'cityReferences' ? (
+                {editingTheme.key === 'stateReferences' ? (
+                  /* Special UI for State References */
+                  <>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
+                      }}>
+                        Add State Reference
+                      </label>
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '0.5rem', alignItems: 'start', marginBottom: '0.5rem' }}>
+                        {/* Song Search */}
+                        <div style={{ position: 'relative' }}>
+                          <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', display: 'block' }}>
+                            Song
+                          </label>
+                          <input
+                            type="text"
+                            placeholder={stateSong || "Search song..."}
+                            value={stateSongSearch}
+                            onChange={(e) => setStateSongSearch(e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              background: stateSong ? 'rgba(59, 130, 246, 0.1)' : 'var(--bg-dark)',
+                              border: stateSong ? '1px solid rgb(59, 130, 246)' : '1px solid var(--border)',
+                              borderRadius: '6px',
+                              color: 'var(--text-primary)',
+                              fontSize: '0.9rem'
+                            }}
+                          />
+                          {stateSong && !stateSongSearch && (
+                            <button
+                              onClick={() => { setStateSong(''); setStateSongSearch(''); }}
+                              style={{
+                                position: 'absolute',
+                                right: '0.5rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--text-muted)',
+                                cursor: 'pointer',
+                                fontSize: '1rem',
+                                padding: '0.25rem',
+                                marginTop: '0.6rem'
+                              }}
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {stateSongSearch && !stateSong && (
+                            <div style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              right: 0,
+                              zIndex: 1000,
+                              background: 'var(--bg-card)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              marginTop: '0.25rem',
+                              maxHeight: '200px',
+                              overflow: 'auto',
+                              boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                            }}>
+                              {ALL_SONGS_WITH_COVERS
+                                .filter(song => song.toLowerCase().includes(stateSongSearch.toLowerCase()))
+                                .slice(0, 15)
+                                .map(song => (
+                                  <div
+                                    key={song}
+                                    onClick={() => {
+                                      setStateSong(song);
+                                      setStateSongSearch('');
+                                    }}
+                                    style={{
+                                      padding: '0.5rem',
+                                      cursor: 'pointer',
+                                      borderBottom: '1px solid var(--border)',
+                                      fontSize: '0.85rem'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                  >
+                                    {song}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Arrow */}
+                        <div style={{ fontSize: '1.5rem', color: 'rgb(59, 130, 246)', paddingTop: '1.75rem', textAlign: 'center' }}>
+                          →
+                        </div>
+
+                        {/* State Code Input */}
+                        <div>
+                          <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', display: 'block' }}>
+                            State Code
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="GA, CA, TN..."
+                            value={stateCode}
+                            onChange={(e) => setStateCode(e.target.value.toUpperCase())}
+                            maxLength={2}
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              background: 'var(--bg-dark)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '6px',
+                              color: 'var(--text-primary)',
+                              fontSize: '0.9rem',
+                              textTransform: 'uppercase'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={addStateRefToTheme}
+                        disabled={!stateSong || !stateCode}
+                        className="btn btn-primary"
+                        style={{
+                          width: '100%',
+                          opacity: (!stateSong || !stateCode) ? 0.5 : 1,
+                          cursor: (!stateSong || !stateCode) ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Add State Reference
+                      </button>
+                    </div>
+
+                    {/* Current State References List */}
+                    <div>
+                      <label style={{ 
+                        display: 'block', 
+                        marginBottom: '0.5rem',
+                        fontSize: '0.9rem',
+                        fontWeight: '600'
+                      }}>
+                        Current State References ({editingTheme.songs.length})
+                      </label>
+                      <div style={{
+                        background: 'var(--bg-dark)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        padding: '0.5rem',
+                        maxHeight: '300px',
+                        overflow: 'auto'
+                      }}>
+                        {editingTheme.songs.length === 0 ? (
+                          <div style={{ 
+                            padding: '1rem', 
+                            textAlign: 'center', 
+                            color: 'var(--text-muted)',
+                            fontStyle: 'italic'
+                          }}>
+                            No state references yet. Add songs that mention states in their lyrics.
+                          </div>
+                        ) : (
+                          editingTheme.songs.map(ref => {
+                            const [song, state] = ref.split(':').map(s => s.trim());
+                            return (
+                              <div
+                                key={ref}
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  padding: '0.75rem',
+                                  borderBottom: '1px solid var(--border)',
+                                  gap: '0.5rem'
+                                }}
+                              >
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                                  <span>{song}</span>
+                                  <span style={{ color: 'rgb(59, 130, 246)', fontWeight: '700' }}>→</span>
+                                  <span style={{ color: 'rgb(59, 130, 246)' }}>🗺️ {state}</span>
+                                </div>
+                                <button
+                                  onClick={() => removeSongFromTheme(ref)}
+                                  style={{
+                                    background: 'rgba(239, 68, 68, 0.2)',
+                                    border: '1px solid rgb(239, 68, 68)',
+                                    color: 'rgb(239, 68, 68)',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.75rem',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : editingTheme.key === 'cityReferences' ? (
                   /* Special UI for City References */
                   <>
                     <div style={{ marginBottom: '1.5rem' }}>
@@ -3085,20 +3338,16 @@
               {(() => {
                 const upcomingDate = '2026-02-14';
                 const theme = getDateTheme(upcomingDate);
-                const isBeach = isBeachCity(nextRunCity);
-                if (!theme && !isBeach) return null;
+                if (!theme) return null;
                 
                 const themeLabels = {
                   valentine: { emoji: '💜', label: 'Valentine\'s Day', color: 'rgb(147, 51, 234)' },
-                  stpatricks: { emoji: '☘️', label: 'St. Patrick\'s Day', color: 'rgb(34, 197, 94)' },
                   july4th: { emoji: '🎆', label: 'July 4th', color: 'rgb(239, 68, 68)' },
-                  beach: { emoji: '🏖️', label: 'Beach Vibes', color: 'rgb(14, 165, 233)' },
                   halloween: { emoji: '🎃', label: 'Halloween', color: 'rgb(249, 115, 22)' },
-                  christmas: { emoji: '🎄', label: 'Christmas', color: 'rgb(22, 163, 74)' },
                   newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)' }
                 };
                 
-                const themeInfo = theme ? themeLabels[theme] : (isBeach ? themeLabels['beach'] : null);
+                const themeInfo = theme ? themeLabels[theme] : null;
                 if (!themeInfo) return null;
                 
                 return (
@@ -3309,30 +3558,35 @@
                           score += Math.min(15, status.showsSince * 2.5);
                         }
                         
-                        // Factor 4: City-specific bonus (0-30 points)
-                        // Check cityReferences theme for "Song:City" format
+                        // Factor 4: City/State-specific bonus (0-30 points)
+                        // Check both cityReferences and stateReferences
                         const cityRefs = themeSongs['cityReferences'] || [];
-                        let isCitySong = false;
+                        const stateRefs = themeSongs['stateReferences'] || [];
+                        let isCityOrStateSong = false;
                         
+                        // Check city references (Song:City format)
                         cityRefs.forEach(ref => {
                           const [songName, cityName] = ref.split(':').map(s => s.trim());
                           if (songName === song && upcomingCity.toLowerCase().includes(cityName.toLowerCase())) {
-                            isCitySong = true;
+                            isCityOrStateSong = true;
                           }
                         });
                         
-                        if (isCitySong) {
+                        // Check state references (Song:STATE_CODE format)
+                        stateRefs.forEach(ref => {
+                          const [songName, stateCode] = ref.split(':').map(s => s.trim());
+                          if (songName === song && upcomingCity.toLowerCase().includes(stateCode.toLowerCase())) {
+                            isCityOrStateSong = true;
+                          }
+                        });
+                        
+                        if (isCityOrStateSong) {
                           score += 30;
                         }
                         
                         // Factor 5: Holiday/Theme bonus (0-30 points)
                         const currentTheme = getDateTheme(upcomingDate);
-                        let themeList = currentTheme ? (themeSongs[currentTheme] || []) : [];
-                        
-                        // Also check for beach location bonus
-                        if (isBeachCity(nextRunCity)) {
-                          themeList = [...themeList, ...(themeSongs['beach'] || [])];
-                        }
+                        const themeList = currentTheme ? (themeSongs[currentTheme] || []) : [];
                         
                         const isThemeSong = themeList.includes(song);
                         if (isThemeSong) {
@@ -3354,7 +3608,7 @@
                           song, 
                           score, 
                           status: { ...status, timesPlayed: actualTimesPlayed }, 
-                          isCity: isCitySong,
+                          isCity: isCityOrStateSong,
                           isTheme: isThemeSong,
                           theme: currentTheme,
                           nightsAvailable: nightsAvailable
@@ -3410,10 +3664,8 @@
                         bgColor = 'rgba(147, 51, 234, 0.15)'; // Purple for theme songs
                         borderColor = 'rgb(147, 51, 234)';
                         icon = theme === 'valentine' ? '💜' : 
-                               theme === 'stpatricks' ? '☘️' :
                                theme === 'july4th' ? '🎆' :
                                theme === 'halloween' ? '🎃' :
-                               theme === 'christmas' ? '🎄' :
                                theme === 'newyear' ? '🎉' : '🎵';
                       } else if (isCity) {
                         bgColor = 'rgba(255, 140, 66, 0.15)'; // Orange for city songs
@@ -4191,12 +4443,11 @@ Chilly Water, Pigeons, Space Wrangler..."
             }}>
               {Object.entries({
                 valentine: { emoji: '💜', label: 'Valentine\'s Day', color: 'rgb(147, 51, 234)', dateRange: 'Feb 10-18' },
-                stpatricks: { emoji: '☘️', label: 'St. Patrick\'s Day', color: 'rgb(34, 197, 94)', dateRange: 'Mar 13-21' },
                 july4th: { emoji: '🎆', label: 'July 4th', color: 'rgb(239, 68, 68)', dateRange: 'Jun 30 - Jul 8' },
-                beach: { emoji: '🏖️', label: 'Beach', color: 'rgb(14, 165, 233)', dateRange: 'Coastal cities only' },
                 halloween: { emoji: '🎃', label: 'Halloween', color: 'rgb(249, 115, 22)', dateRange: 'Oct 27 - Nov 4' },
                 newyear: { emoji: '🎉', label: 'New Year\'s', color: 'rgb(234, 179, 8)', dateRange: 'Dec 28 - Jan 5' },
                 cityReferences: { emoji: '📍', label: 'City References', color: 'rgb(255, 140, 66)', dateRange: 'Format: Song:City' },
+                stateReferences: { emoji: '🗺️', label: 'State References', color: 'rgb(59, 130, 246)', dateRange: 'Format: Song:STATE' },
                 sequentialPairs: { emoji: '🔗', label: 'Sequential Pairs', color: 'rgb(139, 92, 246)', dateRange: 'Format: Song A<->Song B' }
               }).map(([themeKey, themeInfo]) => (
                 <div key={themeKey} style={{
