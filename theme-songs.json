@@ -18,13 +18,6 @@
     "Papa's Home",
     "Gimme"
   ],
-  "stpatricks": [
-    "Tall Boy",
-    "C. Brown",
-    "Barstools And Dreamers",
-    "Papa's Home",
-    "Diner"
-  ],
   "july4th": [
     "Disco",
     "Ain't Life Grand",
@@ -32,14 +25,6 @@
     "C. Brown",
     "Party At Your Mama's House",
     "North"
-  ],
-  "beach": [
-    "Fishwater",
-    "Chilly Water",
-    "Coconut",
-    "Arleen",
-    "Greta",
-    "Papa Johnny Road"
   ],
   "halloween": [
     "Blackout Blues",
@@ -63,6 +48,14 @@
     "Hope In A Hopeless World:New York City",
     "Action Man:Saratoga",
     "Bust It Big:New York City"
+  ],
+  "stateReferences": [
+    "Don't Tell The Band:GA",
+    "Henry Parsons Died:GA",
+    "Up All Night:GA",
+    "Hatfield:CA",
+    "Rebirtha:KS",
+    "Visiting Day:TN"
   ],
   "sequentialPairs": [
     "Machine<->Barstools And Dreamers",
