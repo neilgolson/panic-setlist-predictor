@@ -71,7 +71,7 @@
     function Sheet({open,onClose,title,titleColor,level,children}){
       const z=level===2?1000:900;
       return(<>{React.createElement('div',{className:`sheet-bg ${open?'on':''}`,onClick:onClose,style:{zIndex:z}})}
-        <div className={`sheet ${open?'on':''}`} style={{zIndex:z+50}}><div className="sheet-bar"/><div className="sheet-hd"><h3 style={{color:titleColor||'var(--orange)'}}>{title}</h3><button className="sheet-x" onClick={onClose}>×</button></div><div className="sheet-bd">{children}</div></div></>);
+        <div className={`sheet ${open?'on':''}`} style={{zIndex:z+50,pointerEvents:open?'auto':'none'}}><div className="sheet-bar"/><div className="sheet-hd"><h3 style={{color:titleColor||'var(--orange)'}}>{title}</h3><button className="sheet-x" onClick={onClose}>×</button></div><div className="sheet-bd">{children}</div></div></>);
     }
 
     /* ═══════════════════ MAIN APP ═══════════════════ */
