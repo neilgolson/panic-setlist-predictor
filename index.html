@@ -88,6 +88,19 @@
       .main-grid {
         grid-template-columns: 1fr;
       }
+      
+      .predictions-layout {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+      }
+      
+      .prediction-card {
+        font-size: 0.85rem !important;
+      }
+      
+      .prediction-song-name {
+        font-size: 0.9rem !important;
+      }
     }
 
     .card {
@@ -616,21 +629,21 @@
       "Barstools And Dreamers", "Proving Ground", "The Last Straw", "Pleas", "Hatfield",
       "Wondering", "Papa's Home", "Diner", "Better Off", "Pickin' Up The Pieces",
       "Henry Parsons Died", "Pilgrims", "Postcard", "Dream Song", "Little Kin", "Ain't Life Grand",
-      "Airplane", "Can't Get High", "Heroes", "Raise The Roof", "Junior", "Blackout Blues",
+      "Airplane", "Can't Get High", "Heroes", "Junior", "Blackout Blues",
       "Jack", "Fishwater", "Radio Child", "Aunt Avis", "Tall Boy", "Gradle",
-      "Rebirtha", "You Got Yours", "Hope In A Hopeless World", "Greta", "Surprise Valley",
+      "Rebirtha", "You Got Yours", "Greta", "Surprise Valley",
       "Bear's Gone Fishin'", "Climb To Safety", "Blue Indian", "The Waker", "Dyin' Man",
       "One Arm Steve", "Christmas Katie", "All Time Low", "Nobody's Loss",
-      "Fishing", "Thin Air (Smells Like Mississippi)", "Tortured Artist", "Papa Johnny Road",
-      "Sparks Fly", "Counting Train Cars", "Don't Wanna Lose You",
+      "Fishing", "Tortured Artist", "Papa Johnny Road",
+      "Sparks Fly", "Don't Wanna Lose You",
       "Monstrosity", "Travelin' Man",
-      "Second Skin", "Goodpeople", "From The Cradle", "Solid Rock", "Time Zones",
+      "Second Skin", "Goodpeople", "From The Cradle",
       "Ribs And Whiskey", "Crazy", "You Should Be Glad",
       "May Your Glass Be Filled", "Walk On The Flood",
       "Free Somehow", "Flicker",
       "Her Dance Needs No Body", "Up All Night", "Saint Ex", "North",
-      "Dirty Side Down", "Visiting Day", "Clinic Cynic", "Shut Up And Drive",
-      "Jaded Tourist", "Cotton Was King", "Cosmic Confidante"
+      "Dirty Side Down", "Visiting Day", "Shut Up And Drive",
+      "Cotton Was King", "Cosmic Confidante"
     ].sort();
 
     // Common covers and variations (not in official lyrics but played frequently)
@@ -3474,7 +3487,7 @@
                 );
               })()}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '2rem', alignItems: 'start' }}>
+            <div className="predictions-layout" style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '2rem', alignItems: 'start' }}>
               <div>
                 <div style={{ marginBottom: '1rem' }}>
                   <div style={{ 
@@ -3781,7 +3794,7 @@
                       }
 
                       return (
-                        <div key={i} style={{ 
+                        <div key={i} className="prediction-card" style={{ 
                           padding: '0.5rem 0.75rem',
                           background: bgColor,
                           borderRadius: '6px',
@@ -3792,13 +3805,14 @@
                           alignItems: 'center',
                           gap: '0.5rem',
                           cursor: 'pointer',
-                          transition: 'transform 0.1s ease'
+                          transition: 'transform 0.1s ease',
+                          flexWrap: 'wrap'
                         }}
                         onClick={() => showSongHistory(song)}
                         onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                         >
-                          <span style={{ flex: 1, minWidth: 0 }}>
+                          <span className="prediction-song-name" style={{ flex: 1, minWidth: 0 }}>
                             {song}
                             {icon && <span style={{ marginLeft: '0.25rem' }}>{icon}</span>}
                             {nightsAvailable === 'night2' && (
