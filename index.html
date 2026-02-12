@@ -815,45 +815,75 @@
 
       // Load from storage on mount
       useEffect(() => {
-        const saved = localStorage.getItem('panicSetlists');
-        if (saved) {
-          const data = JSON.parse(saved);
-          setSetlists(data.setlists || []);
-          
-          // Auto-detect if run has ended
-          let loadedRun = data.currentRun || null;
-          if (loadedRun && data.setlists && data.setlists.length > 0) {
-            // Sort to get most recent show
-            const sortedShows = [...data.setlists].sort((a, b) => new Date(b.date) - new Date(a.date));
-            const mostRecentShow = sortedShows[0];
-            const mostRecentDate = new Date(mostRecentShow.date);
-            const today = new Date();
-            
-            // Calculate days since most recent show
-            const daysSince = Math.floor((today - mostRecentDate) / (1000 * 60 * 60 * 24));
-            
-            // If more than 1 day since most recent show, the run is over
-            if (daysSince > 1) {
-              loadedRun = null;
-              setIsRun(false);
+        // Load from GitHub canonical source first
+        const loadFromGitHub = async () => {
+          try {
+            const response = await fetch('https://neilgolson.com/setlists.json');
+            if (response.ok) {
+              const data = await response.json();
+              console.log('✅ Loaded canonical setlists from GitHub:', data.setlists.length, 'shows');
+              setSetlists(data.setlists || []);
+              
+              // Also load user preferences from localStorage (themes, custom songs)
+              const localPrefs = localStorage.getItem('panicSetlists');
+              if (localPrefs) {
+                const prefs = JSON.parse(localPrefs);
+                setCustomSongs(prefs.customSongs || []);
+                setThemeSongs(prefs.themeSongs || DEFAULT_THEME_SONGS);
+              }
+              
+              return true;
+            }
+          } catch (error) {
+            console.warn('Could not load from GitHub, falling back to localStorage:', error);
+          }
+          return false;
+        };
+        
+        // Try GitHub first, fall back to localStorage
+        loadFromGitHub().then(success => {
+          if (!success) {
+            // Fallback to localStorage if GitHub fails
+            const saved = localStorage.getItem('panicSetlists');
+            if (saved) {
+              const data = JSON.parse(saved);
+              setSetlists(data.setlists || []);
+              setCustomSongs(data.customSongs || []);
+              setThemeSongs(data.themeSongs || DEFAULT_THEME_SONGS);
+              console.log('📂 Loaded from localStorage (GitHub unavailable)');
             }
           }
           
-          setCurrentRun(loadedRun);
-          setCustomSongs(data.customSongs || []);
-          setThemeSongs(data.themeSongs || DEFAULT_THEME_SONGS);
-        }
+          // Auto-detect if run has ended (from whichever source we loaded)
+          const saved = localStorage.getItem('panicSetlists');
+          if (saved) {
+            const data = JSON.parse(saved);
+            let loadedRun = data.currentRun || null;
+            if (loadedRun && setlists && setlists.length > 0) {
+              const sortedShows = [...setlists].sort((a, b) => new Date(b.date) - new Date(a.date));
+              const mostRecentShow = sortedShows[0];
+              const mostRecentDate = new Date(mostRecentShow.date);
+              const today = new Date();
+              const daysSince = Math.floor((today - mostRecentDate) / (1000 * 60 * 60 * 24));
+              
+              if (daysSince > 1) {
+                loadedRun = null;
+                setIsRun(false);
+              }
+            }
+            setCurrentRun(loadedRun);
+          }
+        });
       }, []);
 
-      // Save to storage whenever data changes
+      // Save user preferences to localStorage (NOT setlists - those come from GitHub)
       useEffect(() => {
         localStorage.setItem('panicSetlists', JSON.stringify({
-          setlists,
           currentRun,
           customSongs,
           themeSongs
         }));
-      }, [setlists, currentRun, customSongs, themeSongs]);
+      }, [currentRun, customSongs, themeSongs]);
 
       const addSetlist = () => {
         if (!newSongs) return;
@@ -3136,6 +3166,46 @@
             <div>
               <div className="card">
                 <h2>Mode</h2>
+                
+                {/* Cloud Sync Status */}
+                <div style={{
+                  padding: '0.75rem',
+                  marginBottom: '1rem',
+                  background: 'rgba(34, 197, 94, 0.1)',
+                  border: '1px solid var(--accent-green)',
+                  borderRadius: '6px',
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span style={{ fontSize: '1rem' }}>☁️</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', color: 'var(--accent-green)' }}>
+                      Synced from GitHub
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                      {setlists.length} shows • All devices see same data
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => window.location.reload()}
+                    style={{
+                      padding: '0.35rem 0.75rem',
+                      background: 'var(--accent-green)',
+                      border: 'none',
+                      borderRadius: '4px',
+                      color: 'white',
+                      fontSize: '0.75rem',
+                      cursor: 'pointer',
+                      fontWeight: '600'
+                    }}
+                    title="Reload page to get latest shows from GitHub"
+                  >
+                    Refresh
+                  </button>
+                </div>
+                
                 <div className="mode-toggle">
                   <button 
                     className={`mode-btn ${mode === 'setup' ? 'active' : ''}`}
@@ -4030,8 +4100,20 @@ Chilly Water, Pigeons, Space Wrangler..."
                 padding: '0.75rem 2rem'
               }}
             >
-              📤 Export Data for Analysis
+              📤 Export for GitHub Update
             </button>
+            
+            <div style={{
+              padding: '0.75rem',
+              background: 'rgba(124, 58, 237, 0.1)',
+              border: '1px solid rgba(124, 58, 237, 0.3)',
+              borderRadius: '6px',
+              fontSize: '0.8rem',
+              color: 'var(--text-muted)',
+              marginTop: '0.5rem'
+            }}>
+              💡 To add shows: Export → Upload setlists.json to GitHub repo → Everyone sees updates
+            </div>
             
             <button 
               className="btn btn-primary"
