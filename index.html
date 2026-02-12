@@ -17,7 +17,7 @@
       --red:#ff3366;--orange:#ff8c42;--yellow:#ffd93d;--green:#4ade80;--purple:#a855f7;
       --t1:#f0f0f0;--t2:#999;--t3:#555;--bdr:#2a2a2a;
       --avail:#4ade80;--rest:#fbbf24;--played:#f87171;
-      --safe-b:env(safe-area-inset-bottom,0px);--tab-h:60px
+      --safe-b:env(safe-area-inset-bottom,0px);--tab-h:60px;--sidebar-w:0px
     }
     html,body{height:100%;overflow:hidden;font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--t1)}
     #root{height:100%}
@@ -25,12 +25,20 @@
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
     .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:900;opacity:0;pointer-events:none;transition:opacity .3s}.sheet-bg.on{opacity:1;pointer-events:auto}
     .sheet{position:fixed;left:0;right:0;bottom:0;background:var(--bg2);border-radius:20px 20px 0 0;z-index:950;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.5)}.sheet.on{transform:translateY(0)}
+    @media(min-width:768px){.sheet{left:var(--sidebar-w);max-width:720px}}
     .sheet-bar{width:36px;height:5px;border-radius:3px;background:#444;margin:10px auto 6px;flex-shrink:0}
     .sheet-hd{padding:0 1.25rem .75rem;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
     .sheet-hd h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em}
     .sheet-bd{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:1rem 1.25rem;padding-bottom:calc(1rem + var(--safe-b))}
     .sheet-x{background:none;border:none;color:var(--t2);font-size:1.6rem;cursor:pointer;padding:.25rem;line-height:1}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+    @media(min-width:768px){
+      :root{--sidebar-w:200px;--tab-h:0px;--safe-b:0px}
+      .app-shell{flex-direction:row!important}
+      .app-content{max-width:720px;margin-left:var(--sidebar-w)!important;margin-right:auto}
+      .bottom-nav{display:none!important}
+      .side-nav{display:flex!important}
+    }
   </style>
 </head>
 <body>
@@ -217,7 +225,7 @@
         if(!liveSetlist.length)return;
         const sl={date:new Date().toISOString().split('T')[0],songs:liveSetlist,city:`${CITY}, ${STATE}`,id:Date.now()};
         setSetlists(p=>[sl,...p].sort((a,b)=>new Date(b.date)-new Date(a.date)));
-        setLiveSetlist([]);setTab('history');
+        setLiveSetlist([]);setTab('shows');
       };
 
       const addSetlist=()=>{
@@ -303,12 +311,32 @@
       const sTitle={fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.6rem',letterSpacing:'.06em',color:'var(--orange)',marginBottom:'.75rem'};
       const tabBtn=a=>({display:'flex',flexDirection:'column',alignItems:'center',gap:2,background:'none',border:'none',cursor:'pointer',padding:'4px 12px',color:a?'var(--orange)':'var(--t3)',fontSize:'.65rem',fontFamily:"'Crimson Pro',serif",fontWeight:a?700:400,letterSpacing:'.04em',transition:'color .15s',position:'relative'});
 
+      const tabs=[{id:'predict',ic:'🎯',l:'Predict'},{id:'live',ic:'🎸',l:'Live'},{id:'songs',ic:'🎵',l:'Songs'},{id:'shows',ic:'📋',l:'Shows'},{id:'settings',ic:'⚙️',l:'Settings'}];
+      const switchTab=id=>{setTab(id);setSearchTerm('')};
+
       // ═══════════════════════════════════════
       // RENDER
       // ═══════════════════════════════════════
       return(
-        <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
-          <div style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',paddingBottom:'calc(var(--tab-h) + var(--safe-b) + 12px)'}}>
+        <div className="app-shell" style={{display:'flex',flexDirection:'column',height:'100%'}}>
+          {/* ═══ SIDEBAR (desktop) ═══ */}
+          <nav className="side-nav" style={{display:'none',flexDirection:'column',width:'var(--sidebar-w,200px)',height:'100%',background:'var(--bg2)',borderRight:'1px solid var(--bdr)',padding:'1.5rem 0',flexShrink:0,position:'fixed',left:0,top:0,bottom:0,zIndex:800}}>
+            <div style={{padding:'0 1.25rem 1.5rem',borderBottom:'1px solid var(--bdr)',marginBottom:'.75rem'}}>
+              <h1 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.5rem',letterSpacing:'.06em',lineHeight:1,background:'linear-gradient(135deg,var(--red),var(--orange),var(--yellow))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Panic<br/>Predictor</h1>
+            </div>
+            {tabs.map(t=>(
+              <button key={t.id} onClick={()=>switchTab(t.id)} style={{display:'flex',alignItems:'center',gap:'.75rem',width:'100%',padding:'.85rem 1.25rem',background:tab===t.id?'rgba(255,140,66,.1)':'transparent',border:'none',borderLeft:tab===t.id?'3px solid var(--orange)':'3px solid transparent',cursor:'pointer',color:tab===t.id?'var(--orange)':'var(--t3)',fontFamily:"'Crimson Pro',serif",fontSize:'.95rem',fontWeight:tab===t.id?700:400,letterSpacing:'.02em',transition:'all .15s',textAlign:'left',position:'relative'}}>
+                <span style={{fontSize:'1.25rem',lineHeight:1,width:'1.5rem',textAlign:'center'}}>{t.ic}</span>
+                <span>{t.l}</span>
+                {t.id==='live'&&liveSetlist.length>0&&<span style={{width:8,height:8,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 6px var(--green)',marginLeft:'auto'}}/>}
+              </button>
+            ))}
+            <div style={{marginTop:'auto',padding:'1rem 1.25rem',borderTop:'1px solid var(--bdr)',fontSize:'.73rem',color:'var(--t3)'}}>
+              {setlists.length} shows loaded
+            </div>
+          </nav>
+
+          <div className="app-content" style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',paddingBottom:'calc(var(--tab-h) + var(--safe-b) + 12px)',marginLeft:'var(--sidebar-w,0px)'}}>
 
             {/* Loading / Error states */}
             {loadState==='loading'&&(
@@ -380,9 +408,6 @@
                         </div>
                       </div>)
                   })}
-                <button onClick={()=>setAllSongsSheet(true)} style={{width:'100%',padding:'.85rem',marginTop:'.75rem',borderRadius:10,background:'var(--bg3)',border:'1px solid var(--bdr)',color:'var(--t2)',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.05rem',letterSpacing:'.06em',cursor:'pointer'}}>
-                  Browse All Songs ({ALL_WITH.length})
-                </button>
               </div>
             )}
 
@@ -445,8 +470,38 @@
               </div>
             )}
 
-            {/* ═══ HISTORY ═══ */}
-            {tab==='history'&&loadState==='ok'&&(
+            {/* ═══ SONGS ═══ */}
+            {tab==='songs'&&loadState==='ok'&&(
+              <div style={{padding:'1rem 1rem 0'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'.5rem',marginBottom:'1rem'}}>
+                  <h2 style={sTitle}>All Songs</h2>
+                  <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{filteredSongs.length}{searchTerm?` / ${ALL_WITH.length}`:''}</span>
+                </div>
+                <input type="text" placeholder="🔍 Search..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} style={{...input,marginBottom:'.5rem'}}/>
+                <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{...input,fontSize:'.85rem',padding:'.6rem .8rem',marginBottom:'1rem',color:'var(--t2)'}}>
+                  <option value="showsSince">Sort by Shows Since Played</option>
+                  <option value="likelihood">Sort by Likelihood</option>
+                  <option value="timesPlayed">Sort by Times Played</option>
+                  <option value="alpha">Sort by A–Z</option>
+                </select>
+                {filteredSongs.map(song=>{const st=songStatus[song];if(!st)return null;
+                  return(
+                    <div key={song} style={{...row(),borderLeft:`3px solid ${st.available?'var(--avail)':st.showsSince===0?'var(--played)':'var(--rest)'}`}} onClick={()=>showHistory(song)}>
+                      <span style={{fontSize:'.95rem',fontWeight:600,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{song}</span>
+                      <div style={{display:'flex',gap:'.5rem',alignItems:'center',flexShrink:0}}>
+                        {st.timesPlayed>0&&<span style={{fontSize:'.72rem',color:'var(--t3)'}}>{st.timesPlayed}×</span>}
+                        <span style={chip(st.available?'var(--avail)':st.showsSince===0?'var(--played)':'var(--rest)')}>
+                          {st.available?(st.showsSince===Infinity?'Never':'Avail'):st.lastPlayed==='Tonight'?'Tonight':st.showsSince===0?'Latest':`${st.showsSince} ago`}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ═══ SHOWS ═══ */}
+            {tab==='shows'&&loadState==='ok'&&(
               <div style={{padding:'1rem 1rem 0'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem',paddingTop:'.5rem'}}>
                   <h2 style={sTitle}>Show History</h2>
@@ -508,10 +563,10 @@
             )}
           </div>
 
-          {/* ═══ TAB BAR ═══ */}
-          <nav style={{position:'fixed',bottom:0,left:0,right:0,height:'calc(var(--tab-h) + var(--safe-b))',paddingBottom:'var(--safe-b)',background:'rgba(14,14,14,.95)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderTop:'1px solid #222',display:'flex',justifyContent:'space-around',alignItems:'flex-start',zIndex:800,paddingTop:6}}>
-            {[{id:'predict',ic:'🎯',l:'Predict'},{id:'live',ic:'🎸',l:'Live'},{id:'history',ic:'📋',l:'History'},{id:'settings',ic:'⚙️',l:'Settings'}].map(t=>(
-              <button key={t.id} onClick={()=>setTab(t.id)} style={tabBtn(tab===t.id)}>
+          {/* ═══ BOTTOM TAB BAR (mobile) ═══ */}
+          <nav className="bottom-nav" style={{position:'fixed',bottom:0,left:0,right:0,height:'calc(var(--tab-h) + var(--safe-b))',paddingBottom:'var(--safe-b)',background:'rgba(14,14,14,.95)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderTop:'1px solid #222',display:'flex',justifyContent:'space-around',alignItems:'flex-start',zIndex:800,paddingTop:6}}>
+            {tabs.map(t=>(
+              <button key={t.id} onClick={()=>switchTab(t.id)} style={tabBtn(tab===t.id)}>
                 <span style={{fontSize:'1.5rem',lineHeight:1}}>{t.ic}</span>
                 <span>{t.l}</span>
                 {t.id==='live'&&liveSetlist.length>0&&<span style={{position:'absolute',top:0,right:2,width:8,height:8,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 6px var(--green)'}}/>}
@@ -618,10 +673,10 @@
             <div style={{position:'sticky',top:'-1rem',background:'var(--bg2)',paddingTop:'0',paddingBottom:'.75rem',zIndex:10}}>
               <input type="text" placeholder="🔍 Search..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} style={{...input,marginBottom:'.5rem'}}/>
               <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{...input,fontSize:'.85rem',padding:'.6rem .8rem'}}>
-                <option value="likelihood">By Likelihood</option>
-                <option value="showsSince">By Shows Since</option>
-                <option value="timesPlayed">By Times Played</option>
-                <option value="alpha">A-Z</option>
+                <option value="likelihood">Sort by Likelihood</option>
+                <option value="showsSince">Sort by Shows Since Played</option>
+                <option value="timesPlayed">Sort by Times Played</option>
+                <option value="alpha">Sort by A–Z</option>
               </select>
             </div>
             {filteredSongs.map(song=>{const st=songStatus[song];if(!st)return null;
