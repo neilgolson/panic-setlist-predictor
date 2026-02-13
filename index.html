@@ -599,8 +599,29 @@
                   <h2 style={sTitle}>Show History</h2>
                   <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{setlists.length} shows</span>
                 </div>
+                {/* List */}
+                {[...setlists].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(sl=>{
+                  const acc=showAccuracy[sl.id];const pct=acc?parseInt(acc.predictionAccuracy):null;
+                  const ac=pct>=50?'rgb(34,197,94)':pct>=20?'rgb(234,179,8)':'rgb(239,68,68)';
+                  return(
+                    <div key={sl.id} style={{padding:'.7rem 1rem',borderRadius:10,marginBottom:'.5rem',background:'var(--bg3)',border:'1px solid var(--bdr)'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.25rem'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'.4rem',flex:1,minWidth:0}}>
+                          <span style={{fontWeight:700,color:'var(--orange)',fontSize:'.93rem'}}>{sl.date}</span>
+                          {sl.city&&<span style={{color:'var(--t3)',fontSize:'.83rem'}}>📍 {sl.city}</span>}
+                          {acc&&<span onClick={()=>setDetailSheet({date:sl.date,city:sl.city||'',predictions:acc.predictions,actualSongs:acc.actualSongs,matchedSongs:acc.matchedSongs,matches:acc.matches,accuracy:acc.predictionAccuracy,runInfo:acc.runShows,excludedSongs:acc.songsPlayedInRun})} style={{...chip(ac),cursor:'pointer'}}>{acc.matches}/10</span>}
+                        </div>
+                        <div style={{display:'flex',gap:'.4rem',flexShrink:0}}>
+                          <button onClick={()=>setEditingSetlist({...sl,editDate:sl.date,editCity:sl.city||'',editSongs:sl.songs.join('\n')})} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:'var(--t2)',cursor:'pointer',fontSize:'.72rem',padding:'.2rem .6rem',fontFamily:"'Crimson Pro',serif"}}>✎</button>
+                          <button onClick={()=>delSetlist(sl.id)} style={{background:'none',border:'1px solid rgba(248,113,113,.25)',borderRadius:6,color:'var(--played)',cursor:'pointer',fontSize:'.72rem',padding:'.2rem .6rem',fontFamily:"'Crimson Pro',serif"}}>✕</button>
+                        </div>
+                      </div>
+                      <div style={{fontSize:'.93rem',color:'var(--t2)',lineHeight:1.2}}>{sl.songs.join(', ')}</div>
+                    </div>
+                  );
+                })}
                 {/* Add */}
-                <div style={{padding:'1rem',borderRadius:12,marginBottom:'1.15rem',background:'var(--bg3)',border:'1px solid var(--bdr)'}}>
+                <div style={{padding:'1rem',borderRadius:12,marginTop:'.5rem',marginBottom:'1.15rem',background:'var(--bg3)',border:'1px solid var(--bdr)'}}>
                   <div style={{fontSize:'.78rem',color:'var(--t2)',marginBottom:'.5rem',fontWeight:600,textTransform:'uppercase',letterSpacing:'.05em'}}>Add Setlist</div>
                   <textarea placeholder={"11/23/25 Fox Theater - Boulder, CO\nChilly Water, Pigeons, Space Wrangler..."} value={newSongs} onChange={e=>setNewSongs(e.target.value)} style={{...input,minHeight:100,resize:'vertical'}}/>
                   <div style={{display:'flex',gap:'.5rem',marginTop:'.5rem'}}>
@@ -608,27 +629,6 @@
                     <button onClick={addSetlist} style={{padding:'0 1.5rem',borderRadius:10,border:'none',background:'linear-gradient(135deg,var(--red),var(--orange))',color:'#fff',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',letterSpacing:'.06em',cursor:'pointer',whiteSpace:'nowrap'}}>Add</button>
                   </div>
                 </div>
-                {/* List */}
-                {[...setlists].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(sl=>{
-                  const acc=showAccuracy[sl.id];const pct=acc?parseInt(acc.predictionAccuracy):null;
-                  const ac=pct>=50?'rgb(34,197,94)':pct>=20?'rgb(234,179,8)':'rgb(239,68,68)';
-                  return(
-                    <div key={sl.id} style={{padding:'.85rem 1rem',borderRadius:10,marginBottom:'.5rem',background:'var(--bg3)',border:'1px solid var(--bdr)'}}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.3rem'}}>
-                        <div>
-                          <span style={{fontWeight:700,color:'var(--orange)',fontSize:'.93rem'}}>{sl.date}</span>
-                          {sl.city&&<span style={{color:'var(--t3)',fontSize:'.83rem',marginLeft:'.5rem'}}>📍 {sl.city}</span>}
-                        </div>
-                        {acc&&<span onClick={()=>setDetailSheet({date:sl.date,city:sl.city||'',predictions:acc.predictions,actualSongs:acc.actualSongs,matchedSongs:acc.matchedSongs,matches:acc.matches,accuracy:acc.predictionAccuracy,runInfo:acc.runShows,excludedSongs:acc.songsPlayedInRun})} style={{...chip(ac),cursor:'pointer'}}>{acc.matches}/10</span>}
-                      </div>
-                      <div style={{fontSize:'.85rem',color:'var(--t2)',lineHeight:1.25}}>{sl.songs.join(', ')}</div>
-                      <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',marginTop:'.5rem',paddingTop:'.5rem',borderTop:'1px solid var(--bdr)'}}>
-                        <button onClick={()=>setEditingSetlist({...sl,editDate:sl.date,editCity:sl.city||'',editSongs:sl.songs.join('\n')})} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:'var(--t2)',cursor:'pointer',fontSize:'.78rem',padding:'.4rem .85rem',fontFamily:"'Crimson Pro',serif",minHeight:36}}>✎ Edit</button>
-                        <button onClick={()=>delSetlist(sl.id)} style={{background:'none',border:'1px solid rgba(248,113,113,.25)',borderRadius:6,color:'var(--played)',cursor:'pointer',fontSize:'.78rem',padding:'.4rem .85rem',fontFamily:"'Crimson Pro',serif",minHeight:36}}>✕ Delete</button>
-                      </div>
-                    </div>
-                  );
-                })}
             </div>
 
             {/* ═══ SETTINGS ═══ */}
