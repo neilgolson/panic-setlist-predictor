@@ -19,6 +19,7 @@
       --avail:#4ade80;--rest:#fbbf24;--played:#f87171;
       --safe-b:env(safe-area-inset-bottom,0px);--tab-h:60px;--sidebar-w:0px
     }
+    html{font-size:112.5%}
     html,body{height:100%;overflow:hidden;font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--t1)}
     #root{height:100%}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -38,6 +39,7 @@
     .sheet-x{background:none;border:none;color:var(--t2);font-size:1.6rem;cursor:pointer;padding:.25rem;line-height:1}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
     @media(min-width:768px){
+      html{font-size:100%}
       :root{--sidebar-w:200px;--tab-h:0px;--safe-b:0px}
       .app-shell{flex-direction:row!important}
       .app-content{max-width:720px;margin-left:var(--sidebar-w)!important;margin-right:auto}
