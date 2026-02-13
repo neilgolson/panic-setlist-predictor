@@ -602,7 +602,7 @@
                 {/* Add */}
                 <div style={{padding:'1rem',borderRadius:12,marginBottom:'1.15rem',background:'var(--bg3)',border:'1px solid var(--bdr)'}}>
                   <div style={{fontSize:'.78rem',color:'var(--t2)',marginBottom:'.5rem',fontWeight:600,textTransform:'uppercase',letterSpacing:'.05em'}}>Add Setlist</div>
-                  <textarea placeholder={"Add any setlist that isn't already listed!\n11/23/25 Fox Theater - Boulder, CO\nChilly Water, Pigeons, Space Wrangler..."} value={newSongs} onChange={e=>setNewSongs(e.target.value)} style={{...input,minHeight:100,resize:'vertical'}}/>
+                  <textarea placeholder={"11/23/25 Fox Theater - Boulder, CO\nChilly Water, Pigeons, Space Wrangler..."} value={newSongs} onChange={e=>setNewSongs(e.target.value)} style={{...input,minHeight:100,resize:'vertical'}}/>
                   <div style={{display:'flex',gap:'.5rem',marginTop:'.5rem'}}>
                     <input type="date" value={newDate} onChange={e=>setNewDate(e.target.value)} style={{...input,flex:1}}/>
                     <button onClick={addSetlist} style={{padding:'0 1.5rem',borderRadius:10,border:'none',background:'linear-gradient(135deg,var(--red),var(--orange))',color:'#fff',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',letterSpacing:'.06em',cursor:'pointer',whiteSpace:'nowrap'}}>Add</button>
