@@ -152,8 +152,6 @@
         const total=sorted.length;
         if(total>0)ALL_WITH.forEach(s=>{if(st[s])st[s].playFrequency=(st[s].timesPlayed/total)*100});
         sorted.forEach((sl,i)=>{sl.songs.forEach(s=>{if(st[s]&&st[s].showsSince===Infinity){st[s].showsSince=i;st[s].lastPlayed=sl.date;st[s].available=i>=3}})});
-        const allLiveSongs=[...liveSets.set1,...liveSets.set2,...liveSets.encore];
-        if(tab==='live'&&allLiveSongs.length>0)allLiveSongs.forEach(s=>{if(st[s]){st[s].available=false;st[s].lastPlayed='Tonight';st[s].showsSince=0}});
         const pairs=themeSongs['sequentialPairs']||[];
         const last3=sorted.slice(0,3);const recent=new Set();last3.forEach(sl=>sl.songs.forEach(s=>recent.add(s)));
         pairs.forEach(p=>{if(p.includes('<->')){const[a,b]=p.split('<->').map(s=>s.trim());
@@ -161,7 +159,7 @@
           if(recent.has(b)&&st[a]&&st[b].showsSince!==Infinity){st[a].showsSince=Math.min(st[a].showsSince,st[b].showsSince);st[a].available=st[a].showsSince>=3;st[a].lastPlayed=st[b].lastPlayed}
         }});
         return st;
-      },[setlists,tab,liveSets,themeSongs,ALL_WITH]);
+      },[setlists,themeSongs,ALL_WITH]);
 
       const heavyRotation=useMemo(()=>{
         const c={};setlists.forEach(sl=>{[...new Set(sl.songs)].forEach(s=>{if(s!=='Drums'&&s!=='Jam')c[s]=(c[s]||0)+1})});
@@ -241,14 +239,10 @@
         setSetlists(p=>[sl,...p].sort((a,b)=>new Date(b.date)-new Date(a.date)));
         setLiveSets({set1:[],set2:[],encore:[]});setLiveCurrentSet('set1');setLiveEditMode(false);setTab('shows');
       };
-      const predictionRef=useRef([]);
-      useEffect(()=>{
-        if(predictions.length>0&&allLiveSongs.length===0)predictionRef.current=predictions.map(p=>p.song);
-      },[predictions,allLiveSongs]);
-      const stablePredSongs=predictionRef.current.length>0?predictionRef.current:predictions.map(p=>p.song);
+      const predSongNames=useMemo(()=>predictions.map(p=>p.song),[predictions]);
       const liveHits=useMemo(()=>{
-        return allLiveSongs.filter(s=>stablePredSongs.includes(s));
-      },[allLiveSongs,stablePredSongs]);
+        return allLiveSongs.filter(s=>predSongNames.includes(s));
+      },[allLiveSongs,predSongNames]);
 
       const addSetlist=()=>{
         if(!newSongs)return;let eDate=newDate,eCity=currentRun?.city||'',eVenue='',sText=newSongs;
@@ -499,7 +493,7 @@
                     {[{key:'set1',label:'1'},{key:'set2',label:'2'},{key:'encore',label:'E'}].map(s=>{
                       const songs=liveSets[s.key];
                       if(songs.length===0)return null;
-                      const predSongs=stablePredSongs;
+                      const predSongs=predSongNames;
                       return(
                         <div key={s.key} style={{marginBottom:'.75rem'}}>
                           <div style={{display:'flex',alignItems:'flex-start',gap:'.5rem',padding:'.5rem 0'}}>
