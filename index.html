@@ -599,6 +599,7 @@
                   <h2 style={sTitle}>Show History</h2>
                   <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{setlists.length} shows</span>
                 </div>
+                <div style={{fontSize:'.78rem',color:'var(--t3)',marginBottom:'.75rem',marginTop:'-.5rem'}}>Setlist data made possible by <a href="https://everydaycompanion.com" target="_blank" rel="noopener noreferrer" style={{color:'var(--orange)',textDecoration:'none'}}>Everyday Companion</a> & <a href="https://hometeam.fm" target="_blank" rel="noopener noreferrer" style={{color:'var(--orange)',textDecoration:'none'}}>hometeam.fm</a></div>
                 {/* List */}
                 {[...setlists].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(sl=>{
                   const acc=showAccuracy[sl.id];const pct=acc?parseInt(acc.predictionAccuracy):null;
