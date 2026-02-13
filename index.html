@@ -19,7 +19,6 @@
       --avail:#4ade80;--rest:#fbbf24;--played:#f87171;
       --safe-b:env(safe-area-inset-bottom,0px);--tab-h:60px;--sidebar-w:0px
     }
-    html{font-size:106.25%}
     html,body{height:100%;overflow:hidden;font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--t1)}
     #root{height:100%}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -39,17 +38,11 @@
     .sheet-x{background:none;border:none;color:var(--t2);font-size:1.6rem;cursor:pointer;padding:.25rem;line-height:1}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
     @media(min-width:768px){
-      html{font-size:93.75%}
       :root{--sidebar-w:200px;--tab-h:0px;--safe-b:0px}
       .app-shell{flex-direction:row!important}
-      .app-content{max-width:calc(100vw - var(--sidebar-w) - 1rem)!important;padding-left:1.5rem!important;padding-right:1rem!important;margin-left:var(--sidebar-w)!important;margin-right:0!important;box-sizing:border-box!important}
+      .app-content{max-width:720px;margin-left:var(--sidebar-w)!important;margin-right:auto}
       .bottom-nav{display:none!important}
       .side-nav{display:flex!important}
-      .pred-grid{display:block}
-    }
-    @media(min-width:1280px){
-      .app-content{max-width:820px;padding-left:2.5rem!important;padding-right:2.5rem!important}
-      .pred-grid{display:grid!important;grid-template-columns:1fr 1fr;gap:.5rem}
     }
   </style>
 </head>
@@ -62,8 +55,8 @@
     const FAVORITES=["Up All Night","Climb To Safety","Ain't Life Grand","Space Wrangler","Airplane","Driving Song","Pleas","Bear's Gone Fishin'","Chilly Water","Tall Boy","Blue Indian","Disco","Party At Your Mama's House","Little Lilly","Nobody's Loss","Porch Song","Little by Little","The Last Straw","Love Tractor","Hatfield","Papa's Home","Wondering","Blackout Blues","Aunt Avis","Hope In A Hopeless World","C. Brown","Pilgrims","And It Stoned Me","Holden Oversoul","Stop-Go","All Time Low","Travelin' Light","Can't Get High","One Arm Steve","Surprise Valley","Walkin' (For Your Love)","Diner","Jack","Dyin' Man","The Waker","Pickin' Up The Pieces"];
     const DEFAULT_THEME_SONGS={valentine:['Love Tractor','Climb To Safety','Walkin\' (For Your Love)','Mercy','Barstools And Dreamers','Who Do You Belong To','Airplane','Tie Your Shoes','Red Hot Mama','Ride Me High','Genesis','Gradle','Diner','Blight','Space Wrangler','Papa\'s Home','Gimme'],july4th:['Disco','Ain\'t Life Grand','Tall Boy','C. Brown','Party At Your Mama\'s House','North'],newyear:['Disco','Ain\'t Life Grand','Tall Boy','C. Brown','Party At Your Mama\'s House'],cityReferences:['Makes Sense To Me:Atlanta','Up All Night:Savannah','Hatfield:San Diego','Hatfield:Los Angeles','Fishwater:New Orleans','Bayou Lena:New Orleans','Hope In A Hopeless World:New York City','Action Man:Saratoga','Bust It Big:New York City'],stateReferences:['Don\'t Tell The Band:GA','Henry Parsons Died:GA','Up All Night:GA','Hatfield:CA','Rebirtha:KS','Visiting Day:TN'],sequentialPairs:['Machine<->Barstools And Dreamers','Protein Drink<->Sewing Machine','Goodpeople<->Dark Bar','Travelin\' Man<->The Waker','Jack<->Bear\'s Gone Fishin\'','Bear\'s Gone Fishin\'<->Tie Your Shoes','Party At Your Mama\'s House<->Stop Breakin\' Down Blues','Surprise Valley<->Blackout Blues']};
     const BEACH_CITIES=['miami','fort lauderdale','west palm beach','jacksonville','st. augustine','savannah','charleston','myrtle beach','wilmington','outer banks','virginia beach','norfolk','ocean city','rehoboth','atlantic city','asbury park','long beach','brooklyn','queens','boston','portland','providence','newport','cape cod','tampa','st. petersburg','clearwater','sarasota','naples','fort myers','pensacola','panama city','destin','mobile','gulfport','biloxi','new orleans','galveston','corpus christi','south padre','san diego','los angeles','santa monica','malibu','santa barbara','san luis obispo','monterey','santa cruz','san francisco','oakland','berkeley','sausalito','portland','seattle','tacoma','honolulu','maui','kauai','anchorage','juneau'];
-    const ALL_SONGS=["Chilly Water","Travelin' Light","Space Wrangler","Coconut","Porch Song","Stop-Go","Driving Song","Holden Oversoul","Contentment Blues","Me And The Devil Blues","Heaven","Send Your Mind","Walkin' (For Your Love)","Pigeons","Mercy","Rock","Makes Sense To Me","C. Brown","Love Tractor","Weight Of The World","I'm Not Alone","Barstools And Dreamers","Proving Ground","The Last Straw","Pleas","Hatfield","Wondering","Papa's Home","Diner","Better Off","Pickin' Up The Pieces","Henry Parsons Died","Pilgrims","Postcard","Dream Song","Little Kin","Ain't Life Grand","Airplane","Can't Get High","Heroes","Junior","Blackout Blues","Jack","Fishwater","Radio Child","Aunt Avis","Tall Boy","Gradle","Rebirtha","You Got Yours","Greta","Surprise Valley","Bear's Gone Fishin'","Climb To Safety","Blue Indian","The Waker","Dyin' Man","One Arm Steve","Christmas Katie","All Time Low","Nobody's Loss","Fishing","Tortured Artist","Papa Johnny Road","Sparks Fly","Don't Wanna Lose You","Monstrosity","Travelin' Man","Second Skin","Goodpeople","From The Cradle","Ribs And Whiskey","Crazy","You Should Be Glad","May Your Glass Be Filled","Walk On The Flood","Free Somehow","Flicker","Her Dance Needs No Body","Up All Night","Saint Ex","North","Dirty Side Down","Visiting Day","Shut Up And Drive","Cotton Was King","Cosmic Confidante"].sort();
-    const COMMON_COVERS=["Low Spark Of High Heeled Boys","Bowlegged Woman","Let's Get Down To Business","Sleeping Man","Conrad","Machine","Dark Bar","Party At Your Mama's House","Stop Breakin' Down Blues","Mr. Soul","Little By Little","Walk On","Pleas","There Is A Time","Let's Get The Show On The Road","Sewing Machine","Protein Drink","Bust It Big","We Walk Each Other Home","Don't Be Denied","Down in a Hole","Who Do You Belong To?","Big Wooly Mammoth","King Baby","Sitting In Limbo","I Can See Clearly Now","Paranoid","War Pigs","Disco","Tie Your Shoes","Ride Me High","Little Lilly","Trashy","Down","Drums","Jam","Arleen","Smokestack Lightning","Blight","Pusherman","For What It's Worth","Action Man","Good Morning Little Schoolgirl","Chainsaw City","I Walk On Guilded Splinters","I'm So Glad","And It Stoned Me","Red Hot Mama","Spoonful","Maggot Brain","Jack Straw","Blue Carousel","The Take Out","1 x 1","A Hard Rain's A-Gonna Fall","A of D","B of D","Bird On A Wire","Black Hole Sun","Black Sabbath","Breathing Slow","Can't Find My Way Home","Cease Fire","City of Dreams","Clair de Lune","Comfortably Numb","Cortez the Killer","Cream Puff War","Dead Flowers","Dear Mr. Fantasy","Dear Prudence","Degenerate","Dirty Business","End Of The Show","Expiration Day","Fairies Wear Boots","Fixin' To Die","Flat Foot Flewzy","Four Cornered Room","Genesis","Gimme","Give","Godzilla","Goin' Out West","Halloween Face","Happy","Help Me Somebody","Honey Bee","Honky Red","Imitation Leather Shoes","Impossible","Iron Man","Jamais Vu","Jessica","Keep Me in Your Heart","Knocking 'Round The Zoo","Lawyers, Guns, And Money","Life As A Tree","Life During Wartime","Little Wing","Narrow Mind","No Sugar Tonight/New Mother Nature","None of Us Are Free","Old Joe","Old Neighborhood","One Kind Favor","Piece of My Heart","Play a Train Song","Red Beans","Riders On The Storm","Room at the Top","Rumble","Sharon","Sleepy Monkey","Slippin' Into Darkness","Small Town","Sometimes","Soul Kitchen","Steven's Cat","Stranger in a Strange Land","Tackle Box Hero","Tail Dragger","The Harder They Come","This Part Of Town","Thought Sausage","Time Is Free","Vacation","Waitin' For The Bus","We're All Mad Here","Weak Brain","White Rabbit","Who Are You","Worry","You Can't Always Get What You Want","You Wreck Me","You're Lost Little Girl"];
+    const ALL_SONGS=["Chilly Water","Travelin' Light","Space Wrangler","Coconut","Porch Song","Stop-Go","Driving Song","Holden Oversoul","Contentment Blues","Me And The Devil Blues","Heaven","Send Your Mind","Walkin' (For Your Love)","Pigeons","Mercy","Rock","Makes Sense To Me","C. Brown","Love Tractor","Weight Of The World","I'm Not Alone","Barstools And Dreamers","Proving Ground","The Last Straw","Pleas","Hatfield","Wondering","Papa's Home","Diner","Better Off","Pickin' Up The Pieces","Henry Parsons Died","Pilgrims","Postcard","Dream Song","Little Kin","Ain't Life Grand","Airplane","Can't Get High","Heroes","Junior","Blackout Blues","Jack","Fishwater","Radio Child","Aunt Avis","Tall Boy","Gradle","Rebirtha","You Got Yours","Greta","Surprise Valley","Bear's Gone Fishin'","Climb To Safety","Blue Indian","The Waker","Dyin' Man","One Arm Steve","Christmas Katie","All Time Low","Nobody's Loss","Fishing","Tortured Artist","Papa Johnny Road","Sparks Fly","Don't Wanna Lose You","Monstrosity","Travelin' Man","Second Skin","Goodpeople","From The Cradle","Ribs And Whiskey","Crazy","You Should Be Glad","May Your Glass Be Filled","Walk On The Flood","Free Somehow","Flicker","Her Dance Needs No Body","Up All Night","Saint Ex","North","Dirty Side Down","Visiting Day","Shut Up And Drive","Cotton Was King","Cosmic Confidante","Tickle the Truth","Time Zones","Sundown Betty","Elevator To The Moon","Entering A Black Hole Backwards","Last Dance","Quarter Tank Of Gasoline","Puppy Sleeps","When You Coming Home","Jaded Tourist","Hope In A Hopeless World"].sort();
+    const COMMON_COVERS=["Low Spark Of High Heeled Boys","Bowlegged Woman","Let's Get Down To Business","Sleeping Man","Conrad","Machine","Dark Bar","Party At Your Mama's House","Stop Breakin' Down Blues","Mr. Soul","Little By Little","Walk On","Pleas","There Is A Time","Let's Get The Show On The Road","Sewing Machine","Protein Drink","Bust It Big","We Walk Each Other Home","Don't Be Denied","Down in a Hole","Who Do You Belong To?","Big Wooly Mammoth","King Baby","Sitting In Limbo","I Can See Clearly Now","Paranoid","War Pigs","Disco","Tie Your Shoes","Ride Me High","Little Lilly","Trashy","Down","Drums","Jam","Arleen","Smokestack Lightning","Blight","Pusherman","For What It's Worth","Action Man","Good Morning Little Schoolgirl","Chainsaw City","I Walk On Guilded Splinters","I'm So Glad","And It Stoned Me","Red Hot Mama","Spoonful","Maggot Brain","Jack Straw","Blue Carousel","The Take Out","1 x 1","A Hard Rain's A-Gonna Fall","A of D","B of D","Bird On A Wire","Black Hole Sun","Black Sabbath","Breathing Slow","Can't Find My Way Home","Cease Fire","City of Dreams","Clair de Lune","Comfortably Numb","Cortez the Killer","Cream Puff War","Dead Flowers","Dear Mr. Fantasy","Dear Prudence","Degenerate","Dirty Business","End Of The Show","Expiration Day","Fairies Wear Boots","Fixin' To Die","Flat Foot Flewzy","Four Cornered Room","Genesis","Gimme","Give","Godzilla","Goin' Out West","Halloween Face","Happy","Help Me Somebody","Honey Bee","Honky Red","Imitation Leather Shoes","Impossible","Iron Man","Jamais Vu","Jessica","Keep Me in Your Heart","Knocking 'Round The Zoo","Lawyers, Guns, And Money","Life As A Tree","Life During Wartime","Little Wing","Narrow Mind","Weak Brain, Narrow Mind","No Sugar Tonight/New Mother Nature","None of Us Are Free","Old Joe","Old Neighborhood","One Kind Favor","Piece of My Heart","Play a Train Song","Red Beans","Riders On The Storm","Room at the Top","Rumble","Sharon","Sleepy Monkey","Slippin' Into Darkness","Small Town","Sometimes","Soul Kitchen","Steven's Cat","Stranger in a Strange Land","Tackle Box Hero","Tail Dragger","The Harder They Come","This Part Of Town","Thought Sausage","Time Is Free","Vacation","Waitin' For The Bus","We're All Mad Here","Weak Brain","White Rabbit","Who Are You","Worry","You Can't Always Get What You Want","You Wreck Me","You're Lost Little Girl","Ace of Spades","Are You Ready For The Country?","Casa Del Grillo","Come Together","Crazy Train","Don't Drink The Water","Heart of Gold","I Got The Same Old Blues","I Wanna Be Sedated","I'll Sleep When I'm Dead","Jesus Just Left Chicago","Let It Rock","Machine Gun","Mr. Crowley","My Generation","Nobody's Fault But Mine","Ophelia","Over The Rainbow","Papa Legba","Roadhouse Blues","Rockin' In The Free World","Running Down A Dream","Snowblind","Straight To Hell","The Golden Road (To Unlimited Devotion)","The Wizard","Thin Air (Smells Like Mississippi)","This Friendly World","This Must Be The Place (Naive Melody)","Trouble","Use Me","Vampire Blues","Wish You Were Here"];
 
     /* ─── HELPERS ─── */
     const norm=n=>n.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
@@ -85,9 +78,7 @@
     function App(){
       const[tab,setTab]=useState('predict');
       const[setlists,setSetlists]=useState([]);
-      const[liveSets,setLiveSets]=useState({set1:[],set2:[],encore:[]});
-      const[liveCurrentSet,setLiveCurrentSet]=useState('set1');
-      const[liveEditMode,setLiveEditMode]=useState(false);
+      const[liveSetlist,setLiveSetlist]=useState([]);
       const[customSongs,setCustomSongs]=useState([]);
       const[themeSongs,setThemeSongs]=useState({});
       const[loadState,setLoadState]=useState('loading'); // loading | ok | error
@@ -159,6 +150,7 @@
         const total=sorted.length;
         if(total>0)ALL_WITH.forEach(s=>{if(st[s])st[s].playFrequency=(st[s].timesPlayed/total)*100});
         sorted.forEach((sl,i)=>{sl.songs.forEach(s=>{if(st[s]&&st[s].showsSince===Infinity){st[s].showsSince=i;st[s].lastPlayed=sl.date;st[s].available=i>=3}})});
+        if(tab==='live'&&liveSetlist.length>0)liveSetlist.forEach(s=>{if(st[s]){st[s].available=false;st[s].lastPlayed='Tonight';st[s].showsSince=0}});
         const pairs=themeSongs['sequentialPairs']||[];
         const last3=sorted.slice(0,3);const recent=new Set();last3.forEach(sl=>sl.songs.forEach(s=>recent.add(s)));
         pairs.forEach(p=>{if(p.includes('<->')){const[a,b]=p.split('<->').map(s=>s.trim());
@@ -166,7 +158,7 @@
           if(recent.has(b)&&st[a]&&st[b].showsSince!==Infinity){st[a].showsSince=Math.min(st[a].showsSince,st[b].showsSince);st[a].available=st[a].showsSince>=3;st[a].lastPlayed=st[b].lastPlayed}
         }});
         return st;
-      },[setlists,themeSongs,ALL_WITH]);
+      },[setlists,tab,liveSetlist,themeSongs,ALL_WITH]);
 
       const heavyRotation=useMemo(()=>{
         const c={};setlists.forEach(sl=>{[...new Set(sl.songs)].forEach(s=>{if(s!=='Drums'&&s!=='Jam')c[s]=(c[s]||0)+1})});
@@ -232,24 +224,14 @@
         const dates=setlists.filter(sl=>sl.songs.includes(song)).map(sl=>({date:sl.date,city:sl.city||''})).sort((a,b)=>new Date(b.date)-new Date(a.date));
         setSongSheet({song,dates});
       };
-      const allLiveSongs=useMemo(()=>[...liveSets.set1,...liveSets.set2,...liveSets.encore],[liveSets]);
-      const addToLive=song=>{
-        const allSongs=[...liveSets.set1,...liveSets.set2,...liveSets.encore];
-        if(!allSongs.includes(song))setLiveSets(p=>({...p,[liveCurrentSet]:[...p[liveCurrentSet],song]}));
-        setQuickAdd('');
-      };
-      const removeFromLive=(song,setKey)=>setLiveSets(p=>({...p,[setKey]:p[setKey].filter(s=>s!==song)}));
+      const addToLive=song=>{if(!liveSetlist.includes(song))setLiveSetlist(p=>[...p,song]);setQuickAdd('')};
+      const removeFromLive=song=>setLiveSetlist(p=>p.filter(s=>s!==song));
       const saveLive=()=>{
-        const allSongs=[...liveSets.set1,...liveSets.set2,...liveSets.encore];
-        if(!allSongs.length)return;
-        const sl={date:new Date().toISOString().split('T')[0],songs:allSongs,city:`${CITY}, ${STATE}`,id:Date.now()};
+        if(!liveSetlist.length)return;
+        const sl={date:new Date().toISOString().split('T')[0],songs:liveSetlist,city:`${CITY}, ${STATE}`,id:Date.now()};
         setSetlists(p=>[sl,...p].sort((a,b)=>new Date(b.date)-new Date(a.date)));
-        setLiveSets({set1:[],set2:[],encore:[]});setLiveCurrentSet('set1');setLiveEditMode(false);setTab('shows');
+        setLiveSetlist([]);setTab('shows');
       };
-      const predSongNames=useMemo(()=>predictions.map(p=>p.song),[predictions]);
-      const liveHits=useMemo(()=>{
-        return allLiveSongs.filter(s=>predSongNames.includes(s));
-      },[allLiveSongs,predSongNames]);
 
       const addSetlist=()=>{
         if(!newSongs)return;let eDate=newDate,eCity=currentRun?.city||'',eVenue='',sText=newSongs;
@@ -322,7 +304,6 @@
       },[searchTerm,sortBy,songStatus,heavyRotation,ALL_WITH]);
 
       const quickResults=quickAdd?ALL_WITH.filter(s=>s.toLowerCase().includes(quickAdd.toLowerCase())).slice(0,15):[];
-      const quickAddNoMatch=quickAdd.length>=2&&quickResults.length===0;
       const theme=getDateTheme(DATE1);
       const themeInfo={valentine:{e:'💜',l:"Valentine's",c:'#a855f7'},july4th:{e:'🎆',l:'July 4th',c:'#ef4444'},newyear:{e:'🎉',l:"New Year's",c:'#eab308'}}[theme];
 
@@ -353,7 +334,7 @@
               <button key={t.id} onClick={()=>switchTab(t.id)} style={{display:'flex',alignItems:'center',gap:'.75rem',width:'100%',padding:'.85rem 1.25rem',background:tab===t.id?'rgba(255,140,66,.1)':'transparent',border:'none',borderLeft:tab===t.id?'3px solid var(--orange)':'3px solid transparent',cursor:'pointer',color:tab===t.id?'var(--orange)':'var(--t3)',fontFamily:"'Crimson Pro',serif",fontSize:'.95rem',fontWeight:tab===t.id?700:400,letterSpacing:'.02em',transition:'all .15s',textAlign:'left',position:'relative'}}>
                 <span style={{fontSize:'1.25rem',lineHeight:1,width:'1.5rem',textAlign:'center'}}>{t.ic}</span>
                 <span>{t.l}</span>
-                {t.id==='live'&&allLiveSongs.length>0&&<span style={{width:8,height:8,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 6px var(--green)',marginLeft:'auto'}}/>}
+                {t.id==='live'&&liveSetlist.length>0&&<span style={{width:8,height:8,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 6px var(--green)',marginLeft:'auto'}}/>}
               </button>
             ))}
             <div style={{marginTop:'auto',padding:'1rem 1.25rem',borderTop:'1px solid var(--bdr)',fontSize:'.73rem',color:'var(--t3)'}}>
@@ -390,23 +371,31 @@
                   <p style={{color:'var(--t3)',fontSize:'.85rem',marginTop:'.25rem'}}>3-show rule • {setlists.length} shows loaded</p>
                 </div>
                 {/* Next Run */}
-                <div style={{padding:'.75rem 1rem',borderRadius:14,marginBottom:'1.15rem',background:'linear-gradient(135deg,rgba(255,51,102,.08),rgba(255,140,66,.08))',border:'1px solid rgba(255,140,66,.2)'}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
-                    <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.15rem',letterSpacing:'.04em',color:'var(--orange)'}}>
-                      {new Date(DATE1+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})}{NIGHTS>1&&`–${new Date(DATE2+'T12:00:00').toLocaleDateString('en-US',{day:'numeric'})}`}
+                <div style={{padding:'1rem 1.15rem',borderRadius:14,marginBottom:'1.15rem',background:'linear-gradient(135deg,rgba(255,51,102,.08),rgba(255,140,66,.08))',border:'1px solid rgba(255,140,66,.2)'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'.35rem'}}>
+                    <div>
+                      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.35rem',letterSpacing:'.04em',color:'var(--orange)'}}>
+                        {new Date(DATE1+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})}{NIGHTS>1&&`–${new Date(DATE2+'T12:00:00').toLocaleDateString('en-US',{day:'numeric'})}`}
+                      </div>
+                      <div style={{fontSize:'.9rem',color:'var(--t2)'}}>📍 {VENUE} • {CITY}, {STATE}</div>
                     </div>
                     {themeInfo&&<span style={{...chip(themeInfo.c),fontSize:'.72rem',padding:'3px 8px'}}>{themeInfo.e} {themeInfo.l}</span>}
                   </div>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginTop:'.2rem'}}>
-                    <div style={{fontSize:'.9rem',color:'var(--t2)'}}>📍 {VENUE} • {CITY}, {STATE}</div>
-                    <span style={{fontSize:'.78rem',color:'var(--t3)'}}>{NIGHTS}-night run</span>
-                  </div>
+                  <div style={{fontSize:'.78rem',color:'var(--t3)'}}>{NIGHTS}-night run</div>
+                </div>
+                {/* Stats */}
+                <div style={{display:'flex',gap:'.5rem',marginBottom:'1.15rem'}}>
+                  {[{v:stats.available,l:'AVAILABLE',c:'var(--avail)'},{v:stats.resting,l:'RESTING',c:'var(--rest)'},{v:stats.played,l:'JUST PLAYED',c:'var(--played)'}].map(s=>(
+                    <div key={s.l} style={statBox(s.c)}>
+                      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'2rem',lineHeight:1,color:s.c}}>{s.v}</div>
+                      <div style={{fontSize:'.68rem',color:'var(--t3)',marginTop:2}}>{s.l}</div>
+                    </div>
+                  ))}
                 </div>
                 {/* Top 10 */}
                 <div style={sTitle}>🎸 Top 10 Predictions</div>
                 {predictions.length===0?<div style={{color:'var(--t3)',padding:'2rem',textAlign:'center'}}>Add setlists to see predictions</div>:
-                  <div className="pred-grid">
-                  {predictions.map(({song,status:st,isCity,isTheme,theme:th,nights},i)=>{
+                  predictions.map(({song,status:st,isCity,isTheme,theme:th,nights},i)=>{
                     const ico=isTheme?(th==='valentine'?'💜':th==='july4th'?'🎆':th==='newyear'?'🎉':'🎵'):isCity?'📍':'';
                     return(
                       <div key={song} style={predRow(isTheme,isCity)} onClick={()=>showHistory(song)}>
@@ -424,7 +413,6 @@
                         </div>
                       </div>)
                   })}
-                  </div>}
             </div>
 
             {/* ═══ LIVE ═══ */}
@@ -432,115 +420,54 @@
                 <div style={{display:'flex',alignItems:'center',gap:'.7rem',marginBottom:'1rem',paddingTop:'.5rem'}}>
                   <div style={{width:12,height:12,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 8px var(--green)',animation:'blink 1.2s ease-in-out infinite'}}/>
                   <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.8rem',color:'var(--green)',letterSpacing:'.06em'}}>Live Show</h2>
-                  <span style={{fontSize:'.85rem',color:'var(--t3)',marginLeft:'auto'}}>{allLiveSongs.length} songs</span>
+                  <span style={{fontSize:'.85rem',color:'var(--t3)',marginLeft:'auto'}}>{liveSetlist.length} songs</span>
                 </div>
-
-                {/* Prediction hit counter */}
-                {allLiveSongs.length>0&&(
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.5rem',marginBottom:'1rem',padding:'.6rem 1rem',borderRadius:10,background:liveHits.length>=5?'rgba(74,222,128,.15)':liveHits.length>=3?'rgba(234,179,8,.12)':'rgba(255,140,66,.1)',border:`1px solid ${liveHits.length>=5?'var(--green)':liveHits.length>=3?'var(--rest)':'var(--orange)'}`}}>
-                    <span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.6rem',color:liveHits.length>=5?'var(--green)':liveHits.length>=3?'var(--rest)':'var(--orange)'}}>{liveHits.length}/10</span>
-                    <span style={{fontSize:'.85rem',color:'var(--t2)'}}>Predicted</span>
-                  </div>
-                )}
-
-                {/* Set indicator tabs */}
-                <div style={{display:'flex',gap:'.35rem',marginBottom:'.75rem'}}>
-                  {[{key:'set1',label:'Set 1'},{key:'set2',label:'Set 2'},{key:'encore',label:'Encore'}].map(s=>{
-                    const isActive=liveCurrentSet===s.key;
-                    const count=liveSets[s.key].length;
-                    return(
-                      <button key={s.key} onClick={()=>setLiveCurrentSet(s.key)} style={{flex:1,padding:'.6rem .5rem',borderRadius:8,border:isActive?'1px solid var(--green)':'1px solid var(--bdr)',background:isActive?'rgba(74,222,128,.15)':'var(--bg3)',color:isActive?'var(--green)':'var(--t3)',fontFamily:"'Bebas Neue',sans-serif",fontSize:'.95rem',letterSpacing:'.04em',cursor:'pointer',transition:'all .15s',position:'relative'}}>
-                        {s.label}{count>0&&<span style={{marginLeft:'.35rem',fontSize:'.75rem',opacity:.7}}>({count})</span>}
-                        {isActive&&<div style={{position:'absolute',bottom:-1,left:'20%',right:'20%',height:2,background:'var(--green)',borderRadius:1}}/>}
-                      </button>
-                    );
-                  })}
-                </div>
-
                 {/* Search */}
                 <div style={{position:'relative',marginBottom:'1rem'}}>
                   <input type="text" placeholder="🔍 Search song to add..." value={quickAdd} onChange={e=>setQuickAdd(e.target.value)}
-                    onKeyDown={e=>{if(e.key==='Enter'){if(quickResults.length>0)addToLive(quickResults[0]);else if(quickAddNoMatch){const name=quickAdd.trim();setCustomSongs(p=>[...new Set([...p,name])]);addToLive(name)}}}}
+                    onKeyDown={e=>{if(e.key==='Enter'&&quickResults.length>0)addToLive(quickResults[0])}}
                     style={{...input,borderColor:quickAdd?'var(--green)':'var(--bdr)'}}/>
-                  {quickAdd&&(quickResults.length>0||quickAddNoMatch)&&(
+                  {quickAdd&&quickResults.length>0&&(
                     <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:100,background:'var(--bg2)',border:'1px solid var(--bdr)',borderRadius:10,marginTop:4,maxHeight:'50vh',overflow:'auto',boxShadow:'0 8px 24px rgba(0,0,0,.5)'}}>
-                      {quickResults.map(song=>{const added=allLiveSongs.includes(song),st=songStatus[song];return(
+                      {quickResults.map(song=>{const added=liveSetlist.includes(song),st=songStatus[song];return(
                         <div key={song} onClick={()=>!added&&addToLive(song)} style={{padding:'.85rem 1rem',borderBottom:'1px solid var(--bdr)',display:'flex',justifyContent:'space-between',alignItems:'center',opacity:added?.4:1,cursor:added?'default':'pointer',minHeight:48}}>
                           <span style={{fontSize:'1rem'}}>{song}</span>
                           {added?<span style={chip('var(--green)')}>Added</span>:!st?.available?<span style={chip('var(--rest)')}>Resting</span>:null}
                         </div>)})}
-                      {quickAddNoMatch&&(
-                        <div onClick={()=>{const name=quickAdd.trim();setCustomSongs(p=>[...new Set([...p,name])]);addToLive(name)}} style={{padding:'.85rem 1rem',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',minHeight:48,background:'rgba(168,85,247,.08)',borderTop:quickResults.length>0?'1px solid var(--bdr)':'none'}}>
-                          <span style={{fontSize:'1rem',color:'var(--purple)'}}>+ Create "{quickAdd.trim()}"</span>
-                          <span style={chip('var(--purple)')}>New Song</span>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
-
-                {/* Live Setlist Display */}
-                {allLiveSongs.length>0?(
+                {/* Setlist */}
+                {liveSetlist.length>0?(
                   <div style={{marginBottom:'1rem'}}>
-                    {/* Show header + edit toggle */}
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.75rem',paddingBottom:'.5rem',borderBottom:'1px solid var(--bdr)'}}>
-                      <div style={{fontSize:'.9rem',color:'var(--t2)'}}>{new Date(DATE1+'T12:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'})} {VENUE}, {CITY}, {STATE}</div>
-                      <button onClick={()=>setLiveEditMode(p=>!p)} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:liveEditMode?'var(--played)':'var(--t3)',cursor:'pointer',fontSize:'.78rem',padding:'.35rem .75rem',fontFamily:"'Crimson Pro',serif",flexShrink:0,marginLeft:'.5rem'}}>
-                        {liveEditMode?'Done':'✎ Edit'}
-                      </button>
-                    </div>
-                    {/* Formatted setlist */}
-                    {[{key:'set1',label:'1'},{key:'set2',label:'2'},{key:'encore',label:'E'}].map(s=>{
-                      const songs=liveSets[s.key];
-                      if(songs.length===0)return null;
-                      const predSongs=predSongNames;
-                      return(
-                        <div key={s.key} style={{marginBottom:'.75rem'}}>
-                          <div style={{display:'flex',alignItems:'baseline',gap:'.5rem',padding:'.5rem 0'}}>
-                            <span style={{fontSize:'.95rem',color:'var(--t2)',flexShrink:0}}>{s.label}:</span>
-                            {liveEditMode?(
-                              <div style={{flex:1}}>
-                                {songs.map((song,i)=>{
-                                  const isPred=predSongs.includes(song);
-                                  return(
-                                    <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.4rem .5rem',marginBottom:'.25rem',borderRadius:6,background:isPred?'rgba(74,222,128,.12)':'var(--bg3)',border:isPred?'1px solid rgba(74,222,128,.3)':'1px solid var(--bdr)'}}>
-                                      <span style={{fontSize:'.9rem',color:isPred?'var(--green)':'var(--t1)',fontWeight:isPred?600:400}}>{song}</span>
-                                      <button onClick={()=>removeFromLive(song,s.key)} style={{background:'none',border:'none',color:'var(--played)',cursor:'pointer',fontSize:'1rem',padding:'.25rem .5rem',lineHeight:1}}>✕</button>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ):(
-                              <div style={{flex:1,fontSize:'.95rem',lineHeight:1.7}}>
-                                {songs.map((song,i)=>{
-                                  const isPred=predSongs.includes(song);
-                                  return(
-                                    <span key={i}>
-                                      <span onClick={()=>showHistory(song)} style={{cursor:'pointer',color:isPred?'var(--green)':'var(--t2)',fontWeight:isPred?700:400,borderBottom:isPred?'1px solid var(--green)':'none'}}>{song}</span>
-                                      {i<songs.length-1&&<span style={{color:'var(--t3)'}}>, </span>}
-                                    </span>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {liveSetlist.map((song,i)=>(
+                      <div key={i} style={row('rgba(74,222,128,.12)','var(--green)')}>
+                        <span style={{fontWeight:600}}><span style={{color:'var(--t3)',marginRight:'.5rem',fontSize:'.85rem'}}>{i+1}.</span>{song}</span>
+                        <button onClick={()=>removeFromLive(song)} style={{background:'none',border:'none',color:'var(--played)',cursor:'pointer',fontSize:'1.2rem',padding:'.5rem'}}>✕</button>
+                      </div>
+                    ))}
                   </div>
                 ):(
                   <div style={{textAlign:'center',padding:'3rem 1rem',color:'var(--t3)'}}>
                     <div style={{fontSize:'3rem',marginBottom:'.5rem'}}>🎸</div>
                     <p style={{fontSize:'1.02rem'}}>Search and tap songs as they're played</p>
-                    <p style={{fontSize:'.85rem',marginTop:'.5rem',color:'var(--t3)'}}>Use the set tabs above to switch between sets</p>
                   </div>
                 )}
-
-                {/* Action buttons */}
-                {allLiveSongs.length>0&&(
+                {liveSetlist.length>0&&(
                   <div style={{display:'flex',gap:'.5rem'}}>
-                    <button onClick={saveLive} style={{flex:1,padding:'.85rem',borderRadius:10,border:'1px solid rgba(74,222,128,.4)',background:'rgba(74,222,128,.12)',color:'var(--green)',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.1rem',letterSpacing:'.06em',cursor:'pointer',fontWeight:700}}>Save Show</button>
-                    <button onClick={()=>{if(confirm('Clear all sets?')){setLiveSets({set1:[],set2:[],encore:[]});setLiveCurrentSet('set1');setLiveEditMode(false)}}} style={{padding:'.85rem 1.2rem',borderRadius:10,background:'var(--bg3)',border:'1px solid var(--bdr)',color:'var(--t2)',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.1rem',cursor:'pointer'}}>Clear</button>
+                    <button onClick={saveLive} style={{flex:1,padding:'.85rem',borderRadius:10,border:'none',background:'linear-gradient(135deg,var(--green),#22c55e)',color:'#000',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.1rem',letterSpacing:'.06em',cursor:'pointer',fontWeight:700}}>Save Setlist</button>
+                    <button onClick={()=>{if(confirm('Clear?'))setLiveSetlist([])}} style={{padding:'.85rem 1.2rem',borderRadius:10,background:'var(--bg3)',border:'1px solid var(--bdr)',color:'var(--t2)',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.1rem',cursor:'pointer'}}>Clear</button>
+                  </div>
+                )}
+                {liveSetlist.length>0&&(
+                  <div style={{marginTop:'1.5rem'}}>
+                    <div style={{...sTitle,fontSize:'1.3rem'}}>Up Next?</div>
+                    {predictions.filter(p=>!liveSetlist.includes(p.song)).slice(0,5).map(({song})=>(
+                      <div key={song} style={{...row(),marginBottom:'.35rem'}} onClick={()=>addToLive(song)}>
+                        <span style={{fontSize:'.95rem'}}>{song}</span>
+                        <span style={{...chip('var(--green)'),fontSize:'.63rem'}}>TAP TO ADD</span>
+                      </div>
+                    ))}
                   </div>
                 )}
             </div>
@@ -550,14 +477,6 @@
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'.5rem',marginBottom:'1rem'}}>
                   <h2 style={sTitle}>All Songs</h2>
                   <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{filteredSongs.length}{searchTerm?` / ${ALL_WITH.length}`:''}</span>
-                </div>
-                <div style={{display:'flex',gap:'.5rem',marginBottom:'1rem'}}>
-                  {[{v:stats.available,l:'AVAILABLE',c:'var(--avail)'},{v:stats.resting,l:'RESTING',c:'var(--rest)'},{v:stats.played,l:'JUST PLAYED',c:'var(--played)'}].map(s=>(
-                    <div key={s.l} style={statBox(s.c)}>
-                      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'2rem',lineHeight:1,color:s.c}}>{s.v}</div>
-                      <div style={{fontSize:'.68rem',color:'var(--t3)',marginTop:2}}>{s.l}</div>
-                    </div>
-                  ))}
                 </div>
                 <input type="text" placeholder="🔍 Search..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} style={{...input,marginBottom:'.5rem'}}/>
                 <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{...input,fontSize:'.85rem',padding:'.6rem .8rem',marginBottom:'1rem',color:'var(--t2)'}}>
@@ -636,7 +555,7 @@
                 <button onClick={()=>{const d={exportDate:new Date().toISOString(),totalShows:setlists.length,setlists:[...setlists].sort((a,b)=>new Date(a.date)-new Date(b.date)).map(s=>({id:s.id,date:s.date,city:s.city||'',venue:s.venue||'',songs:s.songs})),themeSongs};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`panic-data-${new Date().toISOString().split('T')[0]}.json`;a.click()}} style={{...input,textAlign:'center',cursor:'pointer',color:'var(--purple)',fontWeight:600,marginBottom:'.5rem',border:'1px solid rgba(168,85,247,.2)'}}>📤 Export Data</button>
                 <button onClick={()=>{if(confirm('Fix duplicate songs?')){const f=setlists.map(sl=>({...sl,songs:[...new Set(sl.songs)]}));const r=setlists.reduce((s,sl)=>s+sl.songs.length,0)-f.reduce((s,sl)=>s+sl.songs.length,0);setSetlists(f);alert(`Removed ${r} duplicates.`)}}} style={{...input,textAlign:'center',cursor:'pointer',color:'var(--green)',fontWeight:600,marginBottom:'.5rem',border:'1px solid rgba(74,222,128,.2)'}}>🔧 Fix Duplicate Songs</button>
                 <button onClick={()=>window.location.reload()} style={{...input,textAlign:'center',cursor:'pointer',color:'var(--t2)',fontWeight:600,marginBottom:'1.5rem'}}>☁️ Reload from GitHub</button>
-                <div style={{textAlign:'center'}}><button onClick={()=>{if(confirm('⚠️ Delete ALL data permanently?')){setSetlists([]);setLiveSets({set1:[],set2:[],encore:[]});setLiveCurrentSet('set1');setCustomSongs([]);localStorage.clear();alert('Reset.')}}} style={{background:'none',border:'none',color:'var(--played)',fontSize:'.85rem',cursor:'pointer',padding:'.5rem',textDecoration:'underline'}}>Reset All Data</button></div>
+                <div style={{textAlign:'center'}}><button onClick={()=>{if(confirm('⚠️ Delete ALL data permanently?')){setSetlists([]);setLiveSetlist([]);setCustomSongs([]);localStorage.clear();alert('Reset.')}}} style={{background:'none',border:'none',color:'var(--played)',fontSize:'.85rem',cursor:'pointer',padding:'.5rem',textDecoration:'underline'}}>Reset All Data</button></div>
             </div>
           </div>
 
@@ -646,7 +565,7 @@
               <button key={t.id} onClick={()=>switchTab(t.id)} style={tabBtn(tab===t.id)}>
                 <span style={{fontSize:'1.5rem',lineHeight:1}}>{t.ic}</span>
                 <span>{t.l}</span>
-                {t.id==='live'&&allLiveSongs.length>0&&<span style={{position:'absolute',top:0,right:2,width:8,height:8,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 6px var(--green)'}}/>}
+                {t.id==='live'&&liveSetlist.length>0&&<span style={{position:'absolute',top:0,right:2,width:8,height:8,borderRadius:'50%',background:'var(--green)',boxShadow:'0 0 6px var(--green)'}}/>}
               </button>
             ))}
           </nav>
@@ -702,7 +621,7 @@
                     {s.city&&<span style={{color:'var(--t3)',fontSize:'.85rem'}}>📍 {s.city}</span>}
                   </div>
                 ))}
-              {tab==='live'&&!allLiveSongs.includes(songSheet.song)&&(
+              {tab==='live'&&!liveSetlist.includes(songSheet.song)&&(
                 <button onClick={()=>{addToLive(songSheet.song);setSongSheet(null)}} style={{width:'100%',padding:'.85rem',marginTop:'1rem',borderRadius:10,border:'none',background:'var(--green)',color:'#000',fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',cursor:'pointer',fontWeight:700}}>Add to Live Setlist</button>
               )}
             </>)}
