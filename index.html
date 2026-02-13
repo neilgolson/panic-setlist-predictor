@@ -397,15 +397,6 @@
                     <span style={{fontSize:'.78rem',color:'var(--t3)'}}>{NIGHTS}-night run</span>
                   </div>
                 </div>
-                {/* Stats */}
-                <div style={{display:'flex',gap:'.5rem',marginBottom:'1.15rem'}}>
-                  {[{v:stats.available,l:'AVAILABLE',c:'var(--avail)'},{v:stats.resting,l:'RESTING',c:'var(--rest)'},{v:stats.played,l:'JUST PLAYED',c:'var(--played)'}].map(s=>(
-                    <div key={s.l} style={statBox(s.c)}>
-                      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'2rem',lineHeight:1,color:s.c}}>{s.v}</div>
-                      <div style={{fontSize:'.68rem',color:'var(--t3)',marginTop:2}}>{s.l}</div>
-                    </div>
-                  ))}
-                </div>
                 {/* Top 10 */}
                 <div style={sTitle}>🎸 Top 10 Predictions</div>
                 {predictions.length===0?<div style={{color:'var(--t3)',padding:'2rem',textAlign:'center'}}>Add setlists to see predictions</div>:
@@ -552,6 +543,14 @@
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'.5rem',marginBottom:'1rem'}}>
                   <h2 style={sTitle}>All Songs</h2>
                   <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{filteredSongs.length}{searchTerm?` / ${ALL_WITH.length}`:''}</span>
+                </div>
+                <div style={{display:'flex',gap:'.5rem',marginBottom:'1rem'}}>
+                  {[{v:stats.available,l:'AVAILABLE',c:'var(--avail)'},{v:stats.resting,l:'RESTING',c:'var(--rest)'},{v:stats.played,l:'JUST PLAYED',c:'var(--played)'}].map(s=>(
+                    <div key={s.l} style={statBox(s.c)}>
+                      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'2rem',lineHeight:1,color:s.c}}>{s.v}</div>
+                      <div style={{fontSize:'.68rem',color:'var(--t3)',marginTop:2}}>{s.l}</div>
+                    </div>
+                  ))}
                 </div>
                 <input type="text" placeholder="🔍 Search..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} style={{...input,marginBottom:'.5rem'}}/>
                 <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{...input,fontSize:'.85rem',padding:'.6rem .8rem',marginBottom:'1rem',color:'var(--t2)'}}>
