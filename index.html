@@ -498,8 +498,8 @@
                       const predSongs=predSongNames;
                       return(
                         <div key={s.key} style={{marginBottom:'.75rem'}}>
-                          <div style={{display:'flex',alignItems:'flex-start',gap:'.5rem',padding:'.5rem 0'}}>
-                            <span style={{fontSize:'.95rem',color:'var(--t2)',minWidth:'1.2rem',flexShrink:0}}>{s.label}:</span>
+                          <div style={{display:'flex',alignItems:'baseline',gap:'.5rem',padding:'.5rem 0'}}>
+                            <span style={{fontSize:'.95rem',color:'var(--t2)',flexShrink:0}}>{s.label}:</span>
                             {liveEditMode?(
                               <div style={{flex:1}}>
                                 {songs.map((song,i)=>{
