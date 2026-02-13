@@ -42,9 +42,14 @@
       html{font-size:100%}
       :root{--sidebar-w:200px;--tab-h:0px;--safe-b:0px}
       .app-shell{flex-direction:row!important}
-      .app-content{max-width:600px;padding-left:2rem!important;padding-right:2rem!important;margin-left:calc(var(--sidebar-w) + 1.5rem)!important;margin-right:auto}
+      .app-content{max-width:600px;padding-left:1.5rem!important;padding-right:1.5rem!important;margin-left:calc(var(--sidebar-w) + 1.5rem)!important;margin-right:auto}
       .bottom-nav{display:none!important}
       .side-nav{display:flex!important}
+      .pred-grid{display:block}
+    }
+    @media(min-width:1100px){
+      .app-content{max-width:820px;padding-left:2.5rem!important;padding-right:2.5rem!important}
+      .pred-grid{display:grid!important;grid-template-columns:1fr 1fr;gap:.5rem}
     }
   </style>
 </head>
@@ -400,7 +405,8 @@
                 {/* Top 10 */}
                 <div style={sTitle}>🎸 Top 10 Predictions</div>
                 {predictions.length===0?<div style={{color:'var(--t3)',padding:'2rem',textAlign:'center'}}>Add setlists to see predictions</div>:
-                  predictions.map(({song,status:st,isCity,isTheme,theme:th,nights},i)=>{
+                  <div className="pred-grid">
+                  {predictions.map(({song,status:st,isCity,isTheme,theme:th,nights},i)=>{
                     const ico=isTheme?(th==='valentine'?'💜':th==='july4th'?'🎆':th==='newyear'?'🎉':'🎵'):isCity?'📍':'';
                     return(
                       <div key={song} style={predRow(isTheme,isCity)} onClick={()=>showHistory(song)}>
@@ -418,6 +424,7 @@
                         </div>
                       </div>)
                   })}
+                  </div>}
             </div>
 
             {/* ═══ LIVE ═══ */}
