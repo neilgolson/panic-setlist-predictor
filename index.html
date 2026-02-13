@@ -485,6 +485,10 @@
                 {/* Live Setlist Display */}
                 {allLiveSongs.length>0?(
                   <div style={{marginBottom:'1rem'}}>
+                    {/* Show header */}
+                    <div style={{marginBottom:'.75rem',paddingBottom:'.5rem',borderBottom:'1px solid var(--bdr)'}}>
+                      <div style={{fontSize:'.9rem',color:'var(--t2)'}}>{new Date(DATE1+'T12:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'})} {VENUE}, {CITY}, {STATE}</div>
+                    </div>
                     {/* Edit toggle */}
                     <div style={{display:'flex',justifyContent:'flex-end',marginBottom:'.5rem'}}>
                       <button onClick={()=>setLiveEditMode(p=>!p)} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:liveEditMode?'var(--played)':'var(--t3)',cursor:'pointer',fontSize:'.78rem',padding:'.35rem .75rem',fontFamily:"'Crimson Pro',serif"}}>
@@ -518,7 +522,7 @@
                                   const isPred=predSongs.includes(song);
                                   return(
                                     <span key={i}>
-                                      <span onClick={()=>showHistory(song)} style={{cursor:'pointer',color:isPred?'var(--green)':'var(--t1)',fontWeight:isPred?700:400,borderBottom:isPred?'1px solid var(--green)':'none'}}>{song}</span>
+                                      <span onClick={()=>showHistory(song)} style={{cursor:'pointer',color:isPred?'var(--green)':'var(--t2)',fontWeight:isPred?700:400,borderBottom:isPred?'1px solid var(--green)':'none'}}>{song}</span>
                                       {i<songs.length-1&&<span style={{color:'var(--t3)'}}>, </span>}
                                     </span>
                                   );
