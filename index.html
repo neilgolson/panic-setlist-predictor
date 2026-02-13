@@ -387,13 +387,13 @@
                 {/* Next Run */}
                 <div style={{padding:'.75rem 1rem',borderRadius:14,marginBottom:'1.15rem',background:'linear-gradient(135deg,rgba(255,51,102,.08),rgba(255,140,66,.08))',border:'1px solid rgba(255,140,66,.2)'}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
-                    <div style={{fontSize:'.9rem',color:'var(--t2)'}}>📍 {VENUE} • {CITY}, {STATE}</div>
-                    {themeInfo&&<span style={{...chip(themeInfo.c),fontSize:'.72rem',padding:'3px 8px'}}>{themeInfo.e} {themeInfo.l}</span>}
-                  </div>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginTop:'.2rem'}}>
                     <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.15rem',letterSpacing:'.04em',color:'var(--orange)'}}>
                       {new Date(DATE1+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})}{NIGHTS>1&&`–${new Date(DATE2+'T12:00:00').toLocaleDateString('en-US',{day:'numeric'})}`}
                     </div>
+                    {themeInfo&&<span style={{...chip(themeInfo.c),fontSize:'.72rem',padding:'3px 8px'}}>{themeInfo.e} {themeInfo.l}</span>}
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginTop:'.2rem'}}>
+                    <div style={{fontSize:'.9rem',color:'var(--t2)'}}>📍 {VENUE} • {CITY}, {STATE}</div>
                     <span style={{fontSize:'.78rem',color:'var(--t3)'}}>{NIGHTS}-night run</span>
                   </div>
                 </div>
