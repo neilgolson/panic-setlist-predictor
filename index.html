@@ -485,13 +485,10 @@
                 {/* Live Setlist Display */}
                 {allLiveSongs.length>0?(
                   <div style={{marginBottom:'1rem'}}>
-                    {/* Show header */}
-                    <div style={{marginBottom:'.75rem',paddingBottom:'.5rem',borderBottom:'1px solid var(--bdr)'}}>
+                    {/* Show header + edit toggle */}
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.75rem',paddingBottom:'.5rem',borderBottom:'1px solid var(--bdr)'}}>
                       <div style={{fontSize:'.9rem',color:'var(--t2)'}}>{new Date(DATE1+'T12:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'})} {VENUE}, {CITY}, {STATE}</div>
-                    </div>
-                    {/* Edit toggle */}
-                    <div style={{display:'flex',justifyContent:'flex-end',marginBottom:'.5rem'}}>
-                      <button onClick={()=>setLiveEditMode(p=>!p)} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:liveEditMode?'var(--played)':'var(--t3)',cursor:'pointer',fontSize:'.78rem',padding:'.35rem .75rem',fontFamily:"'Crimson Pro',serif"}}>
+                      <button onClick={()=>setLiveEditMode(p=>!p)} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:liveEditMode?'var(--played)':'var(--t3)',cursor:'pointer',fontSize:'.78rem',padding:'.35rem .75rem',fontFamily:"'Crimson Pro',serif",flexShrink:0,marginLeft:'.5rem'}}>
                         {liveEditMode?'Done':'✎ Edit'}
                       </button>
                     </div>
@@ -503,7 +500,7 @@
                       return(
                         <div key={s.key} style={{marginBottom:'.75rem'}}>
                           <div style={{display:'flex',alignItems:'flex-start',gap:'.5rem',padding:'.5rem 0'}}>
-                            <span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1.1rem',color:'var(--orange)',minWidth:'1.5rem',flexShrink:0}}>{s.label}:</span>
+                            <span style={{fontSize:'.95rem',color:'var(--t2)',minWidth:'1.2rem',flexShrink:0}}>{s.label}:</span>
                             {liveEditMode?(
                               <div style={{flex:1}}>
                                 {songs.map((song,i)=>{
