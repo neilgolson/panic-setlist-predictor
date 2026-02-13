@@ -241,11 +241,14 @@
         setSetlists(p=>[sl,...p].sort((a,b)=>new Date(b.date)-new Date(a.date)));
         setLiveSets({set1:[],set2:[],encore:[]});setLiveCurrentSet('set1');setLiveEditMode(false);setTab('shows');
       };
+      const predictionRef=useRef([]);
+      useEffect(()=>{
+        if(predictions.length>0&&allLiveSongs.length===0)predictionRef.current=predictions.map(p=>p.song);
+      },[predictions,allLiveSongs]);
+      const stablePredSongs=predictionRef.current.length>0?predictionRef.current:predictions.map(p=>p.song);
       const liveHits=useMemo(()=>{
-        const predSongs=predictions.map(p=>p.song);
-        const allSongs=[...liveSets.set1,...liveSets.set2,...liveSets.encore];
-        return allSongs.filter(s=>predSongs.includes(s));
-      },[predictions,liveSets]);
+        return allLiveSongs.filter(s=>stablePredSongs.includes(s));
+      },[allLiveSongs,stablePredSongs]);
 
       const addSetlist=()=>{
         if(!newSongs)return;let eDate=newDate,eCity=currentRun?.city||'',eVenue='',sText=newSongs;
@@ -496,7 +499,7 @@
                     {[{key:'set1',label:'1'},{key:'set2',label:'2'},{key:'encore',label:'E'}].map(s=>{
                       const songs=liveSets[s.key];
                       if(songs.length===0)return null;
-                      const predSongs=predictions.map(p=>p.song);
+                      const predSongs=stablePredSongs;
                       return(
                         <div key={s.key} style={{marginBottom:'.75rem'}}>
                           <div style={{display:'flex',alignItems:'flex-start',gap:'.5rem',padding:'.5rem 0'}}>
