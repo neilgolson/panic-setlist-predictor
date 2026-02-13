@@ -621,7 +621,7 @@
                         </div>
                         {acc&&<span onClick={()=>setDetailSheet({date:sl.date,city:sl.city||'',predictions:acc.predictions,actualSongs:acc.actualSongs,matchedSongs:acc.matchedSongs,matches:acc.matches,accuracy:acc.predictionAccuracy,runInfo:acc.runShows,excludedSongs:acc.songsPlayedInRun})} style={{...chip(ac),cursor:'pointer'}}>{acc.matches}/10</span>}
                       </div>
-                      <div style={{fontSize:'.8rem',color:'var(--t2)',lineHeight:1.5}}>{sl.songs.join(', ')}</div>
+                      <div style={{fontSize:'.85rem',color:'var(--t2)',lineHeight:1.25}}>{sl.songs.join(', ')}</div>
                       <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',marginTop:'.5rem',paddingTop:'.5rem',borderTop:'1px solid var(--bdr)'}}>
                         <button onClick={()=>setEditingSetlist({...sl,editDate:sl.date,editCity:sl.city||'',editSongs:sl.songs.join('\n')})} style={{background:'none',border:'1px solid var(--bdr)',borderRadius:6,color:'var(--t2)',cursor:'pointer',fontSize:'.78rem',padding:'.4rem .85rem',fontFamily:"'Crimson Pro',serif",minHeight:36}}>✎ Edit</button>
                         <button onClick={()=>delSetlist(sl.id)} style={{background:'none',border:'1px solid rgba(248,113,113,.25)',borderRadius:6,color:'var(--played)',cursor:'pointer',fontSize:'.78rem',padding:'.4rem .85rem',fontFamily:"'Crimson Pro',serif",minHeight:36}}>✕ Delete</button>
