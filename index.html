@@ -97,6 +97,7 @@
       const[searchTerm,setSearchTerm]=useState('');
       const[quickAdd,setQuickAdd]=useState('');
       const[sortBy,setSortBy]=useState('showsSince');
+      const[coverFilter,setCoverFilter]=useState('all');
       const[newDate,setNewDate]=useState('');
       const[newSongs,setNewSongs]=useState('');
       const[currentRun,setCurrentRun]=useState(null);
@@ -319,7 +320,12 @@
       };
 
       const filteredSongs=useMemo(()=>{
-        let songs=ALL_WITH.filter(s=>s.toLowerCase().includes(searchTerm.toLowerCase()));
+        const coverSet=new Set(COMMON_COVERS.map(s=>s.toLowerCase()));
+        let songs=ALL_WITH.filter(s=>s.toLowerCase().includes(searchTerm.toLowerCase())).filter(s=>{
+          if(coverFilter==='all')return true;
+          const isCover=coverSet.has(s.toLowerCase())||!ALL_SONGS.includes(s);
+          return coverFilter==='covers'?isCover:!isCover;
+        });
         if(sortBy==='likelihood')songs.sort((a,b)=>{const aS=songStatus[a],bS=songStatus[b];
           let aScore=aS.playFrequency*FREQ_WEIGHT+(heavyRotation.includes(a)?HR_BONUS:0)+gapScore(aS.showsSince)+(ENCORE_LOCKS.has(a)&&aS.available?ENCORE_BONUS:0);
           let bScore=bS.playFrequency*FREQ_WEIGHT+(heavyRotation.includes(b)?HR_BONUS:0)+gapScore(bS.showsSince)+(ENCORE_LOCKS.has(b)&&bS.available?ENCORE_BONUS:0);
@@ -331,7 +337,7 @@
           return a.localeCompare(b)});
         else songs.sort();
         return songs;
-      },[searchTerm,sortBy,songStatus,heavyRotation,ALL_WITH]);
+      },[searchTerm,sortBy,coverFilter,songStatus,heavyRotation,ALL_WITH]);
 
       const quickResults=quickAdd?ALL_WITH.filter(s=>s.toLowerCase().includes(quickAdd.toLowerCase())).slice(0,15):[];
       const quickAddNoMatch=quickAdd.length>=2&&quickResults.length===0;
@@ -561,7 +567,7 @@
             <div style={{display:tab==='songs'&&loadState==='ok'?'block':'none',padding:'1rem 1rem 0'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'.5rem',marginBottom:'1rem'}}>
                   <h2 style={sTitle}>All Songs</h2>
-                  <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{filteredSongs.length}{searchTerm?` / ${ALL_WITH.length}`:''}</span>
+                  <span style={{fontSize:'.85rem',color:'var(--t3)'}}>{filteredSongs.length}{searchTerm||coverFilter!=='all'?` / ${ALL_WITH.length}`:''}</span>
                 </div>
                 <div style={{display:'flex',gap:'.5rem',marginBottom:'1rem'}}>
                   {[{v:stats.available,l:'AVAILABLE',c:'var(--avail)'},{v:stats.resting,l:'RESTING',c:'var(--rest)'},{v:stats.played,l:'JUST PLAYED',c:'var(--played)'}].map(s=>(
@@ -572,6 +578,11 @@
                   ))}
                 </div>
                 <input type="text" placeholder="🔍 Search..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} style={{...input,marginBottom:'.5rem'}}/>
+                <div style={{display:'flex',gap:0,marginBottom:'.5rem',borderRadius:8,overflow:'hidden',border:'1px solid var(--bdr)'}}>
+                  {[{v:'all',l:'All'},{v:'originals',l:'Originals'},{v:'covers',l:'Covers'}].map(f=>(
+                    <button key={f.v} onClick={()=>setCoverFilter(f.v)} style={{flex:1,padding:'.5rem',border:'none',background:coverFilter===f.v?'var(--purple)':'var(--bg3)',color:coverFilter===f.v?'#fff':'var(--t3)',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:"'Bebas Neue',sans-serif",letterSpacing:'.03em'}}>{f.l}</button>
+                  ))}
+                </div>
                 <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{...input,fontSize:'.85rem',padding:'.6rem .8rem',marginBottom:'1rem',color:'var(--t2)'}}>
                   <option value="showsSince">Sort by Shows Since Played</option>
                   <option value="likelihood">Sort by Likelihood</option>
@@ -759,9 +770,14 @@
           </Sheet>
 
           {/* All Songs */}
-          <Sheet open={allSongsSheet} onClose={()=>{setAllSongsSheet(false);setSearchTerm('')}} title="All Songs" titleColor="var(--t2)">
+          <Sheet open={allSongsSheet} onClose={()=>{setAllSongsSheet(false);setSearchTerm('');setCoverFilter('all')}} title="All Songs" titleColor="var(--t2)">
             <div style={{position:'sticky',top:'-1rem',background:'var(--bg2)',paddingTop:'0',paddingBottom:'.75rem',zIndex:10}}>
               <input type="text" placeholder="🔍 Search..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} style={{...input,marginBottom:'.5rem'}}/>
+              <div style={{display:'flex',gap:0,marginBottom:'.5rem',borderRadius:8,overflow:'hidden',border:'1px solid var(--bdr)'}}>
+                {[{v:'all',l:'All'},{v:'originals',l:'Originals'},{v:'covers',l:'Covers'}].map(f=>(
+                  <button key={f.v} onClick={()=>setCoverFilter(f.v)} style={{flex:1,padding:'.5rem',border:'none',background:coverFilter===f.v?'var(--purple)':'var(--bg3)',color:coverFilter===f.v?'#fff':'var(--t3)',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:"'Bebas Neue',sans-serif",letterSpacing:'.03em'}}>{f.l}</button>
+                ))}
+              </div>
               <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{...input,fontSize:'.85rem',padding:'.6rem .8rem'}}>
                 <option value="likelihood">Sort by Likelihood</option>
                 <option value="showsSince">Sort by Shows Since Played</option>
