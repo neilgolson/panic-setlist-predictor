@@ -214,7 +214,7 @@
             .map(([song,st])=>{let sc=st.playFrequency*FREQ_WEIGHT;if(hhr.includes(song))sc+=HR_BONUS;sc+=gapScore(st.showsSince);
               if(ENCORE_LOCKS.has(song)&&st.available)sc+=ENCORE_BONUS;
               if(hist.some(s=>s.city&&target.city&&s.city.toLowerCase()===target.city.toLowerCase()&&s.songs.includes(song)))sc+=30;
-              const theme=getDateTheme(target.date);let tl=theme?(themeSongs[theme]||[]):[];if(isBeachCity(target.city))tl=[...tl,...(themeSongs['beach']||[])];if(tl.includes(song))sc+=30;
+              const theme=getDateTheme(target.date);let tl=theme?(themeSongs[theme]||[]):[];if(isBeachCity(target.city))tl=[...tl,...(themeSongs['beach']||[])];if(tl.includes(song))sc+=20;
               return{song,score:sc}}).sort((a,b)=>b.score-a.score).slice(0,10).map(p=>p.song);
           const actual=[...new Set(target.songs)],matches=actual.filter(s=>preds.includes(s));
           map[target.id]={matches:matches.length,totalPredicted:10,totalPlayed:actual.length,predictionAccuracy:((matches.length/10)*100).toFixed(0),coverage:((matches.length/actual.length)*100).toFixed(0),predictions:preds,actualSongs:actual,matchedSongs:matches,runShows,songsPlayedInRun:Array.from(runSongs)};
@@ -233,7 +233,7 @@
             if(ENCORE_LOCKS.has(song)&&st.available)sc+=ENCORE_BONUS;
             let isCity=false;(themeSongs['cityReferences']||[]).forEach(r=>{const[sn,cn]=r.split(':').map(s=>s.trim());if(sn===song&&uc.includes(cn.toLowerCase()))isCity=true});
             (themeSongs['stateReferences']||[]).forEach(r=>{const[sn,sc2]=r.split(':').map(s=>s.trim());if(sn===song&&uc.includes(sc2.toLowerCase()))isCity=true});
-            if(isCity)sc+=30;const theme=getDateTheme(DATE1);const tl=theme?(themeSongs[theme]||[]):[];const isTheme=tl.includes(song);if(isTheme)sc+=30;if(nights==='night2')sc+=15;
+            if(isCity)sc+=30;const theme=getDateTheme(DATE1);const tl=theme?(themeSongs[theme]||[]):[];const isTheme=tl.includes(song);if(isTheme)sc+=20;if(nights==='night2')sc+=15;
             const tp=setlists.filter(sl=>sl.songs.includes(song)).length;
             return{song,score:sc,status:{...st,timesPlayed:tp},isCity,isTheme,theme,nights}})
           .sort((a,b)=>{if(a.nights==='both'&&b.nights==='night2')return-1;if(a.nights==='night2'&&b.nights==='both')return 1;return b.score-a.score}).slice(0,10);
