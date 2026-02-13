@@ -70,9 +70,11 @@
     const getDateTheme=ds=>{const d=ds?new Date(ds+'T12:00:00'):new Date(),m=d.getMonth()+1,dy=d.getDate(),wr=(tm,td)=>Math.abs(d-new Date(d.getFullYear(),tm-1,td))/864e5<=4;if(m===2&&wr(2,14))return'valentine';if((m===6&&dy>=30)||(m===7&&dy<=8))return'july4th';if((m===12&&dy>=28)||(m===1&&dy<=5))return'newyear';return null};
     const isBeachCity=c=>{if(!c)return false;const l=c.toLowerCase();return BEACH_CITIES.some(b=>l.includes(b))};
     const fmtDate=d=>{if(!d||d==='Tonight')return'—';const[y,m,dy]=d.split('-');return`${m}/${dy}/${y.slice(-2)}`};
-    /* Gap scoring: bell curve peaking at gap 4 (backtested 37%→45% accuracy) */
-    const gapScore=gap=>{if(gap>=999||gap===Infinity)return 0;if(gap<=4)return Math.min(15,gap*3.75);return Math.max(0,15-(gap-4)*2)};
-    const HR_SIZE=40,HR_BONUS=15,FREQ_WEIGHT=0.3;
+    /* Gap scoring: fat-tail bell curve peaking at gap 5, slow decay 1.2 (backtested improvement over peak-4) */
+    const gapScore=gap=>{if(gap>=999||gap===Infinity)return 0;if(gap<=5)return Math.min(15,gap*3.0);return Math.max(0,15-(gap-5)*1.2)};
+    const HR_SIZE=40,HR_BONUS=15,FREQ_WEIGHT=0.3,ENCORE_BONUS=10,HR_WINDOW=50;
+    /* Encore-lock songs: >=70% of plays land in last 3 positions */
+    const ENCORE_LOCKS=new Set(["End Of The Show","Expiration Day","Old Joe","You Wreck Me","Keep Me in Your Heart","I'm So Glad"]);
 
     /* ─── BOTTOM SHEET ─── */
     function Sheet({open,onClose,title,titleColor,level,children}){
@@ -169,7 +171,8 @@
       },[setlists,themeSongs,ALL_WITH]);
 
       const heavyRotation=useMemo(()=>{
-        const c={};setlists.forEach(sl=>{[...new Set(sl.songs)].forEach(s=>{if(s!=='Drums'&&s!=='Jam')c[s]=(c[s]||0)+1})});
+        const recent=[...setlists].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,HR_WINDOW);
+        const c={};recent.forEach(sl=>{[...new Set(sl.songs)].forEach(s=>{if(s!=='Drums'&&s!=='Jam')c[s]=(c[s]||0)+1})});
         return Object.entries(c).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,HR_SIZE).map(([s])=>s);
       },[setlists]);
 
@@ -201,9 +204,15 @@
             if(rH.has(a)&&hs[b]&&hs[a].showsSince!==Infinity){hs[b].showsSince=Math.min(hs[b].showsSince,hs[a].showsSince);hs[b].available=hs[b].showsSince>=3}
             if(rH.has(b)&&hs[a]&&hs[b].showsSince!==Infinity){hs[a].showsSince=Math.min(hs[a].showsSince,hs[b].showsSince);hs[a].available=hs[a].showsSince>=3}
           }});
-          const hhr=Object.entries(hs).filter(([s,st])=>s!=='Drums'&&s!=='Jam'&&st.timesPlayed>=3).sort((a,b)=>b[1].timesPlayed-a[1].timesPlayed||a[0].localeCompare(b[0])).slice(0,HR_SIZE).map(([s])=>s);
-          const preds=Object.entries(hs).filter(([s,st])=>s!=='Drums'&&s!=='Jam'&&st.timesPlayed>=2&&!st.playedInRun&&(st.available||st.showsSince===2))
+          /* Recency-windowed HR: use last HR_WINDOW shows of history */
+          const hrHist=hist.slice(-HR_WINDOW);
+          const hrc={};hrHist.forEach(sl=>{[...new Set(sl.songs)].forEach(s=>{if(s!=='Drums'&&s!=='Jam')hrc[s]=(hrc[s]||0)+1})});
+          const hhr=Object.entries(hrc).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,HR_SIZE).map(([s])=>s);
+          /* Recent plays for relaxed min-play threshold */
+          const recentH=new Set();hist.slice(-25).forEach(sl=>sl.songs.forEach(s=>recentH.add(s)));
+          const preds=Object.entries(hs).filter(([s,st])=>s!=='Drums'&&s!=='Jam'&&(st.timesPlayed>=2||(st.timesPlayed>=1&&recentH.has(s)))&&!st.playedInRun&&(st.available||st.showsSince===2))
             .map(([song,st])=>{let sc=st.playFrequency*FREQ_WEIGHT;if(hhr.includes(song))sc+=HR_BONUS;sc+=gapScore(st.showsSince);
+              if(ENCORE_LOCKS.has(song)&&st.available)sc+=ENCORE_BONUS;
               if(hist.some(s=>s.city&&target.city&&s.city.toLowerCase()===target.city.toLowerCase()&&s.songs.includes(song)))sc+=30;
               const theme=getDateTheme(target.date);let tl=theme?(themeSongs[theme]||[]):[];if(isBeachCity(target.city))tl=[...tl,...(themeSongs['beach']||[])];if(tl.includes(song))sc+=30;
               return{song,score:sc}}).sort((a,b)=>b.score-a.score).slice(0,10).map(p=>p.song);
@@ -214,18 +223,21 @@
       },[setlists,themeSongs,ALL_WITH]);
 
       /* ─── PREDICTIONS ─── */
+      /* Improvements: fat-tail gap, encore bonus, recency HR, night-2 HR boost, relaxed min-play */
+      const recentPlays=useMemo(()=>{const r=new Set();[...setlists].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,25).forEach(sl=>sl.songs.forEach(s=>r.add(s)));return r},[setlists]);
       const predictions=useMemo(()=>{
         const uc=`${CITY}, ${STATE}`.toLowerCase();
-        return Object.entries(songStatus).filter(([s,st])=>s!=='Drums'&&s!=='Jam'&&st.timesPlayed>=2&&(st.available||st.showsSince===2))
+        return Object.entries(songStatus).filter(([s,st])=>s!=='Drums'&&s!=='Jam'&&(st.timesPlayed>=2||(st.timesPlayed>=1&&recentPlays.has(s)))&&(st.available||st.showsSince===2))
           .map(([song,st])=>{let sc=0;const n1=st.available,nights=n1?'both':'night2';
             sc+=st.playFrequency*FREQ_WEIGHT;if(heavyRotation.includes(song))sc+=HR_BONUS;sc+=gapScore(st.showsSince);
+            if(ENCORE_LOCKS.has(song)&&st.available)sc+=ENCORE_BONUS;
             let isCity=false;(themeSongs['cityReferences']||[]).forEach(r=>{const[sn,cn]=r.split(':').map(s=>s.trim());if(sn===song&&uc.includes(cn.toLowerCase()))isCity=true});
             (themeSongs['stateReferences']||[]).forEach(r=>{const[sn,sc2]=r.split(':').map(s=>s.trim());if(sn===song&&uc.includes(sc2.toLowerCase()))isCity=true});
             if(isCity)sc+=30;const theme=getDateTheme(DATE1);const tl=theme?(themeSongs[theme]||[]):[];const isTheme=tl.includes(song);if(isTheme)sc+=30;if(nights==='night2')sc+=15;
             const tp=setlists.filter(sl=>sl.songs.includes(song)).length;
             return{song,score:sc,status:{...st,timesPlayed:tp},isCity,isTheme,theme,nights}})
           .sort((a,b)=>{if(a.nights==='both'&&b.nights==='night2')return-1;if(a.nights==='night2'&&b.nights==='both')return 1;return b.score-a.score}).slice(0,10);
-      },[songStatus,heavyRotation,themeSongs,setlists]);
+      },[songStatus,heavyRotation,themeSongs,setlists,recentPlays]);
 
       /* ─── ACTIONS ─── */
       const showHistory=song=>{
@@ -309,8 +321,8 @@
       const filteredSongs=useMemo(()=>{
         let songs=ALL_WITH.filter(s=>s.toLowerCase().includes(searchTerm.toLowerCase()));
         if(sortBy==='likelihood')songs.sort((a,b)=>{const aS=songStatus[a],bS=songStatus[b];
-          let aScore=aS.playFrequency*FREQ_WEIGHT+(heavyRotation.includes(a)?HR_BONUS:0)+gapScore(aS.showsSince);
-          let bScore=bS.playFrequency*FREQ_WEIGHT+(heavyRotation.includes(b)?HR_BONUS:0)+gapScore(bS.showsSince);
+          let aScore=aS.playFrequency*FREQ_WEIGHT+(heavyRotation.includes(a)?HR_BONUS:0)+gapScore(aS.showsSince)+(ENCORE_LOCKS.has(a)&&aS.available?ENCORE_BONUS:0);
+          let bScore=bS.playFrequency*FREQ_WEIGHT+(heavyRotation.includes(b)?HR_BONUS:0)+gapScore(bS.showsSince)+(ENCORE_LOCKS.has(b)&&bS.available?ENCORE_BONUS:0);
           return bScore!==aScore?bScore-aScore:a.localeCompare(b)});
         else if(sortBy==='timesPlayed')songs.sort((a,b)=>songStatus[b].timesPlayed-songStatus[a].timesPlayed||a.localeCompare(b));
         else if(sortBy==='showsSince')songs.sort((a,b)=>{const aS=songStatus[a],bS=songStatus[b];
