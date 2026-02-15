@@ -478,17 +478,17 @@
                 <div style={{position:'relative',marginBottom:'1rem'}}>
                   <input type="text" placeholder="🔍 Search song to add..." value={quickAdd} onChange={e=>setQuickAdd(e.target.value)}
                     onKeyDown={e=>{if(e.key==='Enter'){if(quickResults.length>0)addToLive(quickResults[0]);else if(quickAddNoMatch){const name=quickAdd.trim();setCustomSongs(p=>[...new Set([...p,name])]);addToLive(name)}}}}
-                    style={{...input,borderColor:quickAdd?'var(--green)':'var(--bdr)'}}/>
+                    style={{...input,fontSize:'1.15rem',borderColor:quickAdd?'var(--green)':'var(--bdr)'}}/>
                   {quickAdd&&(quickResults.length>0||quickAddNoMatch)&&(
                     <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:100,background:'var(--bg2)',border:'1px solid var(--bdr)',borderRadius:10,marginTop:4,maxHeight:'50vh',overflow:'auto',boxShadow:'0 8px 24px rgba(0,0,0,.5)'}}>
                       {quickResults.map(song=>{const added=allLiveSongs.includes(song),st=songStatus[song];return(
                         <div key={song} onClick={()=>!added&&addToLive(song)} style={{padding:'.85rem 1rem',borderBottom:'1px solid var(--bdr)',display:'flex',justifyContent:'space-between',alignItems:'center',opacity:added?.4:1,cursor:added?'default':'pointer',minHeight:48}}>
-                          <span style={{fontSize:'1rem'}}>{song}</span>
+                          <span style={{fontSize:'1.15rem'}}>{song}</span>
                           {added?<span style={chip('var(--green)')}>Added</span>:!st?.available?<span style={chip('var(--rest)')}>Resting</span>:null}
                         </div>)})}
                       {quickAddNoMatch&&(
                         <div onClick={()=>{const name=quickAdd.trim();setCustomSongs(p=>[...new Set([...p,name])]);addToLive(name)}} style={{padding:'.85rem 1rem',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',minHeight:48,background:'rgba(168,85,247,.08)',borderTop:quickResults.length>0?'1px solid var(--bdr)':'none'}}>
-                          <span style={{fontSize:'1rem',color:'var(--purple)'}}>+ Create "{quickAdd.trim()}"</span>
+                          <span style={{fontSize:'1.15rem',color:'var(--purple)'}}>+ Create "{quickAdd.trim()}"</span>
                           <span style={chip('var(--purple)')}>New Song</span>
                         </div>
                       )}
@@ -521,14 +521,14 @@
                                   const isPred=predSongs.includes(song);
                                   return(
                                     <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.4rem .5rem',marginBottom:'.25rem',borderRadius:6,background:isPred?'rgba(74,222,128,.12)':'var(--bg3)',border:isPred?'1px solid rgba(74,222,128,.3)':'1px solid var(--bdr)'}}>
-                                      <span style={{fontSize:'.9rem',color:isPred?'var(--green)':'var(--t1)',fontWeight:isPred?600:400}}>{song}</span>
+                                      <span style={{fontSize:'1.1rem',color:isPred?'var(--green)':'var(--t1)',fontWeight:isPred?600:400}}>{song}</span>
                                       <button onClick={()=>removeFromLive(song,s.key)} style={{background:'none',border:'none',color:'var(--played)',cursor:'pointer',fontSize:'1rem',padding:'.25rem .5rem',lineHeight:1}}>✕</button>
                                     </div>
                                   );
                                 })}
                               </div>
                             ):(
-                              <div style={{flex:1,fontSize:'.95rem',lineHeight:1.7}}>
+                              <div style={{flex:1,fontSize:'1.15rem',lineHeight:1.7}}>
                                 {songs.map((song,i)=>{
                                   const isPred=predSongs.includes(song);
                                   return(
