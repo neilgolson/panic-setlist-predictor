@@ -1,6 +1,6 @@
 {
   "exportDate": "2026-02-13T05:01:25.062951Z",
-  "totalShows": 104,
+  "totalShows": 105,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3056,6 +3056,37 @@
         "Chilly Water",
         "Jack Straw",
         "Ain't Life Grand"
+      ]
+    },
+    {
+      "id": 1770854400000,
+      "date": "2026-02-14",
+      "city": "Austin, TX",
+      "venue": "The Moody Theater",
+      "songs": [
+        "Junior",
+        "Greta",
+        "Little Lilly",
+        "Climb To Safety",
+        "This Part Of Town",
+        "Thought Sausage",
+        "Barstools And Dreamers",
+        "King Baby",
+        "Porch Song",
+        "You Wreck Me",
+        "Ribs And Whiskey",
+        "Wondering",
+        "Proving Ground",
+        "Ride Me High",
+        "Proving Ground",
+        "Down",
+        "Papa's Home",
+        "Drums",
+        "Tie Your Shoes",
+        "Papa's Home",
+        "North",
+        "Keep Me in Your Heart",
+        "Love Tractor"
       ]
     }
   ],
