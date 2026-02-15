@@ -86,7 +86,7 @@
     function App(){
       const[tab,setTab]=useState('predict');
       const[setlists,setSetlists]=useState([]);
-      const[liveSets,setLiveSets]=useState({set1:[],set2:[],encore:[]});
+      const[liveSets,setLiveSets]=useState(()=>{try{const s=JSON.parse(localStorage.getItem('panicSetlists')||'{}');return s.liveSets||{set1:[],set2:[],encore:[]}}catch(e){return{set1:[],set2:[],encore:[]}}});
       const[liveCurrentSet,setLiveCurrentSet]=useState('set1');
       const[liveEditMode,setLiveEditMode]=useState(false);
       const[customSongs,setCustomSongs]=useState([]);
@@ -150,8 +150,8 @@
 
       useEffect(()=>{
         const e=JSON.parse(localStorage.getItem('panicSetlists')||'{}');
-        localStorage.setItem('panicSetlists',JSON.stringify({...e,currentRun,customSongs}));
-      },[currentRun,customSongs]);
+        localStorage.setItem('panicSetlists',JSON.stringify({...e,currentRun,customSongs,liveSets}));
+      },[currentRun,customSongs,liveSets]);
 
       /* ─── SONG STATUS ─── */
       const songStatus=useMemo(()=>{
@@ -533,7 +533,7 @@
                                   const isPred=predSongs.includes(song);
                                   return(
                                     <span key={i}>
-                                      <span onClick={()=>showHistory(song)} style={{cursor:'pointer',color:isPred?'var(--green)':'var(--t2)',fontWeight:isPred?700:400,borderBottom:isPred?'1px solid var(--green)':'none'}}>{song}</span>
+                                      <span onClick={()=>showHistory(song)} style={{cursor:'pointer',color:isPred?'var(--green)':'var(--t1)',fontWeight:isPred?700:400,borderBottom:isPred?'1px solid var(--green)':'none'}}>{song}</span>
                                       {i<songs.length-1&&<span style={{color:'var(--t3)'}}>, </span>}
                                     </span>
                                   );
