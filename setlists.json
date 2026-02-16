@@ -1,6 +1,6 @@
 {
   "exportDate": "2026-02-13T05:01:25.062951Z",
-  "totalShows": 105,
+  "totalShows": 106,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3087,6 +3087,36 @@
         "North",
         "Keep Me in Your Heart",
         "Love Tractor"
+      ]
+    },
+    {
+      "id": 1770940800000,
+      "date": "2026-02-15",
+      "city": "Austin, TX",
+      "venue": "Moody Center",
+      "songs": [
+        "Driving Song",
+        "Disco",
+        "Driving Song",
+        "Little By Little",
+        "Goodpeople",
+        "Dark Bar",
+        "Goodpeople",
+        "Aunt Avis",
+        "Holden Oversoul",
+        "Henry Parsons Died",
+        "Blackout Blues",
+        "Diner",
+        "Blight",
+        "Saint Ex",
+        "Airplane",
+        "You Got Yours",
+        "Gimme",
+        "Blue Indian",
+        "Pigeons",
+        "We Walk Each Other Home",
+        "Up All Night",
+        "Tall Boy"
       ]
     }
   ],
