@@ -627,7 +627,7 @@
                           <button onClick={()=>delSetlist(sl.id)} style={{background:'none',border:'1px solid rgba(248,113,113,.25)',borderRadius:6,color:'var(--played)',cursor:'pointer',fontSize:'.72rem',padding:'.2rem .6rem',fontFamily:"'Crimson Pro',serif"}}>✕</button>
                         </div>
                       </div>
-                      <div style={{fontSize:'.93rem',color:'var(--t2)',lineHeight:1.2}}>{sl.songs.join(', ')}</div>
+                      <div style={{fontSize:'.93rem',color:'var(--t2)',lineHeight:1.2}}>{sl.songs.map((s,i)=>{const hit=acc&&acc.matchedSongs.includes(s);return(<React.Fragment key={i}>{i>0&&', '}<span style={hit?{color:'rgb(34,197,94)',fontWeight:600}:undefined}>{s}</span></React.Fragment>)})}</div>
                     </div>
                   );
                 })}
