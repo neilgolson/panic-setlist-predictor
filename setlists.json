@@ -1,6 +1,6 @@
 {
   "exportDate": "2026-02-13T05:01:25.062951Z",
-  "totalShows": 106,
+  "totalShows": 107,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3117,6 +3117,34 @@
         "We Walk Each Other Home",
         "Up All Night",
         "Tall Boy"
+      ]
+    },
+    {
+      "id": 1774070400000,
+      "date": "2026-03-20",
+      "city": "St. Augustine, FL",
+      "venue": "St. Augustine Amphitheatre",
+      "songs": [
+        "Goin' Out West",
+        "Surprise Valley",
+        "Pleas",
+        "One Arm Steve",
+        "Hatfield",
+        "Surprise Valley",
+        "Imitation Leather Shoes",
+        "Trashy",
+        "Space Wrangler",
+        "Let's Get Down To Business",
+        "Halloween Face",
+        "Mercy",
+        "Smokestack Lightning",
+        "Rebirtha",
+        "Party At Your Mama's House",
+        "Jack",
+        "Big Wooly Mammoth",
+        "All Time Low",
+        "Chilly Water",
+        "May Your Glass Be Filled"
       ]
     }
   ],
