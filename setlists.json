@@ -1,6 +1,6 @@
 {
   "exportDate": "2026-02-13T05:01:25.062951Z",
-  "totalShows": 108,
+  "totalShows": 109,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3172,6 +3172,35 @@
         "Ain't Life Grand",
         "Vacation",
         "Postcard"
+      ]
+    },
+    {
+      "id": 1774137600000,
+      "date": "2026-03-22",
+      "city": "St. Augustine, FL",
+      "venue": "St. Augustine Amphitheatre",
+      "songs": [
+        "Holden Oversoul",
+        "Can't Get High",
+        "Travelin' Light",
+        "Happy",
+        "Little Lilly",
+        "Driving Song",
+        "Blue Carousel",
+        "Driving Song",
+        "Conrad",
+        "Pilgrims",
+        "Sharon",
+        "Tackle Box Hero",
+        "Fishing",
+        "Time Is Free",
+        "Bear's Gone Fishin'",
+        "Drums",
+        "Fishwater",
+        "Blue Indian",
+        "Ribs And Whiskey",
+        "Hope In A Hopeless World",
+        "Life During Wartime"
       ]
     }
   ],
