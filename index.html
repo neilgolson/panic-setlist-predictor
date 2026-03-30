@@ -109,7 +109,16 @@
       const[allSongsSheet,setAllSongsSheet]=useState(false);
       const[themeSheet,setThemeSheet]=useState(false);
 
-      const VENUE='St. Augustine Amphitheater',CITY='St. Augustine',STATE='FL',DATE1='2026-03-20',DATE2='2026-03-22',NIGHTS=3;
+      const[tourDates,setTourDates]=useState([]);
+      const nextRun=useMemo(()=>{
+        const today=new Date().toISOString().split('T')[0];
+        // Find the next run where the last date hasn't passed yet
+        const upcoming=tourDates.find(r=>r.dates[r.dates.length-1]>=today);
+        if(upcoming)return upcoming;
+        // If all passed, show the last one
+        return tourDates[tourDates.length-1]||null;
+      },[tourDates]);
+      const VENUE=nextRun?.venue||'',CITY=nextRun?.city||'',STATE=nextRun?.state||'',DATE1=nextRun?.dates[0]||'',DATE2=nextRun?.dates[nextRun?.dates.length-1]||'',NIGHTS=nextRun?.dates.length||1;
 
       const ALL_WITH=useMemo(()=>[...new Set([...ALL_SONGS,...COMMON_COVERS,...customSongs])].sort(),[customSongs]);
 
@@ -130,7 +139,10 @@
             if(!sr.ok){setLoadError(`setlists.json: HTTP ${sr.status}`);setLoadState('error');return}
             const tr=await fetch('/theme-songs.json');
             if(!tr.ok){setLoadError(`theme-songs.json: HTTP ${tr.status}`);setLoadState('error');return}
-            const sd=await sr.json(),td=await tr.json();
+            const dr=await fetch('/tourDates.json');
+            if(!dr.ok){setLoadError(`tourDates.json: HTTP ${dr.status}`);setLoadState('error');return}
+            const sd=await sr.json(),td=await tr.json(),dd=await dr.json();
+            setTourDates(dd);
             if(!sd.setlists||!sd.setlists.length){setLoadError('setlists.json loaded but contains no setlists');setLoadState('error');return}
             setSetlists(sd.setlists);
             const lp=localStorage.getItem('panicSetlists');
@@ -416,7 +428,7 @@
                   </div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginTop:'.2rem'}}>
                     <div style={{fontSize:'.9rem',color:'var(--t2)'}}>📍 {VENUE} • {CITY}, {STATE}</div>
-                    <span style={{fontSize:'.78rem',color:'var(--t3)'}}>{NIGHTS}-night run</span>
+                    <span style={{fontSize:'.78rem',color:'var(--t3)'}}>{NIGHTS>1?`${NIGHTS}-night run`:'1 night'}</span>
                   </div>
                 </div>
                 {/* Top 10 */}
