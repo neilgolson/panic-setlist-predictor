@@ -1,0 +1,198 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Panic Predictor//Widespread Panic Tour//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Widespread Panic Tour
+X-WR-CALDESC:Upcoming Widespread Panic tour dates
+X-PUBLISHED-TTL:PT12H
+BEGIN:VEVENT
+UID:2026-04-18-birmingham@panicpredictor
+DTSTART;VALUE=DATE:20260418
+DTEND;VALUE=DATE:20260419
+SUMMARY:Widespread Panic – Coca-Cola Amphitheater (Night 2 of 2)
+LOCATION:Coca-Cola Amphitheater\, Birmingham\, AL
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-04-30-new-orleans@panicpredictor
+DTSTART;VALUE=DATE:20260430
+DTEND;VALUE=DATE:20260501
+SUMMARY:Widespread Panic – New Orleans Jazz & Heritage Festival
+LOCATION:New Orleans Jazz & Heritage Festival\, New Orleans\, LA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-05-08-las-vegas@panicpredictor
+DTSTART;VALUE=DATE:20260508
+DTEND;VALUE=DATE:20260509
+SUMMARY:Widespread Panic – The Theater at Virgin Hotels Las Vegas (Night 1 of 3)
+LOCATION:The Theater at Virgin Hotels Las Vegas\, Las Vegas\, NV
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-05-09-las-vegas@panicpredictor
+DTSTART;VALUE=DATE:20260509
+DTEND;VALUE=DATE:20260510
+SUMMARY:Widespread Panic – The Theater at Virgin Hotels Las Vegas (Night 2 of 3)
+LOCATION:The Theater at Virgin Hotels Las Vegas\, Las Vegas\, NV
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-05-10-las-vegas@panicpredictor
+DTSTART;VALUE=DATE:20260510
+DTEND;VALUE=DATE:20260511
+SUMMARY:Widespread Panic – The Theater at Virgin Hotels Las Vegas (Night 3 of 3)
+LOCATION:The Theater at Virgin Hotels Las Vegas\, Las Vegas\, NV
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-06-13-columbia@panicpredictor
+DTSTART;VALUE=DATE:20260613
+DTEND;VALUE=DATE:20260614
+SUMMARY:Widespread Panic – All Good Now Festival (Night 1 of 2)
+LOCATION:All Good Now Festival\, Columbia\, MD
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-06-14-columbia@panicpredictor
+DTSTART;VALUE=DATE:20260614
+DTEND;VALUE=DATE:20260615
+SUMMARY:Widespread Panic – All Good Now Festival (Night 2 of 2)
+LOCATION:All Good Now Festival\, Columbia\, MD
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-06-26-morrison@panicpredictor
+DTSTART;VALUE=DATE:20260626
+DTEND;VALUE=DATE:20260627
+SUMMARY:Widespread Panic – Red Rocks Amphitheatre (Night 1 of 3)
+LOCATION:Red Rocks Amphitheatre\, Morrison\, CO
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-06-27-morrison@panicpredictor
+DTSTART;VALUE=DATE:20260627
+DTEND;VALUE=DATE:20260628
+SUMMARY:Widespread Panic – Red Rocks Amphitheatre (Night 2 of 3)
+LOCATION:Red Rocks Amphitheatre\, Morrison\, CO
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-06-28-morrison@panicpredictor
+DTSTART;VALUE=DATE:20260628
+DTEND;VALUE=DATE:20260629
+SUMMARY:Widespread Panic – Red Rocks Amphitheatre (Night 3 of 3)
+LOCATION:Red Rocks Amphitheatre\, Morrison\, CO
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-07-missoula@panicpredictor
+DTSTART;VALUE=DATE:20260707
+DTEND;VALUE=DATE:20260708
+SUMMARY:Widespread Panic – KettleHouse Amphitheater (Night 1 of 2)
+LOCATION:KettleHouse Amphitheater\, Missoula\, MT
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-08-missoula@panicpredictor
+DTSTART;VALUE=DATE:20260708
+DTEND;VALUE=DATE:20260709
+SUMMARY:Widespread Panic – KettleHouse Amphitheater (Night 2 of 2)
+LOCATION:KettleHouse Amphitheater\, Missoula\, MT
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-10-bend@panicpredictor
+DTSTART;VALUE=DATE:20260710
+DTEND;VALUE=DATE:20260711
+SUMMARY:Widespread Panic – Hayden Homes Amphitheater (Night 1 of 2)
+LOCATION:Hayden Homes Amphitheater\, Bend\, OR
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-11-bend@panicpredictor
+DTSTART;VALUE=DATE:20260711
+DTEND;VALUE=DATE:20260712
+SUMMARY:Widespread Panic – Hayden Homes Amphitheater (Night 2 of 2)
+LOCATION:Hayden Homes Amphitheater\, Bend\, OR
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-16-oakland@panicpredictor
+DTSTART;VALUE=DATE:20260716
+DTEND;VALUE=DATE:20260717
+SUMMARY:Widespread Panic – Fox Theater (Night 1 of 3)
+LOCATION:Fox Theater\, Oakland\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-17-oakland@panicpredictor
+DTSTART;VALUE=DATE:20260717
+DTEND;VALUE=DATE:20260718
+SUMMARY:Widespread Panic – Fox Theater (Night 2 of 3)
+LOCATION:Fox Theater\, Oakland\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-18-oakland@panicpredictor
+DTSTART;VALUE=DATE:20260718
+DTEND;VALUE=DATE:20260719
+SUMMARY:Widespread Panic – Fox Theater (Night 3 of 3)
+LOCATION:Fox Theater\, Oakland\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-21-sacramento@panicpredictor
+DTSTART;VALUE=DATE:20260721
+DTEND;VALUE=DATE:20260722
+SUMMARY:Widespread Panic – Channel 24
+LOCATION:Channel 24\, Sacramento\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-23-los-angeles@panicpredictor
+DTSTART;VALUE=DATE:20260723
+DTEND;VALUE=DATE:20260724
+SUMMARY:Widespread Panic – The Orpheum Theatre (Night 1 of 3)
+LOCATION:The Orpheum Theatre\, Los Angeles\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-24-los-angeles@panicpredictor
+DTSTART;VALUE=DATE:20260724
+DTEND;VALUE=DATE:20260725
+SUMMARY:Widespread Panic – The Orpheum Theatre (Night 2 of 3)
+LOCATION:The Orpheum Theatre\, Los Angeles\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-25-los-angeles@panicpredictor
+DTSTART;VALUE=DATE:20260725
+DTEND;VALUE=DATE:20260726
+SUMMARY:Widespread Panic – The Orpheum Theatre (Night 3 of 3)
+LOCATION:The Orpheum Theatre\, Los Angeles\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+END:VCALENDAR
