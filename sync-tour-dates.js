@@ -157,7 +157,7 @@ async function main() {
   }
 
   // Regenerate ICS
-  console.log("Regenerating tour.ics...");
+  console.log("Regenerating calendars/widespread-panic.ics...");
   execSync("node build-cal.js", { cwd: __dirname, stdio: "inherit" });
 }
 

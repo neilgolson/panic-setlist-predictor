@@ -7,15 +7,6 @@ X-WR-CALNAME:Widespread Panic Tour
 X-WR-CALDESC:Upcoming Widespread Panic tour dates
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:2026-04-18-birmingham@panicpredictor
-DTSTART;VALUE=DATE:20260418
-DTEND;VALUE=DATE:20260419
-SUMMARY:Widespread Panic – Coca-Cola Amphitheater (Night 2 of 2)
-LOCATION:Coca-Cola Amphitheater\, Birmingham\, AL
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
 UID:2026-04-30-new-orleans@panicpredictor
 DTSTART;VALUE=DATE:20260430
 DTEND;VALUE=DATE:20260501

@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 
 const TOUR_DATES_PATH = path.join(__dirname, "tourDates.json");
-const OUTPUT_PATH = path.join(__dirname, "tour.ics");
+const OUTPUT_PATH = path.join(__dirname, "calendars", "widespread-panic.ics");
 const SITE_URL = "https://neilgolson.com";
 
 function toIcsDate(yyyy_mm_dd) {
