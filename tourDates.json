@@ -1,0 +1,13 @@
+[
+  { "dates": ["2026-03-20","2026-03-21","2026-03-22"], "venue": "St. Augustine Amphitheater", "city": "St. Augustine", "state": "FL" },
+  { "dates": ["2026-04-17","2026-04-18"], "venue": "Coca-Cola Amphitheater", "city": "Birmingham", "state": "AL" },
+  { "dates": ["2026-04-30"], "venue": "New Orleans Jazz & Heritage Festival", "city": "New Orleans", "state": "LA" },
+  { "dates": ["2026-05-08","2026-05-09","2026-05-10"], "venue": "The Theater at Virgin Hotels Las Vegas", "city": "Las Vegas", "state": "NV" },
+  { "dates": ["2026-06-13","2026-06-14"], "venue": "All Good Now Festival", "city": "Columbia", "state": "MD" },
+  { "dates": ["2026-06-26","2026-06-27","2026-06-28"], "venue": "Red Rocks Amphitheatre", "city": "Morrison", "state": "CO" },
+  { "dates": ["2026-07-07","2026-07-08"], "venue": "KettleHouse Amphitheater", "city": "Missoula", "state": "MT" },
+  { "dates": ["2026-07-10","2026-07-11"], "venue": "Hayden Homes Amphitheater", "city": "Bend", "state": "OR" },
+  { "dates": ["2026-07-16","2026-07-17","2026-07-18"], "venue": "Fox Theater", "city": "Oakland", "state": "CA" },
+  { "dates": ["2026-07-21"], "venue": "Channel 24", "city": "Sacramento", "state": "CA" },
+  { "dates": ["2026-07-23","2026-07-24","2026-07-25"], "venue": "The Orpheum Theatre", "city": "Los Angeles", "state": "CA" }
+]
