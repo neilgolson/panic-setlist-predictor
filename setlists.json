@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-05-01T00:00:00.000Z",
-  "totalShows": 112,
+  "exportDate": "2026-05-09T00:00:00.000Z",
+  "totalShows": 113,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3282,6 +3282,33 @@
         "Fishwater",
         "Arleen",
         "Fishwater"
+      ]
+    },
+    {
+      "id": 1778198400000,
+      "date": "2026-05-08",
+      "city": "Las Vegas, NV",
+      "venue": "The Theater at Virgin Hotels Las Vegas",
+      "songs": [
+        "Chainsaw City",
+        "Holden Oversoul",
+        "And It Stoned Me",
+        "Space Wrangler",
+        "Bear's Gone Fishin'",
+        "Sleeping Man",
+        "Blue Indian",
+        "Blackout Blues",
+        "Makes Sense To Me",
+        "Rebirtha",
+        "You Got Yours",
+        "Goodpeople",
+        "Dark Bar",
+        "Trashy",
+        "Lawyers, Guns, And Money",
+        "Protein Drink",
+        "Sewing Machine",
+        "We Walk Each Other Home",
+        "You Wreck Me"
       ]
     }
   ],
