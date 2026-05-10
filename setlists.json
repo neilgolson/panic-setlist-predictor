@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-05-09T00:00:00.000Z",
-  "totalShows": 113,
+  "exportDate": "2026-05-10T00:00:00.000Z",
+  "totalShows": 114,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3309,6 +3309,34 @@
         "Sewing Machine",
         "We Walk Each Other Home",
         "You Wreck Me"
+      ]
+    },
+    {
+      "id": 1778284800000,
+      "date": "2026-05-09",
+      "city": "Las Vegas, NV",
+      "venue": "The Theater at Virgin Hotels Las Vegas",
+      "songs": [
+        "Wondering",
+        "For What It's Worth",
+        "Little By Little",
+        "Blue Carousel",
+        "Rock",
+        "Sometimes",
+        "Gimme",
+        "Jack",
+        "Climb To Safety",
+        "Tall Boy",
+        "Happy",
+        "Driving Song",
+        "Pilgrims",
+        "Driving Song",
+        "Drums",
+        "Ribs And Whiskey",
+        "Stop Breakin' Down Blues",
+        "Up All Night",
+        "All Time Low",
+        "End Of The Show"
       ]
     }
   ],
