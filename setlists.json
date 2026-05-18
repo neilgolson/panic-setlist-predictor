@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-05-10T00:00:00.000Z",
-  "totalShows": 114,
+  "exportDate": "2026-05-17T00:00:00.000Z",
+  "totalShows": 115,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3337,6 +3337,35 @@
         "Up All Night",
         "All Time Low",
         "End Of The Show"
+      ]
+    },
+    {
+      "id": 1778371200000,
+      "date": "2026-05-10",
+      "city": "Las Vegas, NV",
+      "venue": "The Theater at Virgin Hotels Las Vegas",
+      "songs": [
+        "Junior",
+        "Send Your Mind",
+        "Little Lilly",
+        "Pleas",
+        "Hope In A Hopeless World",
+        "Travelin' Man",
+        "The Waker",
+        "Honky Red",
+        "Red Hot Mama",
+        "Little Kin",
+        "Good Morning Little Schoolgirl",
+        "Dyin' Man",
+        "Aunt Avis",
+        "Machine",
+        "Barstools And Dreamers",
+        "Party At Your Mama's House",
+        "Ride Me High",
+        "Love Tractor",
+        "Keep Me in Your Heart",
+        "Vampire Blues",
+        "Postcard"
       ]
     }
   ],
