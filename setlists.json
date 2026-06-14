@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-05-17T00:00:00.000Z",
-  "totalShows": 115,
+  "exportDate": "2026-06-14T00:00:00.000Z",
+  "totalShows": 116,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3366,6 +3366,32 @@
         "Keep Me in Your Heart",
         "Vampire Blues",
         "Postcard"
+      ]
+    },
+    {
+      "id": 1781308800000,
+      "date": "2026-06-13",
+      "city": "Columbia, MD",
+      "venue": "Merriweather Post Pavilion",
+      "songs": [
+        "Henry Parsons Died",
+        "Greta",
+        "Christmas Katie",
+        "Action Man",
+        "Driving Song",
+        "We Walk Each Other Home",
+        "Shut Up And Drive",
+        "Honky Red",
+        "Imitation Leather Shoes",
+        "Chilly Water",
+        "Contentment Blues",
+        "Second Skin",
+        "Rebirtha",
+        "Tie Your Shoes",
+        "Blue Indian",
+        "Halloween Face",
+        "Big Wooly Mammoth",
+        "Porch Song"
       ]
     }
   ],
