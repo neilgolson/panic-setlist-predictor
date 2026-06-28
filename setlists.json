@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-06-28T00:00:00.000Z",
-  "totalShows": 118,
+  "exportDate": "2026-06-28T17:44:39.369Z",
+  "totalShows": 119,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3392,6 +3392,32 @@
         "Halloween Face",
         "Big Wooly Mammoth",
         "Porch Song"
+      ]
+    },
+    {
+      "id": 1781413200000,
+      "date": "2026-06-14",
+      "city": "Columbia, MD",
+      "venue": "Merriweather Post Pavilion",
+      "songs": [
+        "Pigeons",
+        "Pleas",
+        "Thought Sausage",
+        "Vacation",
+        "Sharon",
+        "I'm Not Alone",
+        "Space Wrangler",
+        "None of Us Are Free",
+        "Tall Boy",
+        "Ribs And Whiskey",
+        "Surprise Valley",
+        "Ride Me High",
+        "Blight",
+        "King Baby",
+        "Bust It Big",
+        "All Time Low",
+        "City of Dreams",
+        "Ain't Life Grand"
       ]
     },
     {
