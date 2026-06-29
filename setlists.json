@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-06-28T17:44:39.369Z",
-  "totalShows": 119,
+  "exportDate": "2026-06-29T23:03:30.191Z",
+  "totalShows": 120,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3473,6 +3473,39 @@
         "Keep Me in Your Heart",
         "Saint Ex",
         "Lawyers, Guns, And Money"
+      ]
+    },
+    {
+      "id": 1782622800000,
+      "date": "2026-06-28",
+      "city": "Morrison, CO",
+      "venue": "Red Rocks Amphitheatre",
+      "songs": [
+        "Big Wooly Mammoth",
+        "Jack",
+        "Radio Child",
+        "This Part Of Town",
+        "Fishwater",
+        "All Time Low",
+        "Rock",
+        "Heroes",
+        "Papa's Home",
+        "North",
+        "Gradle",
+        "Don't Be Denied",
+        "Party At Your Mama's House",
+        "Stop Breakin' Down Blues",
+        "Second Skin",
+        "Airplane",
+        "Jam",
+        "Drums",
+        "Halloween Face",
+        "Ride Me High",
+        "Red Hot Mama",
+        "Greta",
+        "You Got Yours",
+        "May Your Glass Be Filled",
+        "Goin' Out West"
       ]
     }
   ],
