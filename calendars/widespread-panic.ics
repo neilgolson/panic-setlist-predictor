@@ -7,83 +7,11 @@ X-WR-CALNAME:Widespread Panic Tour
 X-WR-CALDESC:Upcoming Widespread Panic tour dates
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:2026-04-30-new-orleans@panicpredictor
-DTSTART;VALUE=DATE:20260430
-DTEND;VALUE=DATE:20260501
-SUMMARY:Widespread Panic – New Orleans Jazz & Heritage Festival
-LOCATION:New Orleans Jazz & Heritage Festival\, New Orleans\, LA
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-05-08-las-vegas@panicpredictor
-DTSTART;VALUE=DATE:20260508
-DTEND;VALUE=DATE:20260509
-SUMMARY:Widespread Panic – The Theater at Virgin Hotels Las Vegas (Night 1 of 3)
-LOCATION:The Theater at Virgin Hotels Las Vegas\, Las Vegas\, NV
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-05-09-las-vegas@panicpredictor
-DTSTART;VALUE=DATE:20260509
-DTEND;VALUE=DATE:20260510
-SUMMARY:Widespread Panic – The Theater at Virgin Hotels Las Vegas (Night 2 of 3)
-LOCATION:The Theater at Virgin Hotels Las Vegas\, Las Vegas\, NV
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-05-10-las-vegas@panicpredictor
-DTSTART;VALUE=DATE:20260510
-DTEND;VALUE=DATE:20260511
-SUMMARY:Widespread Panic – The Theater at Virgin Hotels Las Vegas (Night 3 of 3)
-LOCATION:The Theater at Virgin Hotels Las Vegas\, Las Vegas\, NV
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-06-13-columbia@panicpredictor
-DTSTART;VALUE=DATE:20260613
-DTEND;VALUE=DATE:20260614
-SUMMARY:Widespread Panic – All Good Now Festival (Night 1 of 2)
-LOCATION:All Good Now Festival\, Columbia\, MD
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-06-14-columbia@panicpredictor
-DTSTART;VALUE=DATE:20260614
-DTEND;VALUE=DATE:20260615
-SUMMARY:Widespread Panic – All Good Now Festival (Night 2 of 2)
-LOCATION:All Good Now Festival\, Columbia\, MD
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-06-26-morrison@panicpredictor
-DTSTART;VALUE=DATE:20260626
-DTEND;VALUE=DATE:20260627
-SUMMARY:Widespread Panic – Red Rocks Amphitheatre (Night 1 of 3)
-LOCATION:Red Rocks Amphitheatre\, Morrison\, CO
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-06-27-morrison@panicpredictor
-DTSTART;VALUE=DATE:20260627
-DTEND;VALUE=DATE:20260628
-SUMMARY:Widespread Panic – Red Rocks Amphitheatre (Night 2 of 3)
-LOCATION:Red Rocks Amphitheatre\, Morrison\, CO
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-06-28-morrison@panicpredictor
-DTSTART;VALUE=DATE:20260628
-DTEND;VALUE=DATE:20260629
-SUMMARY:Widespread Panic – Red Rocks Amphitheatre (Night 3 of 3)
-LOCATION:Red Rocks Amphitheatre\, Morrison\, CO
+UID:2026-07-05-jackson@panicpredictor
+DTSTART;VALUE=DATE:20260705
+DTEND;VALUE=DATE:20260706
+SUMMARY:Widespread Panic – Snow King Mountain
+LOCATION:Snow King Mountain\, Jackson\, WY
 URL:https://neilgolson.com
 DESCRIPTION:Panic Predictor: https://neilgolson.com
 END:VEVENT
@@ -183,6 +111,78 @@ DTSTART;VALUE=DATE:20260725
 DTEND;VALUE=DATE:20260726
 SUMMARY:Widespread Panic – The Orpheum Theatre (Night 3 of 3)
 LOCATION:The Orpheum Theatre\, Los Angeles\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-14-atlantic-city@panicpredictor
+DTSTART;VALUE=DATE:20260814
+DTEND;VALUE=DATE:20260815
+SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 1 of 3)
+LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-15-atlantic-city@panicpredictor
+DTSTART;VALUE=DATE:20260815
+DTEND;VALUE=DATE:20260816
+SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 2 of 3)
+LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-16-atlantic-city@panicpredictor
+DTSTART;VALUE=DATE:20260816
+DTEND;VALUE=DATE:20260817
+SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 3 of 3)
+LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-09-18-wilmington@panicpredictor
+DTSTART;VALUE=DATE:20260918
+DTEND;VALUE=DATE:20260919
+SUMMARY:Widespread Panic – Live Oak Bank Pavilion (Night 1 of 2)
+LOCATION:Live Oak Bank Pavilion\, Wilmington\, NC
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-09-19-wilmington@panicpredictor
+DTSTART;VALUE=DATE:20260919
+DTEND;VALUE=DATE:20260920
+SUMMARY:Widespread Panic – Live Oak Bank Pavilion (Night 2 of 2)
+LOCATION:Live Oak Bank Pavilion\, Wilmington\, NC
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-23-milwaukee@panicpredictor
+DTSTART;VALUE=DATE:20261023
+DTEND;VALUE=DATE:20261024
+SUMMARY:Widespread Panic – The Riverside Theater (Night 1 of 3)
+LOCATION:The Riverside Theater\, Milwaukee\, WI
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-24-milwaukee@panicpredictor
+DTSTART;VALUE=DATE:20261024
+DTEND;VALUE=DATE:20261025
+SUMMARY:Widespread Panic – The Riverside Theater (Night 2 of 3)
+LOCATION:The Riverside Theater\, Milwaukee\, WI
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-25-milwaukee@panicpredictor
+DTSTART;VALUE=DATE:20261025
+DTEND;VALUE=DATE:20261026
+SUMMARY:Widespread Panic – The Riverside Theater (Night 3 of 3)
+LOCATION:The Riverside Theater\, Milwaukee\, WI
 URL:https://neilgolson.com
 DESCRIPTION:Panic Predictor: https://neilgolson.com
 END:VEVENT

@@ -10,82 +10,32 @@ const { execSync } = require("child_process");
 const SHOWS_URL = "https://widespreadpanic.com/shows/";
 const TOUR_DATES_PATH = path.join(__dirname, "tourDates.json");
 
-const MONTH_MAP = {
-  Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
-  Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12",
-};
-
-function inferYear(month) {
-  const today = new Date();
-  const currentMonth = today.getMonth() + 1;
-  const m = parseInt(MONTH_MAP[month], 10);
-  // If the month is earlier than current month, it's next year
-  return m < currentMonth - 1 ? today.getFullYear() + 1 : today.getFullYear();
-}
-
 function parseShows(html) {
   const shows = [];
 
-  // widespreadpanic.com embeds page data in __NEXT_DATA__ — try that first
-  const nextDataMatch = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
-  if (nextDataMatch) {
-    try {
-      const nextData = JSON.parse(nextDataMatch[1]);
-      // Walk the props tree looking for show arrays
-      const json = JSON.stringify(nextData);
-      // Extract date patterns like "Apr 17" with venue/city context
-      const eventMatches = [...json.matchAll(/"date"\s*:\s*"([A-Z][a-z]{2}\s+\d{1,2})"/g)];
-      if (eventMatches.length > 0) {
-        // If we found structured data, parse it more carefully
-        const props = nextData?.props?.pageProps;
-        if (props?.shows || props?.events || props?.dates) {
-          const raw = props.shows || props.events || props.dates;
-          for (const ev of raw) {
-            const dateStr = ev.date || ev.startDate || ev.event_date;
-            const venue = ev.venue?.name || ev.venueName || ev.venue;
-            const city = ev.venue?.city || ev.city;
-            const state = ev.venue?.state || ev.stateCode || ev.state;
-            if (dateStr && venue && city) {
-              shows.push({ dateStr, venue, city, state: state || "" });
-            }
-          }
-          if (shows.length) return shows;
-        }
-      }
-    } catch (e) {
-      // fall through to HTML parsing
+  // widespreadpanic.com/shows/ is a WordPress site using the AudioTheme
+  // events plugin. Each show is a "gig-summary" block with an hCalendar
+  // microformat: an ISO datetime attribute plus venue-name/locality/region
+  // spans. Split on the block boundary and pull fields out of each chunk.
+  const blocks = html.split(/(?=<div id="post-\d+" class="gig-summary)/).slice(1);
+
+  for (const block of blocks) {
+    const dateMatch = block.match(/datetime="(\d{4}-\d{2}-\d{2})T/);
+    const venueMatch = block.match(/class="venue-name fn org">([^<]+)</);
+    const cityMatch = block.match(/class="locality">([^<]+)</);
+    const stateMatch = block.match(/class="region">([^<]+)</);
+
+    if (dateMatch && venueMatch) {
+      shows.push({
+        date: dateMatch[1],
+        venue: venueMatch[1].trim(),
+        city: cityMatch ? cityMatch[1].trim() : "Unknown City",
+        state: stateMatch ? stateMatch[1].trim() : "",
+      });
     }
   }
 
-  // HTML fallback: parse show rows
-  // Each show has a date like "Apr 17" and venue/city text
-  const rowPattern = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\b/g;
-  const venuePattern = /<[^>]+class="[^"]*venue[^"]*"[^>]*>\s*([^<]+)/gi;
-  const cityPattern = /<[^>]+class="[^"]*city[^"]*"[^>]*>\s*([^<]+)/gi;
-
-  const dates = [...html.matchAll(rowPattern)].map(m => ({
-    month: m[1],
-    day: m[2].padStart(2, "0"),
-  }));
-
-  const venues = [...html.matchAll(venuePattern)].map(m => m[1].trim());
-  const cities = [...html.matchAll(cityPattern)].map(m => m[1].trim());
-
-  for (let i = 0; i < dates.length; i++) {
-    shows.push({
-      dateStr: `${dates[i].month} ${dates[i].day}`,
-      venue: venues[i] || "Unknown Venue",
-      city: cities[i] ? cities[i].split(",")[0].trim() : "Unknown City",
-      state: cities[i] ? (cities[i].split(",")[1] || "").trim() : "",
-    });
-  }
-
   return shows;
-}
-
-function buildDate(month, day) {
-  const year = inferYear(month);
-  return `${year}-${MONTH_MAP[month]}-${day.toString().padStart(2, "0")}`;
 }
 
 function groupIntoRuns(shows) {
@@ -94,17 +44,15 @@ function groupIntoRuns(shows) {
   let current = null;
 
   for (const show of shows) {
-    const [month, day] = show.dateStr.split(" ");
-    const date = buildDate(month, day);
     const key = `${show.venue}|||${show.city}`;
 
     if (current && current.key === key) {
-      current.dates.push(date);
+      current.dates.push(show.date);
     } else {
       if (current) runs.push(current);
       current = {
         key,
-        dates: [date],
+        dates: [show.date],
         venue: show.venue,
         city: show.city,
         state: show.state,
@@ -146,13 +94,20 @@ async function main() {
     return;
   }
 
+  // The shows page only lists upcoming dates, so merge rather than
+  // overwrite: keep existing runs that are entirely in the past, and let
+  // the fresh scrape (authoritative for today forward) replace the rest.
   const existing = JSON.parse(fs.readFileSync(TOUR_DATES_PATH, "utf8"));
-  const changed = JSON.stringify(runs) !== JSON.stringify(existing);
+  const today = new Date().toISOString().slice(0, 10);
+  const pastRuns = existing.filter(r => r.dates[r.dates.length - 1] < today);
+  const merged = [...pastRuns, ...runs].sort((a, b) => a.dates[0].localeCompare(b.dates[0]));
+
+  const changed = JSON.stringify(merged) !== JSON.stringify(existing);
 
   if (!changed) {
     console.log("\n✓ tourDates.json is already up to date.");
   } else {
-    fs.writeFileSync(TOUR_DATES_PATH, JSON.stringify(runs, null, 2));
+    fs.writeFileSync(TOUR_DATES_PATH, JSON.stringify(merged, null, 2));
     console.log("\n✓ tourDates.json updated.");
   }
 
