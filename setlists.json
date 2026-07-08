@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-06-29T23:03:30.191Z",
-  "totalShows": 120,
+  "exportDate": "2026-07-08T19:29:25.922Z",
+  "totalShows": 122,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3506,6 +3506,55 @@
         "You Got Yours",
         "May Your Glass Be Filled",
         "Goin' Out West"
+      ]
+    },
+    {
+      "id": 1783224000000,
+      "date": "2026-07-05",
+      "city": "Jackson, WY",
+      "venue": "Snow King Resort",
+      "songs": [
+        "Little Lilly",
+        "Send Your Mind",
+        "Ribs And Whiskey",
+        "Can't Get High",
+        "Tall Boy",
+        "I'm Not Alone",
+        "Walkin' (For Your Love)",
+        "Space Wrangler",
+        "For What It's Worth",
+        "King Baby",
+        "Sleeping Man",
+        "Driving Song"
+      ]
+    },
+    {
+      "id": 1783396800000,
+      "date": "2026-07-07",
+      "city": "Bonner, MT",
+      "venue": "KettleHouse Amphitheater",
+      "songs": [
+        "Pleas",
+        "Henry Parsons Died",
+        "Walk On",
+        "Up All Night",
+        "Hatfield",
+        "Blue Carousel",
+        "We Walk Each Other Home",
+        "Sometimes",
+        "Action Man",
+        "Proving Ground",
+        "Conrad",
+        "Free Somehow",
+        "None of Us Are Free",
+        "Gimme",
+        "Bust It Big",
+        "Pigeons",
+        "Low Rider",
+        "Tie Your Shoes",
+        "Junior",
+        "Me And The Devil Blues",
+        "Heaven"
       ]
     }
   ],
