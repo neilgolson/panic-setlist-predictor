@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-08T19:29:25.922Z",
-  "totalShows": 122,
+  "exportDate": "2026-07-10T00:49:33.494Z",
+  "totalShows": 123,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3555,6 +3555,35 @@
         "Junior",
         "Me And The Devil Blues",
         "Heaven"
+      ]
+    },
+    {
+      "id": 1783483200000,
+      "date": "2026-07-08",
+      "city": "Bonner, MT",
+      "venue": "KettleHouse Amphitheater",
+      "songs": [
+        "I'm So Glad",
+        "Little By Little",
+        "Blackout Blues",
+        "Old Joe",
+        "Worry",
+        "Pickin' Up The Pieces",
+        "Tackle Box Hero",
+        "Bear's Gone Fishin'",
+        "Sharon",
+        "Porch Song",
+        "Holden Oversoul",
+        "Honky Red",
+        "Rock",
+        "Impossible",
+        "Drums",
+        "Nobody's Fault But Mine",
+        "B of D",
+        "Chilly Water",
+        "Barstools And Dreamers",
+        "Thought Sausage",
+        "Travelin' Light"
       ]
     }
   ],
