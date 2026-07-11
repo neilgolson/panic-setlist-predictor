@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-10T00:49:33.494Z",
-  "totalShows": 123,
+  "exportDate": "2026-07-11T22:38:05.112Z",
+  "totalShows": 124,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3584,6 +3584,34 @@
         "Barstools And Dreamers",
         "Thought Sausage",
         "Travelin' Light"
+      ]
+    },
+    {
+      "id": 1783656000000,
+      "date": "2026-07-10",
+      "city": "Bend, OR",
+      "venue": "Hayden Homes Amphitheater",
+      "songs": [
+        "Wondering",
+        "Makes Sense To Me",
+        "Down",
+        "Happy",
+        "Diner",
+        "Goodpeople",
+        "Christmas Katie",
+        "Let It Rock",
+        "Radio Child",
+        "Let's Get Down To Business",
+        "Imitation Leather Shoes",
+        "Jack",
+        "Trashy",
+        "Saint Ex",
+        "Smokestack Lightning",
+        "Surprise Valley",
+        "Blight",
+        "Life During Wartime",
+        "Disco",
+        "Love Tractor"
       ]
     }
   ],
