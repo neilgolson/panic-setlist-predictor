@@ -7,51 +7,6 @@ X-WR-CALNAME:Widespread Panic Tour
 X-WR-CALDESC:Upcoming Widespread Panic tour dates
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:2026-07-05-jackson@panicpredictor
-DTSTART;VALUE=DATE:20260705
-DTEND;VALUE=DATE:20260706
-SUMMARY:Widespread Panic – Snow King Mountain
-LOCATION:Snow King Mountain\, Jackson\, WY
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-07-07-missoula@panicpredictor
-DTSTART;VALUE=DATE:20260707
-DTEND;VALUE=DATE:20260708
-SUMMARY:Widespread Panic – KettleHouse Amphitheater (Night 1 of 2)
-LOCATION:KettleHouse Amphitheater\, Missoula\, MT
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-07-08-missoula@panicpredictor
-DTSTART;VALUE=DATE:20260708
-DTEND;VALUE=DATE:20260709
-SUMMARY:Widespread Panic – KettleHouse Amphitheater (Night 2 of 2)
-LOCATION:KettleHouse Amphitheater\, Missoula\, MT
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-07-10-bend@panicpredictor
-DTSTART;VALUE=DATE:20260710
-DTEND;VALUE=DATE:20260711
-SUMMARY:Widespread Panic – Hayden Homes Amphitheater (Night 1 of 2)
-LOCATION:Hayden Homes Amphitheater\, Bend\, OR
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-07-11-bend@panicpredictor
-DTSTART;VALUE=DATE:20260711
-DTEND;VALUE=DATE:20260712
-SUMMARY:Widespread Panic – Hayden Homes Amphitheater (Night 2 of 2)
-LOCATION:Hayden Homes Amphitheater\, Bend\, OR
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
 UID:2026-07-16-oakland@panicpredictor
 DTSTART;VALUE=DATE:20260716
 DTEND;VALUE=DATE:20260717
