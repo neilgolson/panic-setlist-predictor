@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-11T22:38:05.112Z",
-  "totalShows": 124,
+  "exportDate": "2026-07-12T04:04:10.313Z",
+  "totalShows": 125,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3612,6 +3612,29 @@
         "Life During Wartime",
         "Disco",
         "Love Tractor"
+      ]
+    },
+    {
+      "id": 1783742400000,
+      "date": "2026-07-11",
+      "city": "Bend, OR",
+      "venue": "Hayden Homes Amphitheater",
+      "songs": [
+        "Blue Indian",
+        "Chainsaw City",
+        "Heroes",
+        "Party At Your Mama's House",
+        "Stop Breakin' Down Blues",
+        "Visiting Day",
+        "Tickle the Truth",
+        "Old Neighborhood",
+        "Halloween Face",
+        "Fishing",
+        "Protein Drink",
+        "Sewing Machine",
+        "Stop-Go",
+        "Low Spark Of High Heeled Boys",
+        "Ride Me High"
       ]
     }
   ],
