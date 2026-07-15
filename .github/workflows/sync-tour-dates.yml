@@ -1,0 +1,37 @@
+name: Sync tour dates
+
+on:
+  # 06:09 UTC Mondays = 2:09 AM ET in summer, 1:09 AM ET in winter.
+  # GitHub cron is always UTC and does not follow DST.
+  schedule:
+    - cron: "9 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Also regenerates calendars/widespread-panic.ics via build-cal.js.
+      - name: Sync tour dates from widespreadpanic.com
+        run: node sync-tour-dates.js
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- tourDates.json calendars/widespread-panic.ics; then
+            echo "No tour date changes — nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tourDates.json calendars/widespread-panic.ics
+          git commit -m "Auto-sync tour dates from widespreadpanic.com"
+          git push
