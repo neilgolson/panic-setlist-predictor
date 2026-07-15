@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Fetches recent Widespread Panic setlists from setlist.fm and appends new shows to setlists.json
-// Usage: SETLISTFM_API_KEY=your_key node sync-setlists.js [--dry-run] [--pages N]
+// Usage: SETLISTFM_API_KEY=your_key node sync-setlists.js [--dry-run] [--pages N] [--recheck-days N]
 // Requires Node 18+ (built-in fetch)
 
 const fs = require("fs");
@@ -60,12 +60,23 @@ async function main() {
   const dryRun = process.argv.includes("--dry-run");
   const pagesIdx = process.argv.indexOf("--pages");
   const pages = pagesIdx !== -1 ? parseInt(process.argv[pagesIdx + 1], 10) : 1;
+  const recheckIdx = process.argv.indexOf("--recheck-days");
+  const recheckDays = recheckIdx !== -1 ? parseInt(process.argv[recheckIdx + 1], 10) : 7;
 
   const dataPath = path.join(__dirname, "setlists.json");
   const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
-  const existingDates = new Set(data.setlists.map(s => s.date));
+  const existingByDate = new Map(data.setlists.map(s => [s.date, s]));
+
+  // Fans fill setlist.fm in progressively, so a sync running soon after a
+  // show can store a truncated setlist — and without this window that
+  // truncation is permanent. Shows this recent stay eligible for a
+  // re-fetch; older ones have settled and are skipped.
+  const recheckCutoff = new Date(Date.now() - recheckDays * 86400000)
+    .toISOString()
+    .slice(0, 10);
 
   const newShows = [];
+  const grownShows = [];
   const unmatchedByShow = {};
 
   for (let page = 1; page <= pages; page++) {
@@ -75,11 +86,12 @@ async function main() {
 
     for (const sl of (result.setlist || [])) {
       const date = parseDate(sl.eventDate);
-      if (existingDates.has(date)) continue;
+      const existing = existingByDate.get(date);
+      if (existing && date < recheckCutoff) continue;
 
       const rawSongs = parseSongs(sl.sets?.set);
       if (!rawSongs.length) {
-        console.log(`  ⚠  ${date} — empty setlist on setlist.fm, skipping`);
+        if (!existing) console.log(`  ⚠  ${date} — empty setlist on setlist.fm, skipping`);
         continue;
       }
 
@@ -89,6 +101,23 @@ async function main() {
         const { song, matched } = findCanonical(name);
         songs.push(song);
         if (!matched) unmatched.push(name);
+      }
+
+      if (existing) {
+        // Only ever grow a stored setlist. A shorter fetch means setlist.fm
+        // is mid-edit or dropped a song upstream, and a hand correction
+        // already in setlists.json should win over that.
+        if (songs.length <= existing.songs.length) continue;
+        grownShows.push({
+          date,
+          venue: existing.venue,
+          city: existing.city,
+          from: existing.songs.length,
+          to: songs.length,
+        });
+        existing.songs = songs;
+        if (unmatched.length) unmatchedByShow[date] = unmatched;
+        continue;
       }
 
       const city = sl.venue.city.name;
@@ -109,12 +138,23 @@ async function main() {
   }
 
   // Report
-  if (newShows.length === 0) {
+  if (newShows.length === 0 && grownShows.length === 0) {
     console.log("✓ setlists.json is up to date — no new shows found.");
     return;
   }
 
-  console.log(`\nFound ${newShows.length} new show(s):\n`);
+  if (grownShows.length) {
+    console.log(`\nFilled in ${grownShows.length} incomplete show(s):\n`);
+    grownShows.forEach(g => {
+      console.log(`  ↑ ${g.date} — ${g.venue}, ${g.city} (${g.from} → ${g.to} songs)`);
+      if (unmatchedByShow[g.date]) {
+        console.log(`   Unmatched songs (kept as-is, review manually):`);
+        unmatchedByShow[g.date].forEach(n => console.log(`     - ${n}`));
+      }
+    });
+  }
+
+  if (newShows.length) console.log(`\nFound ${newShows.length} new show(s):\n`);
   newShows.forEach(s => {
     const flag = unmatchedByShow[s.date] ? " ⚠" : " ✓";
     console.log(`${flag} ${s.date} — ${s.venue}, ${s.city} (${s.songs.length} songs)`);
