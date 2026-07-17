@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-12T04:04:10.313Z",
-  "totalShows": 125,
+  "exportDate": "2026-07-17T09:05:24.213Z",
+  "totalShows": 126,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3641,6 +3641,16 @@
         "Postcard",
         "We Walk Each Other Home",
         "Climb To Safety"
+      ]
+    },
+    {
+      "id": 1784160000000,
+      "date": "2026-07-16",
+      "city": "Oakland, CA",
+      "venue": "Fox Theater",
+      "songs": [
+        "Airplane",
+        "Lawyers, Guns, And Money"
       ]
     }
   ],
