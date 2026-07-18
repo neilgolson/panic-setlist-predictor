@@ -19,11 +19,17 @@ function findCanonical(name) {
   if (ALL_KNOWN.includes(name)) return { song: name, matched: true };
   const n = norm(name);
   if (normMap.has(n)) return { song: normMap.get(n), matched: true };
-  // substring fallback for longer names
+  // substring fallback for longer names — prefer the longest (most specific)
+  // canonical match so a short name like "Jam" doesn't win over "Jamais Vu"
+  // just because it happens to be a prefix and comes first in the list.
   if (n.length >= 5) {
+    let best = null;
     for (const [k, v] of normMap) {
-      if (k.includes(n) || n.includes(k)) return { song: v, matched: true };
+      if ((k.includes(n) || n.includes(k)) && (!best || k.length > best[0].length)) {
+        best = [k, v];
+      }
     }
+    if (best) return { song: best[1], matched: true };
   }
   return { song: name, matched: false };
 }
