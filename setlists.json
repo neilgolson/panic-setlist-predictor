@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-17T17:49:35.580Z",
-  "totalShows": 126,
+  "exportDate": "2026-07-18T08:45:41.668Z",
+  "totalShows": 127,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3670,6 +3670,34 @@
         "Fishwater",
         "Knockin' Round the Zoo",
         "All Time Low"
+      ]
+    },
+    {
+      "id": 1784246400000,
+      "date": "2026-07-17",
+      "city": "Oakland, CA",
+      "venue": "Fox Theater",
+      "songs": [
+        "Little Kin",
+        "Little Lilly",
+        "Little By Little",
+        "Little Wing",
+        "Bust It Big",
+        "Pleas",
+        "Shut Up And Drive",
+        "C. Brown",
+        "You Wreck Me",
+        "One Arm Steve",
+        "Hatfield",
+        "Tie Your Shoes",
+        "Jam",
+        "Vampire Blues",
+        "Greta",
+        "I Walk On Guilded Splinters",
+        "Papa's Home",
+        "North",
+        "Travelin' Man",
+        "The Waker"
       ]
     }
   ],
