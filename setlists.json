@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-18T08:45:41.668Z",
-  "totalShows": 127,
+  "exportDate": "2026-07-19T09:02:34.229Z",
+  "totalShows": 128,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3698,6 +3698,36 @@
         "North",
         "Travelin' Man",
         "The Waker"
+      ]
+    },
+    {
+      "id": 1784332800000,
+      "date": "2026-07-18",
+      "city": "Oakland, CA",
+      "venue": "Fox Theater",
+      "songs": [
+        "Ride Me High",
+        "Driving Song",
+        "I'm Not Alone",
+        "Junior",
+        "Can't Get High",
+        "Goodpeople",
+        "Dark Bar",
+        "You Should Be Glad",
+        "Mr. Soul",
+        "Holden Oversoul",
+        "Proving Ground",
+        "The Last Straw",
+        "Dyin' Man",
+        "Aunt Avis",
+        "Impossible",
+        "Drums",
+        "Drums",
+        "Honky Red",
+        "Ain't Life Grand",
+        "Love Tractor",
+        "And It Stoned Me",
+        "Bowlegged Woman"
       ]
     }
   ],
