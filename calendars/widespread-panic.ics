@@ -7,33 +7,6 @@ X-WR-CALNAME:Widespread Panic Tour
 X-WR-CALDESC:Upcoming Widespread Panic tour dates
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:2026-07-16-oakland@panicpredictor
-DTSTART;VALUE=DATE:20260716
-DTEND;VALUE=DATE:20260717
-SUMMARY:Widespread Panic – Fox Theater (Night 1 of 3)
-LOCATION:Fox Theater\, Oakland\, CA
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-07-17-oakland@panicpredictor
-DTSTART;VALUE=DATE:20260717
-DTEND;VALUE=DATE:20260718
-SUMMARY:Widespread Panic – Fox Theater (Night 2 of 3)
-LOCATION:Fox Theater\, Oakland\, CA
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-07-18-oakland@panicpredictor
-DTSTART;VALUE=DATE:20260718
-DTEND;VALUE=DATE:20260719
-SUMMARY:Widespread Panic – Fox Theater (Night 3 of 3)
-LOCATION:Fox Theater\, Oakland\, CA
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
 UID:2026-07-21-sacramento@panicpredictor
 DTSTART;VALUE=DATE:20260721
 DTEND;VALUE=DATE:20260722
