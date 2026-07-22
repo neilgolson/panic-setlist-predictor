@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-19T09:02:34.229Z",
-  "totalShows": 128,
+  "exportDate": "2026-07-22T09:23:41.240Z",
+  "totalShows": 129,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3728,6 +3728,33 @@
         "Love Tractor",
         "And It Stoned Me",
         "Bowlegged Woman"
+      ]
+    },
+    {
+      "id": 1784592000000,
+      "date": "2026-07-21",
+      "city": "Sacramento, CA",
+      "venue": "Channel 24",
+      "songs": [
+        "Let's Get The Show On The Road",
+        "Wondering",
+        "Bear's Gone Fishin'",
+        "Blackout Blues",
+        "Just Kissed My Baby",
+        "Radio Child",
+        "Machine",
+        "Barstools And Dreamers",
+        "Flat Foot Flewzy",
+        "Contentment Blues",
+        "Conrad",
+        "Trashy",
+        "Gimme",
+        "Diner",
+        "Fishing",
+        "Pilgrims",
+        "Up All Night",
+        "Nobody's Loss",
+        "Ophelia"
       ]
     }
   ],
