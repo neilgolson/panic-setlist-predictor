@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-23T09:21:46.367Z",
-  "totalShows": 129,
+  "exportDate": "2026-07-24T09:16:37.100Z",
+  "totalShows": 130,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3756,6 +3756,33 @@
         "Red Hot Mama",
         "Nobody's Loss",
         "Ophelia"
+      ]
+    },
+    {
+      "id": 1784764800000,
+      "date": "2026-07-23",
+      "city": "Los Angeles, CA",
+      "venue": "Orpheum Theatre",
+      "songs": [
+        "For What It's Worth",
+        "Tall Boy",
+        "Rock",
+        "Rebirtha",
+        "King Baby",
+        "Worry",
+        "Tickle the Truth",
+        "Henry Parsons Died",
+        "Papa Legba",
+        "Second Skin",
+        "Blue Indian",
+        "Tackle Box Hero",
+        "Surprise Valley",
+        "Blight",
+        "Saint Ex",
+        "Four Cornered Room",
+        "Chilly Water",
+        "Keep Me in Your Heart",
+        "Climb To Safety"
       ]
     }
   ],
