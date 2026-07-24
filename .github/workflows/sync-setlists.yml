@@ -1,0 +1,40 @@
+name: Sync setlists
+
+on:
+  # 07:01 UTC = 3:01 AM ET / 12:01 AM PT in summer — late enough that a
+  # West Coast show has ended and fans have posted the full setlist.
+  # GitHub cron is always UTC and does not follow DST, so this drifts to
+  # 2:01 AM ET in winter.
+  schedule:
+    - cron: "1 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Sync setlists from setlist.fm
+        env:
+          SETLISTFM_API_KEY: ${{ secrets.SETLISTFM_API_KEY }}
+        run: node sync-setlists.js
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- setlists.json; then
+            echo "setlists.json unchanged — nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add setlists.json
+          git commit -m "Auto-sync new setlists from setlist.fm"
+          git push

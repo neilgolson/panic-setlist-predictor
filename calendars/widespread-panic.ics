@@ -1,0 +1,117 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Panic Predictor//Widespread Panic Tour//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Widespread Panic Tour
+X-WR-CALDESC:Upcoming Widespread Panic tour dates
+X-PUBLISHED-TTL:PT12H
+BEGIN:VEVENT
+UID:2026-07-21-sacramento@panicpredictor
+DTSTART;VALUE=DATE:20260721
+DTEND;VALUE=DATE:20260722
+SUMMARY:Widespread Panic – Channel 24
+LOCATION:Channel 24\, Sacramento\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-23-los-angeles@panicpredictor
+DTSTART;VALUE=DATE:20260723
+DTEND;VALUE=DATE:20260724
+SUMMARY:Widespread Panic – The Orpheum Theatre (Night 1 of 3)
+LOCATION:The Orpheum Theatre\, Los Angeles\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-24-los-angeles@panicpredictor
+DTSTART;VALUE=DATE:20260724
+DTEND;VALUE=DATE:20260725
+SUMMARY:Widespread Panic – The Orpheum Theatre (Night 2 of 3)
+LOCATION:The Orpheum Theatre\, Los Angeles\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-07-25-los-angeles@panicpredictor
+DTSTART;VALUE=DATE:20260725
+DTEND;VALUE=DATE:20260726
+SUMMARY:Widespread Panic – The Orpheum Theatre (Night 3 of 3)
+LOCATION:The Orpheum Theatre\, Los Angeles\, CA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-14-atlantic-city@panicpredictor
+DTSTART;VALUE=DATE:20260814
+DTEND;VALUE=DATE:20260815
+SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 1 of 3)
+LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-15-atlantic-city@panicpredictor
+DTSTART;VALUE=DATE:20260815
+DTEND;VALUE=DATE:20260816
+SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 2 of 3)
+LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-16-atlantic-city@panicpredictor
+DTSTART;VALUE=DATE:20260816
+DTEND;VALUE=DATE:20260817
+SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 3 of 3)
+LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-09-18-wilmington@panicpredictor
+DTSTART;VALUE=DATE:20260918
+DTEND;VALUE=DATE:20260919
+SUMMARY:Widespread Panic – Live Oak Bank Pavilion (Night 1 of 2)
+LOCATION:Live Oak Bank Pavilion\, Wilmington\, NC
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-09-19-wilmington@panicpredictor
+DTSTART;VALUE=DATE:20260919
+DTEND;VALUE=DATE:20260920
+SUMMARY:Widespread Panic – Live Oak Bank Pavilion (Night 2 of 2)
+LOCATION:Live Oak Bank Pavilion\, Wilmington\, NC
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-23-milwaukee@panicpredictor
+DTSTART;VALUE=DATE:20261023
+DTEND;VALUE=DATE:20261024
+SUMMARY:Widespread Panic – The Riverside Theater (Night 1 of 3)
+LOCATION:The Riverside Theater\, Milwaukee\, WI
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-24-milwaukee@panicpredictor
+DTSTART;VALUE=DATE:20261024
+DTEND;VALUE=DATE:20261025
+SUMMARY:Widespread Panic – The Riverside Theater (Night 2 of 3)
+LOCATION:The Riverside Theater\, Milwaukee\, WI
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-25-milwaukee@panicpredictor
+DTSTART;VALUE=DATE:20261025
+DTEND;VALUE=DATE:20261026
+SUMMARY:Widespread Panic – The Riverside Theater (Night 3 of 3)
+LOCATION:The Riverside Theater\, Milwaukee\, WI
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+END:VCALENDAR
