@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-24T09:16:37.100Z",
-  "totalShows": 130,
+  "exportDate": "2026-07-25T08:57:00.430Z",
+  "totalShows": 131,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3783,6 +3783,35 @@
         "Chilly Water",
         "Keep Me in Your Heart",
         "Climb To Safety"
+      ]
+    },
+    {
+      "id": 1784851200000,
+      "date": "2026-07-24",
+      "city": "Los Angeles, CA",
+      "venue": "Orpheum Theatre",
+      "songs": [
+        "Down",
+        "Disco",
+        "Greta",
+        "Action Man",
+        "Don't Wanna Lose You",
+        "Tail Dragger",
+        "Jam",
+        "Jack",
+        "Imitation Leather Shoes",
+        "Halloween Face",
+        "Pickin' Up The Pieces",
+        "Big Wooly Mammoth",
+        "Makes Sense To Me",
+        "Party At Your Mama's House",
+        "Ribs And Whiskey",
+        "Protein Drink",
+        "Sewing Machine",
+        "Pigeons",
+        "May Your Glass Be Filled",
+        "Postcard",
+        "Ace of Spades"
       ]
     }
   ],
