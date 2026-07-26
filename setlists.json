@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-25T08:57:00.430Z",
-  "totalShows": 131,
+  "exportDate": "2026-07-26T09:08:33.955Z",
+  "totalShows": 132,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3812,6 +3812,34 @@
         "May Your Glass Be Filled",
         "Postcard",
         "Ace of Spades"
+      ]
+    },
+    {
+      "id": 1784937600000,
+      "date": "2026-07-25",
+      "city": "Los Angeles, CA",
+      "venue": "Orpheum Theatre",
+      "songs": [
+        "Goin' Out West",
+        "The Take Out",
+        "Porch Song",
+        "All Time Low",
+        "Spoonful",
+        "We Walk Each Other Home",
+        "Walkin' (For Your Love)",
+        "Meeting of the Waters",
+        "Love Tractor",
+        "Fishwater",
+        "Space Wrangler",
+        "Vacation",
+        "Galleon",
+        "Driving Song",
+        "Honky Red",
+        "Hatfield",
+        "Bust It Big",
+        "Roadhouse Blues",
+        "Last Dance",
+        "End Of The Show"
       ]
     }
   ],
