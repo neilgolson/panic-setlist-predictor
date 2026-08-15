@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-07-27T10:36:51.667Z",
-  "totalShows": 132,
+  "exportDate": "2026-08-15T07:25:01.539Z",
+  "totalShows": 133,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3841,6 +3841,34 @@
         "Roadhouse Blues",
         "Last Dance",
         "End Of The Show"
+      ]
+    },
+    {
+      "id": 1786665600000,
+      "date": "2026-08-14",
+      "city": "Atlantic City, NJ",
+      "venue": "Hard Rock Live at the Etess Arena",
+      "songs": [
+        "Little Lilly",
+        "Pleas",
+        "Send Your Mind",
+        "Little By Little",
+        "I'm Not Alone",
+        "Up All Night",
+        "Holden Oversoul",
+        "Blackout Blues",
+        "Thought Sausage",
+        "Trashy",
+        "Jam",
+        "Travelin' Light",
+        "Travelin' Man",
+        "The Waker",
+        "This Part Of Town",
+        "Time Is Free",
+        "Tie Your Shoes",
+        "Tall Boy",
+        "Old Joe",
+        "Conrad"
       ]
     }
   ],
