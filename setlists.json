@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-08-15T07:25:01.539Z",
-  "totalShows": 133,
+  "exportDate": "2026-08-16T07:25:22.481Z",
+  "totalShows": 134,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3869,6 +3869,36 @@
         "Tall Boy",
         "Old Joe",
         "Conrad"
+      ]
+    },
+    {
+      "id": 1786752000000,
+      "date": "2026-08-15",
+      "city": "Atlantic City, NJ",
+      "venue": "Hard Rock Live at the Etess Arena",
+      "songs": [
+        "B of D",
+        "Henry Parsons Died",
+        "C. Brown",
+        "Papa Johnny Road",
+        "Better Off",
+        "Aunt Avis",
+        "Rebirtha",
+        "Sleeping Man",
+        "Action Man",
+        "Chainsaw City",
+        "Little Kin",
+        "Radio Child",
+        "Blue Carousel",
+        "King Baby",
+        "Saint Ex",
+        "Mercy",
+        "Drums",
+        "Jamais Vu",
+        "Ride Me High",
+        "Red Hot Mama",
+        "None of Us Are Free",
+        "Ain't Life Grand"
       ]
     }
   ],
