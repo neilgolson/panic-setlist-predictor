@@ -7,33 +7,6 @@ X-WR-CALNAME:Widespread Panic Tour
 X-WR-CALDESC:Upcoming Widespread Panic tour dates
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
-UID:2026-08-14-atlantic-city@panicpredictor
-DTSTART;VALUE=DATE:20260814
-DTEND;VALUE=DATE:20260815
-SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 1 of 3)
-LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-08-15-atlantic-city@panicpredictor
-DTSTART;VALUE=DATE:20260815
-DTEND;VALUE=DATE:20260816
-SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 2 of 3)
-LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-08-16-atlantic-city@panicpredictor
-DTSTART;VALUE=DATE:20260816
-DTEND;VALUE=DATE:20260817
-SUMMARY:Widespread Panic – Hard Rock Live at Etess Arena (Night 3 of 3)
-LOCATION:Hard Rock Live at Etess Arena\, Atlantic City\, NJ
-URL:https://neilgolson.com
-DESCRIPTION:Panic Predictor: https://neilgolson.com
-END:VEVENT
-BEGIN:VEVENT
 UID:2026-09-18-wilmington@panicpredictor
 DTSTART;VALUE=DATE:20260918
 DTEND;VALUE=DATE:20260919
