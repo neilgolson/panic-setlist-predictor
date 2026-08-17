@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-08-16T07:25:22.481Z",
-  "totalShows": 134,
+  "exportDate": "2026-08-17T07:46:50.244Z",
+  "totalShows": 135,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3899,6 +3899,34 @@
         "Red Hot Mama",
         "None of Us Are Free",
         "Ain't Life Grand"
+      ]
+    },
+    {
+      "id": 1786838400000,
+      "date": "2026-08-16",
+      "city": "Atlantic City, NJ",
+      "venue": "Hard Rock Live at the Etess Arena",
+      "songs": [
+        "One Arm Steve",
+        "Can't Get High",
+        "Wondering",
+        "You Should Be Glad",
+        "Gradle",
+        "Worry",
+        "Low Rider",
+        "Blue Indian",
+        "Junior",
+        "Greta",
+        "Sharon",
+        "Sleepy Monkey",
+        "Jack",
+        "Impossible",
+        "See That My Grave Is Kept Clean",
+        "Rock",
+        "Papa's Home",
+        "Climb To Safety",
+        "Heaven",
+        "Chilly Water"
       ]
     }
   ],
