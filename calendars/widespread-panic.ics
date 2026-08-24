@@ -51,4 +51,22 @@ LOCATION:The Riverside Theater\, Milwaukee\, WI
 URL:https://neilgolson.com
 DESCRIPTION:Panic Predictor: https://neilgolson.com
 END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-30-new-orleans@panicpredictor
+DTSTART;VALUE=DATE:20261030
+DTEND;VALUE=DATE:20261031
+SUMMARY:Widespread Panic – Kiefer Lakefront Arena\, University of New Orleans (Night 1 of 2)
+LOCATION:Kiefer Lakefront Arena\, University of New Orleans\, New Orleans\, LA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-31-new-orleans@panicpredictor
+DTSTART;VALUE=DATE:20261031
+DTEND;VALUE=DATE:20261101
+SUMMARY:Widespread Panic – Kiefer Lakefront Arena\, University of New Orleans (Night 2 of 2)
+LOCATION:Kiefer Lakefront Arena\, University of New Orleans\, New Orleans\, LA
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
 END:VCALENDAR

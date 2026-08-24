@@ -145,5 +145,14 @@
     "venue": "The Riverside Theater",
     "city": "Milwaukee",
     "state": "WI"
+  },
+  {
+    "dates": [
+      "2026-10-30",
+      "2026-10-31"
+    ],
+    "venue": "Kiefer Lakefront Arena, University of New Orleans",
+    "city": "New Orleans",
+    "state": "LA"
   }
 ]
