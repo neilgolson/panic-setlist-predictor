@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-08-18T07:32:50.668Z",
-  "totalShows": 135,
+  "exportDate": "2026-09-19T11:44:42.602Z",
+  "totalShows": 136,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3928,6 +3928,32 @@
         "Heaven",
         "Chilly Water",
         "Atlantic City"
+      ]
+    },
+    {
+      "id": 1789689600000,
+      "date": "2026-09-18",
+      "city": "Wilmington, NC",
+      "venue": "Live Oak Bank Pavilion",
+      "songs": [
+        "Papa Legba",
+        "Love Tractor",
+        "Goodpeople",
+        "Diner",
+        "Stop Breakin' Down Blues",
+        "Imitation Leather Shoes",
+        "The Take Out",
+        "Disco",
+        "Pleas",
+        "Trashy",
+        "Bust It Big",
+        "Galleon",
+        "Vacation",
+        "Tackle Box Hero",
+        "Pilgrims",
+        "Porch Song",
+        "City of Dreams",
+        "Saint Ex"
       ]
     }
   ],
