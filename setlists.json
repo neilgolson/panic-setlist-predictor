@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-09-19T11:44:42.602Z",
-  "totalShows": 136,
+  "exportDate": "2026-09-20T11:57:22.904Z",
+  "totalShows": 137,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3954,6 +3954,34 @@
         "Porch Song",
         "City of Dreams",
         "Saint Ex"
+      ]
+    },
+    {
+      "id": 1789776000000,
+      "date": "2026-09-19",
+      "city": "Wilmington, NC",
+      "venue": "Live Oak Bank Pavilion",
+      "songs": [
+        "Pigeons",
+        "Stop-Go",
+        "Ribs And Whiskey",
+        "King Baby",
+        "Greta",
+        "You Got Yours",
+        "We Walk Each Other Home",
+        "Hatfield",
+        "Blackout Blues",
+        "And It Stoned Me",
+        "Fishwater",
+        "Arleen",
+        "Second Skin",
+        "Party At Your Mama's House",
+        "Cease Fire",
+        "C. Brown",
+        "Up All Night",
+        "All Time Low",
+        "Halloween Face",
+        "Down"
       ]
     }
   ],
