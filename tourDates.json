@@ -154,5 +154,14 @@
     "venue": "Kiefer Lakefront Arena, University of New Orleans",
     "city": "New Orleans",
     "state": "LA"
+  },
+  {
+    "dates": [
+      "2026-12-30",
+      "2026-12-31"
+    ],
+    "venue": "Bojangles Coliseum",
+    "city": "Charlotte",
+    "state": "NC"
   }
 ]
