@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-09-21T13:32:14.807Z",
-  "totalShows": 137,
+  "exportDate": "2026-10-11T13:42:52.848Z",
+  "totalShows": 138,
   "setlists": [
     {
       "id": 1673611200000,
@@ -3983,6 +3983,34 @@
         "All Time Low",
         "Halloween Face",
         "Down"
+      ]
+    },
+    {
+      "id": 1791590400000,
+      "date": "2026-10-10",
+      "city": "Memphis, TN",
+      "venue": "Radians Amphitheater",
+      "songs": [
+        "Ain't Life Grand",
+        "Henry Parsons Died",
+        "Walkin' (For Your Love)",
+        "Little By Little",
+        "Tall Boy",
+        "I'm Not Alone",
+        "Space Wrangler",
+        "Honky Red",
+        "Red Hot Mama",
+        "Come and Go Blues",
+        "Low Spark Of High Heeled Boys",
+        "Get in out in",
+        "Machine",
+        "Barstools And Dreamers",
+        "Driving Song",
+        "Tie Your Shoes",
+        "Driving Song",
+        "Protein Drink",
+        "Sewing Machine",
+        "Chilly Water"
       ]
     }
   ],
