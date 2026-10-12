@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-10-11T13:42:52.848Z",
-  "totalShows": 138,
+  "exportDate": "2026-10-12T16:23:57.175Z",
+  "totalShows": 139,
   "setlists": [
     {
       "id": 1673611200000,
@@ -4011,6 +4011,32 @@
         "Protein Drink",
         "Sewing Machine",
         "Chilly Water"
+      ]
+    },
+    {
+      "id": 1791676800000,
+      "date": "2026-10-11",
+      "city": "Memphis, TN",
+      "venue": "Radians Amphitheater",
+      "songs": [
+        "Disco",
+        "Holden Oversoul",
+        "This Part Of Town",
+        "Radio Child",
+        "Visiting Day",
+        "Surprise Valley",
+        "Bust It Big",
+        "Goin' Out West",
+        "Big Wooly Mammoth",
+        "Jack",
+        "Rock",
+        "Drums",
+        "Smokestack Lightning",
+        "Halloween Face",
+        "Blue Indian",
+        "Climb To Safety",
+        "Four Cornered Room",
+        "Last Dance"
       ]
     }
   ],
