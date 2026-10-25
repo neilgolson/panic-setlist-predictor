@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-10-24T11:47:31.522Z",
-  "totalShows": 140,
+  "exportDate": "2026-10-25T12:16:37.526Z",
+  "totalShows": 141,
   "setlists": [
     {
       "id": 1673611200000,
@@ -4069,6 +4069,33 @@
         "Bowlegged Woman",
         "Help Me Somebody",
         "End Of The Show"
+      ]
+    },
+    {
+      "id": 1792800000000,
+      "date": "2026-10-24",
+      "city": "Milwaukee, WI",
+      "venue": "Riverside Theater",
+      "songs": [
+        "Let's Get The Show On The Road",
+        "A of D",
+        "Junior",
+        "Goodpeople",
+        "Dark Bar",
+        "Can't Get High",
+        "Up All Night",
+        "Conrad",
+        "Let's Get Down To Business",
+        "Pigeons",
+        "Aunt Avis",
+        "Blight",
+        "Airplane",
+        "Greta",
+        "Party At Your Mama's House",
+        "Stop Breakin' Down Blues",
+        "Mr. Soul",
+        "We Walk Each Other Home",
+        "Dear Mr. Fantasy"
       ]
     }
   ],
