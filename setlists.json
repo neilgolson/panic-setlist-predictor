@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-10-25T12:16:37.526Z",
-  "totalShows": 141,
+  "exportDate": "2026-10-26T13:47:51.178Z",
+  "totalShows": 142,
   "setlists": [
     {
       "id": 1673611200000,
@@ -4096,6 +4096,15 @@
         "Mr. Soul",
         "We Walk Each Other Home",
         "Dear Mr. Fantasy"
+      ]
+    },
+    {
+      "id": 1792886400000,
+      "date": "2026-10-25",
+      "city": "Milwaukee, WI",
+      "venue": "Riverside Theater",
+      "songs": [
+        "The Take Out"
       ]
     }
   ],
