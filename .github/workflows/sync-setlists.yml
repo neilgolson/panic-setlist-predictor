@@ -1,12 +1,14 @@
 name: Sync setlists
 
 on:
-  # 07:01 UTC = 3:01 AM ET / 12:01 AM PT in summer — late enough that a
-  # West Coast show has ended and fans have posted the full setlist.
-  # GitHub cron is always UTC and does not follow DST, so this drifts to
-  # 2:01 AM ET in winter.
+  # Three passes a day. GitHub starts scheduled runs hours late (07:01
+  # landed between 11:47 and 13:47 UTC in Oct 2026), and fans can take
+  # most of a day to fill setlist.fm in: the 10/23 and 10/25 shows both
+  # synced as one song on their only pass. The sync only ever grows a
+  # stored show, so extra passes are safe; the later two catch the fill-in.
+  # Cron is UTC and ignores DST.
   schedule:
-    - cron: "1 7 * * *"
+    - cron: "1 7,13,19 * * *"
   workflow_dispatch:
 
 permissions:
