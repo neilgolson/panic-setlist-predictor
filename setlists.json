@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-10-27T01:09:00.124Z",
-  "totalShows": 142,
+  "exportDate": "2026-10-31T13:11:35.961Z",
+  "totalShows": 143,
   "setlists": [
     {
       "id": 1673611200000,
@@ -4119,6 +4119,38 @@
         "Nobody's Loss",
         "Climb To Safety",
         "I'm So Glad"
+      ]
+    },
+    {
+      "id": 1793318400000,
+      "date": "2026-10-30",
+      "city": "New Orleans, LA",
+      "venue": "Kiefer UNO Lakefront Arena",
+      "songs": [
+        "Fishwater",
+        "Pleas",
+        "Holden Oversoul",
+        "Christmas Katie",
+        "Big Wooly Mammoth",
+        "Rock",
+        "I'm Not Alone",
+        "Little By Little",
+        "Halloween Face",
+        "Disco",
+        "Tall Boy",
+        "Vacation",
+        "Postcard",
+        "Tie Your Shoes",
+        "Saint Ex",
+        "Space Wrangler",
+        "Low Rider",
+        "Surprise Valley",
+        "Ride Me High",
+        "Surprise Valley",
+        "Drums",
+        "Fishwater",
+        "Heaven",
+        "Straight To Hell"
       ]
     }
   ],
