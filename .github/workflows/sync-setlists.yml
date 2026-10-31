@@ -1,0 +1,42 @@
+name: Sync setlists
+
+on:
+  # Three passes a day. GitHub starts scheduled runs hours late (07:01
+  # landed between 11:47 and 13:47 UTC in Oct 2026), and fans can take
+  # most of a day to fill setlist.fm in: the 10/23 and 10/25 shows both
+  # synced as one song on their only pass. The sync only ever grows a
+  # stored show, so extra passes are safe; the later two catch the fill-in.
+  # Cron is UTC and ignores DST.
+  schedule:
+    - cron: "1 7,13,19 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Sync setlists from setlist.fm
+        env:
+          SETLISTFM_API_KEY: ${{ secrets.SETLISTFM_API_KEY }}
+        run: node sync-setlists.js
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- setlists.json; then
+            echo "setlists.json unchanged — nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add setlists.json
+          git commit -m "Auto-sync new setlists from setlist.fm"
+          git push
