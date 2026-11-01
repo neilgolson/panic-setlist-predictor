@@ -1,6 +1,6 @@
 {
-  "exportDate": "2026-10-31T13:11:35.961Z",
-  "totalShows": 143,
+  "exportDate": "2026-11-01T13:54:21.304Z",
+  "totalShows": 144,
   "setlists": [
     {
       "id": 1673611200000,
@@ -4151,6 +4151,38 @@
         "Fishwater",
         "Heaven",
         "Straight To Hell"
+      ]
+    },
+    {
+      "id": 1793404800000,
+      "date": "2026-10-31",
+      "city": "New Orleans, LA",
+      "venue": "Kiefer UNO Lakefront Arena",
+      "songs": [
+        "Down",
+        "Sitting In Limbo",
+        "Break On Through (to the Other Side)",
+        "Bust It Big",
+        "Tush",
+        "Red Hot Mama",
+        "Ribs And Whiskey",
+        "Contentment Blues",
+        "Thought Sausage",
+        "Lawyers, Guns, And Money",
+        "We're Not Gonna Take It",
+        "Lake of Fire",
+        "Papa Legba",
+        "Machine Gun",
+        "Life During Wartime",
+        "Imitation Leather Shoes",
+        "Down",
+        "Down",
+        "Worry",
+        "King Baby",
+        "All Time Low",
+        "Halos & Horns",
+        "Lord of This World",
+        "Sympathy for the Devil"
       ]
     }
   ],
