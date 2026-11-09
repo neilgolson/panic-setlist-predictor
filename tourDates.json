@@ -188,5 +188,16 @@
     "venue": "Bojangles Coliseum",
     "city": "Charlotte",
     "state": "NC"
+  },
+  {
+    "dates": [
+      "2027-01-19",
+      "2027-01-20",
+      "2027-01-21",
+      "2027-01-22"
+    ],
+    "venue": "Hard Rock Hotel Riviera Maya",
+    "city": "Riviera Maya",
+    "state": "Quintana Roo"
   }
 ]
