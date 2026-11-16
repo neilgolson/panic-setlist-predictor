@@ -1,0 +1,90 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Panic Predictor//Widespread Panic Tour//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Widespread Panic Tour
+X-WR-CALDESC:Upcoming Widespread Panic tour dates
+X-PUBLISHED-TTL:PT12H
+BEGIN:VEVENT
+UID:2026-12-30-charlotte@panicpredictor
+DTSTART;VALUE=DATE:20261230
+DTEND;VALUE=DATE:20261231
+SUMMARY:Widespread Panic – Bojangles Coliseum (Night 1 of 2)
+LOCATION:Bojangles Coliseum\, Charlotte\, NC
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-12-31-charlotte@panicpredictor
+DTSTART;VALUE=DATE:20261231
+DTEND;VALUE=DATE:20270101
+SUMMARY:Widespread Panic – Bojangles Coliseum (Night 2 of 2)
+LOCATION:Bojangles Coliseum\, Charlotte\, NC
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-01-19-riviera-maya@panicpredictor
+DTSTART;VALUE=DATE:20270119
+DTEND;VALUE=DATE:20270120
+SUMMARY:Widespread Panic – Hard Rock Hotel Riviera Maya (Night 1 of 4)
+LOCATION:Hard Rock Hotel Riviera Maya\, Riviera Maya\, Quintana Roo
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-01-20-riviera-maya@panicpredictor
+DTSTART;VALUE=DATE:20270120
+DTEND;VALUE=DATE:20270121
+SUMMARY:Widespread Panic – Hard Rock Hotel Riviera Maya (Night 2 of 4)
+LOCATION:Hard Rock Hotel Riviera Maya\, Riviera Maya\, Quintana Roo
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-01-21-riviera-maya@panicpredictor
+DTSTART;VALUE=DATE:20270121
+DTEND;VALUE=DATE:20270122
+SUMMARY:Widespread Panic – Hard Rock Hotel Riviera Maya (Night 3 of 4)
+LOCATION:Hard Rock Hotel Riviera Maya\, Riviera Maya\, Quintana Roo
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-01-22-riviera-maya@panicpredictor
+DTSTART;VALUE=DATE:20270122
+DTEND;VALUE=DATE:20270123
+SUMMARY:Widespread Panic – Hard Rock Hotel Riviera Maya (Night 4 of 4)
+LOCATION:Hard Rock Hotel Riviera Maya\, Riviera Maya\, Quintana Roo
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-02-11-nashville@panicpredictor
+DTSTART;VALUE=DATE:20270211
+DTEND;VALUE=DATE:20270212
+SUMMARY:Widespread Panic – The Truth (Night 1 of 3)
+LOCATION:The Truth\, Nashville\, TN
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-02-12-nashville@panicpredictor
+DTSTART;VALUE=DATE:20270212
+DTEND;VALUE=DATE:20270213
+SUMMARY:Widespread Panic – The Truth (Night 2 of 3)
+LOCATION:The Truth\, Nashville\, TN
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-02-13-nashville@panicpredictor
+DTSTART;VALUE=DATE:20270213
+DTEND;VALUE=DATE:20270214
+SUMMARY:Widespread Panic – The Truth (Night 3 of 3)
+LOCATION:The Truth\, Nashville\, TN
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+END:VCALENDAR
