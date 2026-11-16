@@ -199,5 +199,15 @@
     "venue": "Hard Rock Hotel Riviera Maya",
     "city": "Riviera Maya",
     "state": "Quintana Roo"
+  },
+  {
+    "dates": [
+      "2027-02-11",
+      "2027-02-12",
+      "2027-02-13"
+    ],
+    "venue": "The Truth",
+    "city": "Nashville",
+    "state": "TN"
   }
 ]

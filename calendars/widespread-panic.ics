@@ -60,4 +60,31 @@ LOCATION:Hard Rock Hotel Riviera Maya\, Riviera Maya\, Quintana Roo
 URL:https://neilgolson.com
 DESCRIPTION:Panic Predictor: https://neilgolson.com
 END:VEVENT
+BEGIN:VEVENT
+UID:2027-02-11-nashville@panicpredictor
+DTSTART;VALUE=DATE:20270211
+DTEND;VALUE=DATE:20270212
+SUMMARY:Widespread Panic – The Truth (Night 1 of 3)
+LOCATION:The Truth\, Nashville\, TN
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-02-12-nashville@panicpredictor
+DTSTART;VALUE=DATE:20270212
+DTEND;VALUE=DATE:20270213
+SUMMARY:Widespread Panic – The Truth (Night 2 of 3)
+LOCATION:The Truth\, Nashville\, TN
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
+BEGIN:VEVENT
+UID:2027-02-13-nashville@panicpredictor
+DTSTART;VALUE=DATE:20270213
+DTEND;VALUE=DATE:20270214
+SUMMARY:Widespread Panic – The Truth (Night 3 of 3)
+LOCATION:The Truth\, Nashville\, TN
+URL:https://neilgolson.com
+DESCRIPTION:Panic Predictor: https://neilgolson.com
+END:VEVENT
 END:VCALENDAR
